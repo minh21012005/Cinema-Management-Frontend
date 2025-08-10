@@ -19,7 +19,11 @@ const LoginPage = () => {
             message.success("Đăng nhập thành công");
             localStorage.setItem("access_token", res.data.access_token);
             setUser(res.data.user);
-            navigate("/");
+            if (res.data.user.role.name === 'ADMIN') {
+                navigate("/admin");
+            } else {
+                navigate("/");
+            }
         } else {
             notification.error({
                 message: "Error Login",

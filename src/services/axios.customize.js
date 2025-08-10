@@ -6,18 +6,27 @@ NProgress.configure({
     trickleSpeed: 100,
 });
 
-
-// Set config defaults when creating the instance
+// Tạo instance mặc định
 const instance = axios.create({
     baseURL: import.meta.env.VITE_BACKEND_URL
 });
 
-// Alter defaults after instance has been created
-// instance.defaults.headers.common['Authorization'] = AUTH_TOKEN;
-
+// Interceptor request
 instance.interceptors.request.use(function (config) {
     NProgress.start();
-    if (typeof window !== "undefined" && window && window.localStorage && window.localStorage.getItem('access_token')) {
+
+    // Danh sách API public (không cần token)
+    const publicPaths = [
+        "/api/v1/auth/login",
+        "/api/v1/auth/register",
+        "/api/v1/auth/refresh"
+    ];
+
+    // Kiểm tra nếu URL thuộc public API
+    const isPublicAPI = publicPaths.some(path => config.url.includes(path));
+
+    // Chỉ gắn Authorization nếu không phải public API
+    if (!isPublicAPI && typeof window !== "undefined" && window.localStorage.getItem('access_token')) {
         config.headers.Authorization = 'Bearer ' + window.localStorage.getItem('access_token');
     }
     // Do something before request is sent
