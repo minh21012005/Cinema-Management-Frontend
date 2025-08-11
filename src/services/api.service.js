@@ -30,6 +30,21 @@ const getAccountApi = () => {
     return axios.get(URL_BACKEND);
 }
 
+const refreshTokenApi = () => {
+    return axios.post("/api/v1/auth/refresh", {}, {
+        withCredentials: true // gửi cookie refresh token lên server
+    });
+}
+
+const fetchAllUserAPI = (current, pageSize) => {
+    return axios.get("/api/v1/users", {
+        params: {
+            current: current,
+            pageSize: pageSize
+        }
+    });
+};
+
 export {
-    loginApi, registerUserApi, getAccountApi
+    loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI
 }

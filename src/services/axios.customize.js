@@ -1,5 +1,6 @@
 import axios from "axios";
 import NProgress from 'nprogress';
+import { refreshTokenApi } from "./api.service";
 
 NProgress.configure({
     showSpinner: false,
@@ -45,10 +46,36 @@ instance.interceptors.response.use(function (response) {
     // Do something with response data
     if (response.data && response.data.data) return response.data;
     return response;
-}, function (error) {
+}, async function (error) {
     NProgress.done();
-    // Any status codes that falls outside the range of 2xx cause this function to trigger
-    // Do something with response error
+
+    const originalRequest = error.config;
+
+    // Nếu lỗi 401 và chưa thử refresh
+    if (error.response?.status === 401 && !originalRequest._retry) {
+        console.log("Access token expired, trying to refresh...");
+        // Đánh dấu request đã retry để tránh vòng lặp vô hạn
+        originalRequest._retry = true;
+        try {
+            // Gọi API refresh token
+            const res = await refreshTokenApi();
+            if (res?.data?.access_token) {
+                // Lưu token mới
+                window.localStorage.setItem("access_token", res.data.access_token);
+                // Gắn token mới vào request cũ
+                originalRequest.headers['Authorization'] = 'Bearer ' + res.data.access_token;
+                // Retry request cũ
+                return instance(originalRequest);
+            } else {
+                window.localStorage.removeItem("access_token");
+                window.location.href = "/login";
+            }
+        } catch (refreshError) {
+            console.error("Refresh token failed:", refreshError);
+            // Xử lý logout nếu cần
+        }
+    }
+
     if (error.response && error.response.data) return error.response.data;
     return Promise.reject(error);
 });
