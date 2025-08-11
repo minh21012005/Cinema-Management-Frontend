@@ -1,14 +1,16 @@
 import { Button, Col, DatePicker, Divider, Form, Input, notification, Radio, Row } from "antd"
 import { Link, useNavigate } from "react-router-dom";
 import { registerUserApi } from "../services/api.service";
+import dayjs from "dayjs";
 
 const RegisterPage = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
 
     const onFinish = async (value) => {
+        const dateFormatted = value.dateOfBirth.format("YYYY-MM-DD");
         const res = await registerUserApi(value.name, value.email, value.password,
-            value.phone, value.address, value.dateOfBirth, value.gender);
+            value.phone, value.address, dateFormatted, value.gender);
         if (res.data) {
             notification.success({
                 message: "Register user",
@@ -135,7 +137,8 @@ const RegisterPage = () => {
                             >
                                 <DatePicker
                                     style={{ width: "100%" }}
-                                    format="YYYY-MM-DD"
+                                    format="DD-MM-YYYY"
+                                    disabledDate={(current) => current && current > dayjs()}
                                 />
                             </Form.Item>
                         </Col>
@@ -160,13 +163,6 @@ const RegisterPage = () => {
                                 <Button type="primary" htmlType="submit" style={{ margin: "15px 0 0" }}>
                                     Register
                                 </Button>
-                                {/* <Button type="primary" onClick={() => {
-                            form.setFieldsValue({
-                                email: "test@gmail.com"
-                            })
-                        }}>
-                            Test
-                        </Button> */}
                             </Form.Item>
                             <Divider />
                             <div style={{ textAlign: "center" }}>Đã có tài khoản? <Link to={"/login"}>Đăng nhập tại đây</Link></div>

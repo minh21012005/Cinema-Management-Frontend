@@ -4,11 +4,14 @@ const loginApi = (email, password) => {
     const URL_BACKEND = "/api/v1/auth/login";
     const data = {
         username: email,
-        password: password,
-        delay: 1000
+        password: password
     }
-
     return axios.post(URL_BACKEND, data);
+}
+
+const logoutApi = () => {
+    const URL_BACKEND = "/api/v1/auth/logout";
+    return axios.post(URL_BACKEND);
 }
 
 const registerUserApi = (name, email, password, phone, address, dateOfBirth, gender) => {
@@ -39,12 +42,21 @@ const refreshTokenApi = () => {
 const fetchAllUserAPI = (current, pageSize) => {
     return axios.get("/api/v1/users", {
         params: {
-            current: current,
-            pageSize: pageSize
+            page: current,
+            size: pageSize
         }
     });
 };
 
+const changeUserStatusAPI = (userId) => {
+    return axios.put(`/api/v1/users/change-status/${userId}`);
+}
+
+const fetchUser = (userId) => {
+    return axios.get(`/api/v1/users/${userId}`);
+}
+
 export {
-    loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI
+    loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
+    fetchUser, logoutApi
 }

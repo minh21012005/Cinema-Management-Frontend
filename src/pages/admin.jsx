@@ -21,7 +21,6 @@ const AdminPage = () => {
             setPageSize(res.data.meta.pageSize);
             setTotal(res.data.meta.total);
         }
-
     }
 
     return (

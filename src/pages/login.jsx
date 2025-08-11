@@ -38,7 +38,7 @@ const LoginPage = () => {
     };
 
     return (
-        <Row justify={"center"} style={{ marginTop: "50px" }}>
+        <Row justify={"center"} style={{ marginTop: "120px" }}>
             <Col xs={24} md={16} lg={8}>
                 <fieldset style={{
                     padding: "15px",
