@@ -21,7 +21,13 @@ const LoginPage = () => {
             setUser(res.data.user);
             if (res.data.user.role.name === 'ADMIN') {
                 navigate("/admin");
-            } else {
+            } else if (res.data.user.role.name === 'MANAGER') {
+                navigate("/manager");
+            }
+            else if (res.data.user.role.name === 'STAFF') {
+                navigate("/staff");
+            }
+            else {
                 navigate("/");
             }
         } else {

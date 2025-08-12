@@ -1,9 +1,9 @@
 import { useContext } from "react";
-import { AuthContext } from "../components/context/auth.context";
+import { AuthContext } from "../../components/context/auth.context";
 import { Link, Navigate } from "react-router-dom";
 import { Button, Result, Spin } from "antd";
 
-const PrivateRouteAdmin = (props) => {
+const PrivateRouteStaff = (props) => {
 
     const { isAppLoading, user } = useContext(AuthContext);
 
@@ -18,7 +18,7 @@ const PrivateRouteAdmin = (props) => {
         )
     }
 
-    if (user && user.role.name === 'ADMIN') {
+    if (user && user.role.name === 'STAFF') {
         return (
             <>
                 {props.children}
@@ -38,4 +38,4 @@ const PrivateRouteAdmin = (props) => {
 
 }
 
-export default PrivateRouteAdmin;
+export default PrivateRouteStaff;

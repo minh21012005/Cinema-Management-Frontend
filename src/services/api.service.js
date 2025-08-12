@@ -56,7 +56,22 @@ const fetchUser = (userId) => {
     return axios.get(`/api/v1/users/${userId}`);
 }
 
+const createUserApi = (name, email, password, phone, address, dateOfBirth, gender, roleId) => {
+    const URL_BACKEND = "/api/v1/users/register";
+    const data = {
+        name: name,
+        email: email,
+        password: password,
+        phone: phone,
+        address: address,
+        dateOfBirth: dateOfBirth,
+        gender: gender,
+        roleId: roleId
+    }
+    return axios.post(URL_BACKEND, data);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
-    fetchUser, logoutApi
+    fetchUser, logoutApi, createUserApi
 }

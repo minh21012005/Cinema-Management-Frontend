@@ -1,4 +1,4 @@
-import { AppstoreOutlined, SettingOutlined, UserOutlined } from "@ant-design/icons";
+import { AppstoreOutlined, BankOutlined, BarChartOutlined, DashboardOutlined, SearchOutlined, SettingOutlined, ShopOutlined, ShoppingCartOutlined, UserOutlined, VideoCameraOutlined } from "@ant-design/icons";
 import { Menu } from "antd";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/auth.context";
@@ -9,54 +9,144 @@ const Sidebar = () => {
     if (user.role.name === "ADMIN") {
         items = [
             {
-                label: 'Navigation One',
+                label: 'User',
                 key: 'user',
                 icon: <UserOutlined />,
             }
         ];
-    } else {
+    } else if (user.role.name === "MANAGER") {
         items = [
             {
-                label: 'Navigation One',
-                key: 'user',
-                icon: <UserOutlined />,
-            },
-            {
-                label: 'Navigation Two',
-                key: 'app',
-                icon: <AppstoreOutlined />,
-                disabled: true,
-            },
-            {
-                label: 'Navigation Three - Submenu',
-                key: 'SubMenu',
-                icon: <SettingOutlined />,
+                label: 'Cinema Management',
+                key: 'cinema-management',
+                icon: <BankOutlined />,
                 children: [
                     {
                         type: 'group',
-                        label: 'Item 1',
+                        label: 'Cinema & Room',
                         children: [
-                            { label: 'Option 1', key: 'setting:1' },
-                            { label: 'Option 2', key: 'setting:2' },
-                        ],
-                    },
-                    {
-                        type: 'group',
-                        label: 'Item 2',
-                        children: [
-                            { label: 'Option 3', key: 'setting:3' },
-                            { label: 'Option 4', key: 'setting:4' },
+                            { label: 'Cinema', key: 'cinema' },
+                            { label: 'Room', key: 'room' },
+                            { label: 'Seat Type', key: 'seat-type' },
+                            { label: 'Seat', key: 'seat' },
                         ],
                     },
                 ],
             },
             {
-                key: 'alipay',
-                label: (
-                    <a href="https://ant.design" target="_blank" rel="noopener noreferrer">
-                        Navigation Four - Link
-                    </a>
-                ),
+                label: 'Movie Management',
+                key: 'movie-management',
+                icon: <VideoCameraOutlined />,
+                children: [
+                    {
+                        type: 'group',
+                        label: 'Movies',
+                        children: [
+                            { label: 'Movie', key: 'movie' },
+                            { label: 'Category', key: 'category' },
+                            { label: 'Rating', key: 'rating' },
+                        ],
+                    },
+                    {
+                        type: 'group',
+                        label: 'Showtime',
+                        children: [
+                            { label: 'Showtime', key: 'showtime' },
+                        ],
+                    },
+                ],
+            },
+            {
+                label: 'Concession',
+                key: 'concession',
+                icon: <ShopOutlined />,
+                children: [
+                    {
+                        type: 'group',
+                        label: 'Food & Combo',
+                        children: [
+                            { label: 'Food', key: 'food' },
+                            { label: 'Combo', key: 'combo' },
+                        ],
+                    },
+                ],
+            },
+            {
+                label: 'Reports',
+                key: 'reports',
+                icon: <BarChartOutlined />,
+                children: [
+                    {
+                        type: 'group',
+                        label: 'Revenue Reports',
+                        children: [
+                            { label: 'Ticket Report', key: 'ticket-report' },
+                            { label: 'Food Report', key: 'food-report' },
+                        ],
+                    },
+                ],
+            },
+            {
+                label: 'Staff Management',
+                key: 'staff-management',
+                icon: <UserOutlined />,
+                children: [
+                    {
+                        type: 'group',
+                        label: 'Staff',
+                        children: [
+                            { label: 'Staff List', key: 'staff' },
+                        ],
+                    },
+                ],
+            },
+            {
+                label: 'Settings',
+                key: 'settings',
+                icon: <SettingOutlined />,
+            },
+        ];
+    } else if (user.role.name === "STAFF") {
+        items = [
+            {
+                label: 'Dashboard',
+                key: 'dashboard',
+                icon: <DashboardOutlined />,
+            },
+            {
+                label: 'Ticket',
+                key: 'ticket',
+                icon: <ShoppingCartOutlined />,
+                children: [
+                    {
+                        type: 'group',
+                        label: 'Ticket Sales',
+                        children: [
+                            { label: 'Sell Ticket', key: 'sell-ticket' },
+                            { label: 'Manage Tickets', key: 'manage-tickets' },
+                        ],
+                    },
+                ],
+            },
+            {
+                label: 'Food & Combo',
+                key: 'food-combo',
+                icon: <ShopOutlined />,
+                children: [
+                    {
+                        type: 'group',
+                        label: 'Sales',
+                        children: [
+                            { label: 'Sell Food/Combo', key: 'sell-food' },
+                            { label: 'Manage Orders', key: 'manage-orders' },
+                        ],
+                    },
+                ],
+            },
+            {
+                label: 'Customer Lookup',
+                key: 'customer-lookup',
+                icon: <SearchOutlined />,
             },
         ];
     }

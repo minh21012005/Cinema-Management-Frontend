@@ -68,7 +68,9 @@ instance.interceptors.response.use(function (response) {
                 return instance(originalRequest);
             } else {
                 window.localStorage.removeItem("access_token");
-                window.location.href = "/login";
+                if (window.location.pathname !== "/login") {
+                    window.location.href = "/login";
+                }
             }
         } catch (refreshError) {
             console.error("Refresh token failed:", refreshError);
