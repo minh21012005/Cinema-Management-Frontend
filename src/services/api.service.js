@@ -39,11 +39,13 @@ const refreshTokenApi = () => {
     });
 }
 
-const fetchAllUserAPI = (current, pageSize) => {
+const fetchAllUserAPI = (current, pageSize, email, role) => {
     return axios.get("/api/v1/users", {
         params: {
             page: current,
-            size: pageSize
+            size: pageSize,
+            email: email || null, // nếu không có email thì truyền null
+            role: role || null // nếu không có role thì truyền null
         }
     });
 };
@@ -71,7 +73,36 @@ const createUserApi = (name, email, password, phone, address, dateOfBirth, gende
     return axios.post(URL_BACKEND, data);
 }
 
+const fetchCinemaAPI = (current, pageSize, name) => {
+    return axios.get("/api/v1/cinemas", {
+        params: {
+            page: current,
+            size: pageSize,
+            name: name || null // nếu không có tên thì truyền null
+        }
+    });
+};
+
+const fetchAllRoleAPI = () => {
+    return axios.get("/api/v1/roles");
+}
+
+const createCinemaApi = (name, city, address, phone) => {
+    const URL_BACKEND = "/api/v1/cinemas";
+    const data = {
+        name: name,
+        city: city,
+        address: address,
+        phone: phone
+    }
+    return axios.post(URL_BACKEND, data);
+}
+
+const changeCinemaStatusAPI = (id) => {
+    return axios.put(`/api/v1/cinemas/change-status/${id}`);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
-    fetchUser, logoutApi, createUserApi
+    fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI
 }

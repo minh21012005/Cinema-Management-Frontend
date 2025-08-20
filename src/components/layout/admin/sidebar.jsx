@@ -6,6 +6,14 @@ import { AuthContext } from "../../context/auth.context";
 const Sidebar = () => {
     let items = [];
     const { user } = useContext(AuthContext);
+
+    let defaultKey = "user";
+    if (user.role.name === "MANAGER") {
+        defaultKey = "cinema";
+    } else if (user.role.name === "STAFF") {
+        defaultKey = "dashboard";
+    }
+
     if (user.role.name === "ADMIN") {
         items = [
             {
@@ -151,7 +159,7 @@ const Sidebar = () => {
         ];
     }
 
-    const [current, setCurrent] = useState('user');
+    const [current, setCurrent] = useState(defaultKey);
     const onClick = e => {
         console.log('click ', e);
         setCurrent(e.key);

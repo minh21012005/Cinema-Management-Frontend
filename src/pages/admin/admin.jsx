@@ -2,10 +2,10 @@ import Sidebar from "../../components/layout/admin/sidebar";
 import UserTable from "../../components/user/user.table";
 import HeaderLayout from "../../components/layout/admin/header";
 import { useEffect, useState } from "react";
-import { createUserApi, fetchAllUserAPI } from "@/services/api.service";
-import { Button, Input, Modal, Form, Row, Col, Select, DatePicker, notification } from "antd";
+import { createUserApi, fetchAllRoleAPI, fetchAllUserAPI } from "@/services/api.service";
+import { Button, Input, Modal, Form, Row, Col, Select, DatePicker, notification, Space } from "antd";
 import dayjs from "dayjs";
-
+const { Search } = Input;
 
 const AdminPage = () => {
     const [dataUser, setDataUser] = useState([]);
@@ -14,14 +14,17 @@ const AdminPage = () => {
     const [total, setTotal] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-
+    const [emailSearch, setEmailSearch] = useState(null);
+    const [roleList, setRoleList] = useState([]);
+    const [roleSelected, setRoleSelected] = useState(null);
 
     const [form] = Form.useForm();
 
-    useEffect(() => { loadUser(); }, [current, pageSize]);
+    useEffect(() => { loadUser(); }, [current, pageSize, emailSearch, roleSelected]);
+    useEffect(() => { loadRole(); }, []);
 
     const loadUser = async () => {
-        const res = await fetchAllUserAPI(current, pageSize);
+        const res = await fetchAllUserAPI(current, pageSize, emailSearch, roleSelected);
         if (res.data) {
             setDataUser(res.data.result);
             setCurrent(res.data.meta.page);
@@ -29,6 +32,13 @@ const AdminPage = () => {
             setTotal(res.data.meta.total);
         }
     };
+
+    const loadRole = async () => {
+        const res = await fetchAllRoleAPI();
+        if (res.data) {
+            setRoleList(res.data);
+        }
+    }
 
     const showModal = () => {
         setIsModalOpen(true);
@@ -71,6 +81,26 @@ const AdminPage = () => {
         setIsModalOpen(false); // đóng modal
     };
 
+    const onSearch = (value, _e, info) => {
+        if (value) {
+            let trimmedValue = value.trim();
+            setEmailSearch(trimmedValue);
+            setCurrent(1); // reset về trang đầu tiên khi tìm kiếm
+        } else {
+            setEmailSearch(null); // nếu không có giá trị tìm kiếm thì reset
+            setCurrent(1); // reset về trang đầu tiên
+        }
+    }
+
+    const handleChange = value => {
+        console.log(`selected ${value}`);
+        if (value) {
+            setRoleSelected(value);
+        } else {
+            setRoleSelected(null); // nếu không có giá trị thì reset
+        }
+    };
+
     return (
         <>
             <HeaderLayout />
@@ -81,7 +111,25 @@ const AdminPage = () => {
                 <div style={{ flex: 1, padding: '10px', overflowY: 'auto' }}>
 
                     {/* Thanh chứa nút Create User */}
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '350px' }}>
+                            <Space direction="vertical">
+                                <Search placeholder="Nhập email..." onSearch={onSearch} enterButton />
+                            </Space>
+                            <Space wrap>
+                                <Select
+                                    placeholder="Select role"
+                                    allowClear
+                                    onChange={handleChange}
+                                    style={{ width: 120 }}
+                                    options={roleList.map(role => ({
+                                        label: role.name,
+                                        value: role.name
+                                    }))}
+                                />
+                            </Space>
+                        </div>
+
                         <Button type="primary" onClick={showModal}>
                             Create User
                         </Button>
