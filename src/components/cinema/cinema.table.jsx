@@ -1,10 +1,15 @@
-import { changeCinemaStatusAPI } from "@/services/api.service";
-import { EyeOutlined } from "@ant-design/icons";
-import { Popconfirm, Space, Switch, Table } from "antd";
+import { changeCinemaStatusAPI, updateCinemaApi } from "@/services/api.service";
+import { EditOutlined } from "@ant-design/icons";
+import { Form, Input, Modal, notification, Popconfirm, Space, Switch, Table } from "antd";
+import { useState } from "react";
 
 const CinemaTable = (props) => {
 
     const { dataCinema, loadCinema, current, pageSize, total, setCurrent, setPageSize } = props;
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [cinemaSelected, setCinemaSelected] = useState(null);
+
+    const [form] = Form.useForm();
 
     const columns = [
         {
@@ -44,11 +49,11 @@ const CinemaTable = (props) => {
             key: "action",
             render: (_, record) => (
                 <Space size="middle">
-                    <EyeOutlined
+                    <EditOutlined
                         onClick={() => {
-                            handleViewDetail(record.id)
+                            handleUpdate(record.id)
                         }}
-                        style={{ cursor: "pointer", color: "#1677ff" }} />
+                        style={{ cursor: "pointer", color: "orange" }} />
                     <Popconfirm
                         title={`Xác nhận ${record.active ? "vô hiệu hóa" : "kích hoạt"} rạp?`}
                         okText="Có"
@@ -90,6 +95,55 @@ const CinemaTable = (props) => {
         }
     };
 
+    const handleUpdate = (id) => {
+        showModal();
+        const cinema = dataCinema.find(item => item.id === id);
+        if (cinema) {
+            setCinemaSelected(cinema);
+            form.setFieldsValue({
+                name: cinema.name,
+                city: cinema.city,
+                address: cinema.address,
+                phone: cinema.phone
+            });
+        }
+    }
+
+    const onFinish = async () => {
+        if (cinemaSelected) {
+            const res = await updateCinemaApi(
+                cinemaSelected.id,
+                form.getFieldValue("name"),
+                form.getFieldValue("city"),
+                form.getFieldValue("address"),
+                form.getFieldValue("phone")
+            );
+            if (res.data) {
+                notification.success({
+                    message: "Update Cinema Success",
+                    description: "Cập nhật rạp thành công!"
+                });
+                handleCancel(); // ✅ reset + đóng modal
+                loadCinema(); // ✅ load lại danh sách rạp
+            } else {
+                notification.error({
+                    message: "Update cinema error",
+                    description: JSON.stringify(res.message)
+                });
+            }
+        }
+    }
+
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleCancel = () => {
+        setCinemaSelected(null);
+        form.resetFields(); // reset dữ liệu form
+        setIsModalOpen(false);
+    };
+
     return (
         <>
             <Table columns={columns}
@@ -101,6 +155,58 @@ const CinemaTable = (props) => {
                     }}
                 onChange={onChange}
             />
+            <Modal
+                title="Update Cinema"
+                closable={{ 'aria-label': 'Custom Close Button' }}
+                open={isModalOpen}
+                onOk={() => form.submit()}
+                onCancel={handleCancel}
+            >
+                <Form
+                    form={form}
+                    layout="vertical"
+                    onFinish={onFinish}
+                >
+                    <Form.Item
+                        label="Name"
+                        name="name"
+                        rules={[{ required: true, message: "Vui lòng nhập tên rạp!" }]}
+                    >
+                        <Input style={{ width: "100%" }} />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="City"
+                        name="city"
+                        rules={[{ required: true, message: "Vui lòng nhập thành phố!" }]}
+                    >
+                        <Input style={{ width: "100%" }} />
+                    </Form.Item>
+
+
+                    <Form.Item
+                        label="Address"
+                        name="address"
+                        rules={[{ required: true, message: "Vui lòng nhập địa chỉ!" }]}
+                    >
+                        <Input style={{ width: "100%" }} />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Phone number"
+                        name="phone"
+                        rules={[
+                            { required: true, message: "Vui lòng nhập số điện thoại!" },
+                            {
+                                pattern: /^0(3|5|7|8|9)[0-9]{8}$/,
+                                message: "Số điện thoại không hợp lệ! Vui lòng nhập số VN."
+                            }
+                        ]}
+                    >
+                        <Input style={{ width: "100%" }} />
+                    </Form.Item>
+                </Form>
+            </Modal>
         </>
     );
 }

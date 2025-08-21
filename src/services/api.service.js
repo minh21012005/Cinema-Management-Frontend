@@ -102,7 +102,20 @@ const changeCinemaStatusAPI = (id) => {
     return axios.put(`/api/v1/cinemas/change-status/${id}`);
 }
 
+const updateCinemaApi = (id, name, city, address, phone) => {
+    const URL_BACKEND = "api/v1/cinemas";
+    const data = {
+        id: id,
+        name: name,
+        city: city,
+        address: address,
+        phone: phone
+    }
+    return axios.put(URL_BACKEND, data);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
-    fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI
+    fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
+    updateCinemaApi
 }
