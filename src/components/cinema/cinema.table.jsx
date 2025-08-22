@@ -2,6 +2,7 @@ import { changeCinemaStatusAPI, updateCinemaApi } from "@/services/api.service";
 import { EditOutlined } from "@ant-design/icons";
 import { Form, Input, Modal, notification, Popconfirm, Space, Switch, Table } from "antd";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const CinemaTable = (props) => {
 
@@ -24,7 +25,11 @@ const CinemaTable = (props) => {
             title: "Name",
             dataIndex: "name",
             key: "name",
-            render: (text) => <a>{text}</a>,
+            render: (text, record) => (
+                <Link to={`cinema/${record.id}/rooms`} style={{ color: "#1677ff" }}>
+                    {text}
+                </Link>
+            ),
         },
         {
             title: "City",

@@ -11,9 +11,11 @@ import PrivateRouteAdmin from './pages/admin/private.route.admin.jsx';
 import AdminPage from './pages/admin/admin.jsx';
 import ErrorPage from './pages/error.jsx';
 import PrivateRouteManager from './pages/manager/private.route.manager.jsx';
-import ManagerPage from './pages/manager/manager.jsx';
 import PrivateRouteStaff from './pages/staff/private.route.manager.jsx';
 import StaffPage from './pages/staff/staff.jsx';
+import ManagerLayout from './pages/manager/index.jsx';
+import CinemaListPage from './pages/manager/cinema.list.jsx';
+import RoomListPage from './pages/manager/room.list.jsx';
 
 const router = createBrowserRouter([
   {
@@ -34,10 +36,24 @@ const router = createBrowserRouter([
     path: "/manager",
     element: (
       <PrivateRouteManager>
-        <ManagerPage />
+        <ManagerLayout />
       </PrivateRouteManager>
     ),
     errorElement: <ErrorPage />,
+    children: [
+      {
+        index: true,
+        element: <CinemaListPage />, // /manager
+      },
+      {
+        path: "cinema/:id/rooms",
+        element: <RoomListPage />,   // bạn tạo sau
+      },
+      // {
+      //   path: "room/:id/seats",
+      //   element: <SeatListPage />,   // bạn tạo sau
+      // },
+    ],
   },
   {
     path: "/staff",
@@ -56,6 +72,10 @@ const router = createBrowserRouter([
     path: "/register",
     element: <RegisterPage />,
   },
+  {
+    path: "/404",
+    element: <ErrorPage />,
+  }
 ]);
 
 createRoot(document.getElementById('root')).render(

@@ -9,7 +9,7 @@ const Sidebar = () => {
 
     let defaultKey = "user";
     if (user.role.name === "MANAGER") {
-        defaultKey = "cinema";
+        defaultKey = "cinema-management";
     } else if (user.role.name === "STAFF") {
         defaultKey = "dashboard";
     }
@@ -28,18 +28,6 @@ const Sidebar = () => {
                 label: 'Cinema Management',
                 key: 'cinema-management',
                 icon: <BankOutlined />,
-                children: [
-                    {
-                        type: 'group',
-                        label: 'Cinema & Room',
-                        children: [
-                            { label: 'Cinema', key: 'cinema' },
-                            { label: 'Room', key: 'room' },
-                            { label: 'Seat Type', key: 'seat-type' },
-                            { label: 'Seat', key: 'seat' },
-                        ],
-                    },
-                ],
             },
             {
                 label: 'Movie Management',

@@ -114,8 +114,12 @@ const updateCinemaApi = (id, name, city, address, phone) => {
     return axios.put(URL_BACKEND, data);
 }
 
+const fetchAllRoomAPI = (id) => {
+    return axios.get(`api/v1/cinemas/${id}/rooms`);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
-    updateCinemaApi
+    updateCinemaApi, fetchAllRoomAPI
 }

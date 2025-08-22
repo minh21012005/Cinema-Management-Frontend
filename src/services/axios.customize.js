@@ -53,7 +53,6 @@ instance.interceptors.response.use(function (response) {
 
     // Nếu lỗi 401 và chưa thử refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
-        console.log("Access token expired, trying to refresh...");
         // Đánh dấu request đã retry để tránh vòng lặp vô hạn
         originalRequest._retry = true;
         try {
@@ -76,6 +75,10 @@ instance.interceptors.response.use(function (response) {
             console.error("Refresh token failed:", refreshError);
             // Xử lý logout nếu cần
         }
+    }
+
+    if (error.response?.status === 404 || error.response?.status === 400) {
+        window.location.href = "/404";
     }
 
     if (error.response && error.response.data) return error.response.data;

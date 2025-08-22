@@ -6,11 +6,16 @@ export default function ErrorPage() {
     const error = useRouteError();
     console.error(error);
 
+    const message =
+        error?.statusText ||
+        error?.message ||
+        "Có lỗi xảy ra, vui lòng thử lại sau!";
+
     return (
         <Result
             status="404"
             title="Oops!"
-            subTitle={error.statusText || error.message}
+            subTitle={message}
             extra={<Button type="primary"><Link to="/">Back Home</Link></Button>}
         />
     );
