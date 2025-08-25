@@ -1,13 +1,36 @@
+import RoomModal from "@/components/room/room.create";
 import RoomTable from "@/components/room/room.table";
-import { Button, Space } from "antd";
-import Search from "antd/es/transfer/search";
-import { useState } from "react";
+import { fetchAllRoomAPI, findCinemaByIdAPI } from "@/services/api.service";
+import { Button } from "antd";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 const RoomListPage = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [dataRoom, setDataRoom] = useState([]);
+    const [cinemaDetails, setCinemaDetails] = useState(null);
 
-    const onSearch = (value) => {
+    const { id } = useParams();
+
+    useEffect(() => {
+        loadRoom();
+        fetchCinema(id);
+    }, []);
+
+    const loadRoom = async () => {
+        const res = await fetchAllRoomAPI(id);
+        if (res.data) {
+            setDataRoom(res.data);
+        }
+    };
+
+    const fetchCinema = async (id) => {
+        const res = await findCinemaByIdAPI(id);
+        if (res.data) {
+            setCinemaDetails(res.data);
+        }
     }
 
     const showModal = () => {
@@ -23,22 +46,35 @@ const RoomListPage = () => {
                     marginBottom: "10px",
                 }}
             >
-                <div style={{ display: "flex", justifyContent: "space-between", width: "350px" }}>
-                    <Space direction="vertical">
-                        <Search
-                            placeholder="Nhập tên phòng..."
-                            allowClear
-                            onSearch={onSearch}
-                            style={{ width: 200 }}
-                        />
-                    </Space>
-                </div>
+                <h2
+                    style={{
+                        margin: 0,
+                        fontFamily: "Inter, sans-serif",
+                        fontWeight: 600,
+                        fontSize: "1.5rem",
+                        lineHeight: 1.4,
+                        color: "#1a1a1a",
+                        letterSpacing: "-0.5px"
+                    }}
+                >
+                    {cinemaDetails ? cinemaDetails.name : "Loading..."}
+                </h2>
 
                 <Button type="primary" onClick={showModal}>
                     Create Room
                 </Button>
             </div>
-            <RoomTable />
+            <RoomTable
+                dataRoom={dataRoom}
+                loadRoom={loadRoom}
+            />
+            <RoomModal
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+                loading={loading}
+                setLoading={setLoading}
+                loadRoom={loadRoom}
+            />
         </>
     );
 }

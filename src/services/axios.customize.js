@@ -77,7 +77,7 @@ instance.interceptors.response.use(function (response) {
         }
     }
 
-    if (error.response?.status === 404 || error.response?.status === 400) {
+    if (error.response?.status === 404) {
         window.location.href = "/404";
     }
 

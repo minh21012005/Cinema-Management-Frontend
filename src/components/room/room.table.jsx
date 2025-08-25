@@ -1,24 +1,10 @@
-import { fetchAllRoomAPI } from "@/services/api.service";
-import { Button, Popconfirm, Space, Switch, Table } from "antd";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { changeRoomStatusAPI } from "@/services/api.service";
+import { EditOutlined } from "@ant-design/icons";
+import { Popconfirm, Space, Switch, Table } from "antd";
 
-const RoomTable = () => {
+const RoomTable = (props) => {
 
-    const [dataRoom, setDataRoom] = useState([]);
-
-    const { id } = useParams();
-
-    useEffect(() => {
-        loadRoom();
-    }, []);
-
-    const loadRoom = async () => {
-        const res = await fetchAllRoomAPI(id);
-        if (res.data) {
-            setDataRoom(res.data);
-        }
-    };
+    const { dataRoom, loadRoom } = props;
 
     const columns = [
         { title: "STT", render: (_, record, index) => index + 1 },
@@ -29,7 +15,11 @@ const RoomTable = () => {
             key: "action",
             render: (_, record) => (
                 <Space>
-                    <Button onClick={() => handleUpdate(record)}>Edit</Button>
+                    <EditOutlined
+                        onClick={() => {
+                            handleUpdate(record.id)
+                        }}
+                        style={{ cursor: "pointer", color: "orange" }} />
                     <Popconfirm
                         title={`Xác nhận ${record.active ? "vô hiệu hóa" : "kích hoạt"} phòng?`}
                         okText="Có"
@@ -48,6 +38,14 @@ const RoomTable = () => {
         }
     ];
 
+    const changeStatus = async (id) => {
+        try {
+            await changeRoomStatusAPI(id);
+            loadRoom();
+        } catch (error) {
+            console.error("Failed to change room status:", error);
+        }
+    };
 
     const onChange = (pagination, filters, sorter, extra) => {
         if (pagination && pagination.current) {

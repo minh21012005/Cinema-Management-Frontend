@@ -118,8 +118,30 @@ const fetchAllRoomAPI = (id) => {
     return axios.get(`api/v1/cinemas/${id}/rooms`);
 }
 
+const fetchAllRoomTypeAPI = () => {
+    return axios.get("api/v1/rooms/types");
+}
+
+const createRoomApi = (cinemaId, name, roomTypeId) => {
+    const URL_BACKEND = "api/v1/rooms";
+    const data = {
+        name: name,
+        cinemaId: cinemaId,
+        roomTypeId: roomTypeId
+    }
+    return axios.post(URL_BACKEND, data);
+}
+
+const changeRoomStatusAPI = (id) => {
+    return axios.put(`/api/v1/rooms/change-status/${id}`);
+}
+
+const findCinemaByIdAPI = (id) => {
+    return axios.get(`api/v1/cinemas/${id}`);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
-    updateCinemaApi, fetchAllRoomAPI
+    updateCinemaApi, fetchAllRoomAPI, fetchAllRoomTypeAPI, createRoomApi, changeRoomStatusAPI, findCinemaByIdAPI
 }
