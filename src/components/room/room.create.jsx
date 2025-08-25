@@ -1,27 +1,14 @@
-import { createRoomApi, fetchAllRoomTypeAPI } from "@/services/api.service";
-import { Form, Input, Modal, notification, Select } from "antd";
-import { use, useEffect, useState } from "react";
+import { createRoomApi } from "@/services/api.service";
+import { Form, Input, InputNumber, Modal, notification, Select } from "antd";
 import { useParams } from "react-router-dom";
 
 const RoomModal = (props) => {
 
-    const { isModalOpen, setIsModalOpen, loading, setLoading, loadRoom } = props;
-    const [roomType, setRoomType] = useState([]);
+    const { isModalOpen, setIsModalOpen, loading, setLoading, loadRoom, roomType } = props;
 
     const [form] = Form.useForm();
 
     const { id } = useParams();
-
-    useEffect(() => {
-        loadRoomType();
-    }, []);
-
-    const loadRoomType = async () => {
-        const res = await fetchAllRoomTypeAPI();
-        if (res.data) {
-            setRoomType(res.data);
-        }
-    }
 
     const handleCancel = () => {
         form.resetFields();
@@ -31,7 +18,7 @@ const RoomModal = (props) => {
     const onFinish = async (value) => {
         setLoading(true);
         try {
-            const res = await createRoomApi(id, value.name, value.type);
+            const res = await createRoomApi(id, value.name, value.type, value.rows, value.cols);
             if (res.data) {
                 notification.success({
                     message: "Thành công!",
@@ -74,11 +61,43 @@ const RoomModal = (props) => {
                 </Form.Item>
 
                 <Form.Item
+                    label="Rows"
+                    name="rows"
+                    rules={[
+                        { required: true, message: "Vui lòng nhập số hàng!" },
+                        {
+                            type: "number",
+                            min: 1,
+                            max: 25,
+                            message: "Số hàng phải lớn hơn 0 và nhỏ hơn hoặc bằng 25!",
+                        },
+                    ]}
+                >
+                    <InputNumber style={{ width: "100%" }} />
+                </Form.Item>
+
+                <Form.Item
+                    label="Cols"
+                    name="cols"
+                    rules={[
+                        { required: true, message: "Vui lòng nhập số cột!" },
+                        {
+                            type: "number",
+                            min: 1,
+                            max: 25,
+                            message: "Số cột phải lớn hơn 0 và nhỏ hơn hoặc bằng 25!",
+                        },
+                    ]}
+                >
+                    <InputNumber style={{ width: "100%" }} />
+                </Form.Item>
+
+                <Form.Item
                     label="Type"
                     name="type"
                     rules={[{ required: true, message: "Vui lòng chọn type!" }]}
                 >
-                    <Select placeholder="Chọn role" style={{ width: "100%" }}>
+                    <Select placeholder="Chọn type" style={{ width: "100%" }}>
                         {roomType && roomType.length > 0 && roomType.map((item) => (
                             <Select.Option key={item.id} value={item.id}>{item.name}</Select.Option>
                         ))}

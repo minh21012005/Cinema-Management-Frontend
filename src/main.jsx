@@ -16,6 +16,7 @@ import StaffPage from './pages/staff/staff.jsx';
 import ManagerLayout from './pages/manager/index.jsx';
 import CinemaListPage from './pages/manager/cinema.list.jsx';
 import RoomListPage from './pages/manager/room.list.jsx';
+import SeatListPage from './pages/manager/seat.list.jsx';
 
 const router = createBrowserRouter([
   {
@@ -49,10 +50,10 @@ const router = createBrowserRouter([
         path: "cinema/:id/rooms",
         element: <RoomListPage />,   // bạn tạo sau
       },
-      // {
-      //   path: "room/:id/seats",
-      //   element: <SeatListPage />,   // bạn tạo sau
-      // },
+      {
+        path: "room/:id/seats",
+        element: <SeatListPage />,   // bạn tạo sau
+      },
     ],
   },
   {

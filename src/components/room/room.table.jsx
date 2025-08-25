@@ -1,15 +1,28 @@
-import { changeRoomStatusAPI } from "@/services/api.service";
+import { changeRoomStatusAPI, updateRoomApi } from "@/services/api.service";
 import { EditOutlined } from "@ant-design/icons";
-import { Popconfirm, Space, Switch, Table } from "antd";
+import { Modal, Popconfirm, Space, Switch, Table, Form, Input, Select, notification } from "antd";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const RoomTable = (props) => {
 
-    const { dataRoom, loadRoom } = props;
+    const { dataRoom, loadRoom, roomType } = props;
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [roomIdSelected, setRoomIdSelected] = useState(null);
+
+    const [form] = Form.useForm();
 
     const columns = [
         { title: "STT", render: (_, record, index) => index + 1 },
-        { title: "Tên phòng", dataIndex: "name", key: "name" },
-        { title: "Loại phòng", dataIndex: "type", key: "type" },
+        {
+            title: "Tên phòng", dataIndex: "name", key: "name",
+            render: (text, record) => (
+                <Link to={`/manager/room/${record.id}/seats`} style={{ color: "#1677ff" }}>
+                    {text}
+                </Link>
+            ),
+        },
+        { title: "Loại phòng", dataIndex: "type", key: "type", render: (type) => type?.name || "" },
         {
             title: "Action",
             key: "action",
@@ -37,6 +50,41 @@ const RoomTable = (props) => {
             )
         }
     ];
+
+    const handleUpdate = (id) => {
+        setIsModalOpen(true);
+        const room = dataRoom.find(r => r.id === id);
+        setRoomIdSelected(id);
+        form.setFieldsValue({
+            name: room.name,
+            type: room.type?.id || null
+        });
+    };
+
+    const handleCancel = () => {
+        form.resetFields();
+        setRoomIdSelected(null);
+        setIsModalOpen(false);
+    };
+
+    const onFinish = async (values) => {
+        const res = await updateRoomApi(roomIdSelected, values.name, values.type);
+        if (res.data) {
+            setRoomIdSelected(null);
+            notification.success({
+                message: "Cập nhật phòng thành công",
+                description: `Phòng ${values.name} đã được cập nhật thành công.`,
+            });
+            loadRoom();
+            setIsModalOpen(false);
+            form.resetFields();
+        } else {
+            notification.error({
+                message: "Cập nhật phòng thất bại",
+                description: `Không thể cập nhật phòng ${values.name}. Vui lòng thử lại.`,
+            });
+        }
+    };
 
     const changeStatus = async (id) => {
         try {
@@ -72,6 +120,39 @@ const RoomTable = (props) => {
                     }}
                 onChange={onChange}
             />
+            <Modal
+                title="Update Room"
+                closable={{ 'aria-label': 'Custom Close Button' }}
+                open={isModalOpen}
+                onOk={() => form.submit()}
+                onCancel={handleCancel}
+            >
+                <Form
+                    form={form}
+                    layout="vertical"
+                    onFinish={onFinish}
+                >
+                    <Form.Item
+                        label="Name"
+                        name="name"
+                        rules={[{ required: true, message: "Vui lòng nhập tên rạp!" }]}
+                    >
+                        <Input style={{ width: "100%" }} />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Type"
+                        name="type"
+                        rules={[{ required: true, message: "Vui lòng chọn type!" }]}
+                    >
+                        <Select placeholder="Chọn role" style={{ width: "100%" }}>
+                            {roomType && roomType.length > 0 && roomType.map((item) => (
+                                <Select.Option key={item.id} value={item.id}>{item.name}</Select.Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+                </Form>
+            </Modal>
         </>
     );
 }

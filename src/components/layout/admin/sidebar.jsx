@@ -1,11 +1,16 @@
-import { AppstoreOutlined, BankOutlined, BarChartOutlined, DashboardOutlined, SearchOutlined, SettingOutlined, ShopOutlined, ShoppingCartOutlined, UserOutlined, VideoCameraOutlined } from "@ant-design/icons";
+import {
+    BankOutlined, BarChartOutlined, DashboardOutlined, SearchOutlined, SettingOutlined,
+    ShopOutlined, ShoppingCartOutlined, UserOutlined, VideoCameraOutlined
+} from "@ant-design/icons";
 import { Menu } from "antd";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/auth.context";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
     let items = [];
     const { user } = useContext(AuthContext);
+    const nav = useNavigate();
 
     let defaultKey = "user";
     if (user.role.name === "MANAGER") {
@@ -28,6 +33,7 @@ const Sidebar = () => {
                 label: 'Cinema Management',
                 key: 'cinema-management',
                 icon: <BankOutlined />,
+                onClick: () => { nav('/manager'); }
             },
             {
                 label: 'Movie Management',

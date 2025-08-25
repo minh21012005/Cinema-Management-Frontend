@@ -1,6 +1,6 @@
 import RoomModal from "@/components/room/room.create";
 import RoomTable from "@/components/room/room.table";
-import { fetchAllRoomAPI, findCinemaByIdAPI } from "@/services/api.service";
+import { fetchAllRoomAPI, fetchAllRoomTypeAPI, findCinemaByIdAPI } from "@/services/api.service";
 import { Button } from "antd";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -11,13 +11,22 @@ const RoomListPage = () => {
     const [loading, setLoading] = useState(false);
     const [dataRoom, setDataRoom] = useState([]);
     const [cinemaDetails, setCinemaDetails] = useState(null);
+    const [roomType, setRoomType] = useState([]);
 
     const { id } = useParams();
 
     useEffect(() => {
         loadRoom();
         fetchCinema(id);
+        loadRoomType();
     }, []);
+
+    const loadRoomType = async () => {
+        const res = await fetchAllRoomTypeAPI();
+        if (res.data) {
+            setRoomType(res.data);
+        }
+    }
 
     const loadRoom = async () => {
         const res = await fetchAllRoomAPI(id);
@@ -67,6 +76,7 @@ const RoomListPage = () => {
             <RoomTable
                 dataRoom={dataRoom}
                 loadRoom={loadRoom}
+                roomType={roomType}
             />
             <RoomModal
                 isModalOpen={isModalOpen}
@@ -74,6 +84,7 @@ const RoomListPage = () => {
                 loading={loading}
                 setLoading={setLoading}
                 loadRoom={loadRoom}
+                roomType={roomType}
             />
         </>
     );
