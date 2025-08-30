@@ -17,7 +17,7 @@ const RoomTable = (props) => {
         {
             title: "Tên phòng", dataIndex: "name", key: "name",
             render: (text, record) => (
-                <Link to={`/manager/room/${record.id}/seats`} style={{ color: "#1677ff" }}>
+                <Link to={`/manager/cinemas/rooms/${record.id}/seats`} style={{ color: "#1677ff" }}>
                     {text}
                 </Link>
             ),

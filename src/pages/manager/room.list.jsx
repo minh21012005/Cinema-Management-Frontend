@@ -1,19 +1,16 @@
-import RoomModal from "@/components/room/room.create";
 import RoomTable from "@/components/room/room.table";
 import { fetchAllRoomAPI, fetchAllRoomTypeAPI, findCinemaByIdAPI } from "@/services/api.service";
 import { Button } from "antd";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const RoomListPage = () => {
-
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [loading, setLoading] = useState(false);
     const [dataRoom, setDataRoom] = useState([]);
     const [cinemaDetails, setCinemaDetails] = useState(null);
     const [roomType, setRoomType] = useState([]);
 
     const { id } = useParams();
+    const nav = useNavigate();
 
     useEffect(() => {
         loadRoom();
@@ -40,10 +37,10 @@ const RoomListPage = () => {
         if (res.data) {
             setCinemaDetails(res.data);
         }
-    }
+    };
 
-    const showModal = () => {
-        setIsModalOpen(true);
+    const navigateCreatePage = () => {
+        nav(`/manager/cinemas/${id}/rooms/create`);
     };
 
     return (
@@ -69,20 +66,12 @@ const RoomListPage = () => {
                     {cinemaDetails ? cinemaDetails.name : "Loading..."}
                 </h2>
 
-                <Button type="primary" onClick={showModal}>
+                <Button type="primary" onClick={navigateCreatePage}>
                     Create Room
                 </Button>
             </div>
             <RoomTable
                 dataRoom={dataRoom}
-                loadRoom={loadRoom}
-                roomType={roomType}
-            />
-            <RoomModal
-                isModalOpen={isModalOpen}
-                setIsModalOpen={setIsModalOpen}
-                loading={loading}
-                setLoading={setLoading}
                 loadRoom={loadRoom}
                 roomType={roomType}
             />

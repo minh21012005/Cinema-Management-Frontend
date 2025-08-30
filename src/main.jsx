@@ -17,6 +17,8 @@ import ManagerLayout from './pages/manager/index.jsx';
 import CinemaListPage from './pages/manager/cinema.list.jsx';
 import RoomListPage from './pages/manager/room.list.jsx';
 import SeatListPage from './pages/manager/seat.list.jsx';
+import RoomCreate from './pages/manager/room.create.jsx';
+
 
 const router = createBrowserRouter([
   {
@@ -47,12 +49,16 @@ const router = createBrowserRouter([
         element: <CinemaListPage />, // /manager
       },
       {
-        path: "cinema/:id/rooms",
+        path: "cinemas/:id/rooms",
         element: <RoomListPage />,   // bạn tạo sau
       },
       {
-        path: "room/:id/seats",
+        path: "cinemas/rooms/:id/seats",
         element: <SeatListPage />,   // bạn tạo sau
+      },
+      {
+        path: "cinemas/:id/rooms/create",
+        element: <RoomCreate />,   // bạn tạo sau
       },
     ],
   },

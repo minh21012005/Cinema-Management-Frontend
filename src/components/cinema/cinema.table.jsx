@@ -26,7 +26,7 @@ const CinemaTable = (props) => {
             dataIndex: "name",
             key: "name",
             render: (text, record) => (
-                <Link to={`cinema/${record.id}/rooms`} style={{ color: "#1677ff" }}>
+                <Link to={`cinemas/${record.id}/rooms`} style={{ color: "#1677ff" }}>
                     {text}
                 </Link>
             ),
