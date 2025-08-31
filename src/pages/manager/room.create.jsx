@@ -1,9 +1,10 @@
 // SeatLayoutAdmin.jsx
 import { useState, useEffect, useRef } from "react";
-import { Button, Form, Input, Select, Divider, message, InputNumber, Row, Col, notification } from "antd";
+import { Form, message, notification } from "antd";
 import { createRoomAPI, fetchAllRoomTypeAPI, fetchAllSeatTypeAPI } from "@/services/api.service";
 import SeatCanvas from "@/components/seat/seat.canvas";
 import { useNavigate, useParams } from "react-router-dom";
+import RoomForm from "@/components/room/room.form";
 
 const RoomCreate = () => {
     const [form] = Form.useForm();
@@ -67,6 +68,10 @@ const RoomCreate = () => {
     };
 
     const handleSave = async (values) => {
+        if (seats.length === 0) {
+            message.warning("Vui lòng thêm ghế vào phòng.");
+            return;
+        }
         const payload = seats.map((s) => ({
             row: s.row,
             col: s.col,
@@ -85,7 +90,7 @@ const RoomCreate = () => {
         } else {
             notification.error({
                 message: "Tạo phòng thất bại",
-                description: `Không thể tạo phòng "${values.name}". Vui lòng thử lại.`,
+                description: JSON.stringify(res.message) || "Đã có lỗi xảy ra.",
             });
         }
     };
@@ -130,51 +135,13 @@ const RoomCreate = () => {
 
             <div style={{ width: "15vw", padding: 16, borderLeft: "1px solid #eee", background: "#fafafa" }}>
                 <h3>Thiết lập phòng</h3>
-                <Form
+                <RoomForm
                     form={form}
-                    layout="vertical"
-                    onFinish={handleSave}
-                    initialValues={{ rows: 6, cols: 10, seatType: Object.keys(seatTypes)[0] }}>
-                    <Form.Item label="Tên phòng" name="name" rules={[{ required: true, message: "Vui lòng nhập tên phòng" }]}>
-                        <Input placeholder="Nhập tên phòng..." />
-                    </Form.Item>
-
-                    <Form.Item label="Loại phòng" name="roomType" rules={[{ required: true, message: "Vui lòng chọn loại phòng" }]}>
-                        <Select placeholder="Chọn loại phòng">
-                            {roomTypes.map((rt) => (
-                                <Select.Option key={rt.id} value={rt.id}>
-                                    {rt.name}
-                                </Select.Option>
-                            ))}
-                        </Select>
-                    </Form.Item>
-
-                    <Row gutter={16}>
-                        <Col span={12}>
-                            <Form.Item label="Số hàng" name="rows" rules={[{ type: "number", min: 1, max: 15 }]}>
-                                <InputNumber min={1} max={15} style={{ width: "100%" }} />
-                            </Form.Item>
-                        </Col>
-                        <Col span={12}>
-                            <Form.Item label="Số cột" name="cols" rules={[{ type: "number", min: 1, max: 15 }]}>
-                                <InputNumber min={1} max={15} style={{ width: "100%" }} />
-                            </Form.Item>
-                        </Col>
-                    </Row>
-
-                    <Form.Item label="Loại ghế hiện tại" name="seatType">
-                        <Select>
-                            {seatTypes && Object.values(seatTypes).length > 0 && Object.values(seatTypes).map((item) => (
-                                <Select.Option key={item.id} value={item.id}>{item.label}</Select.Option>
-                            ))}
-                        </Select>
-                    </Form.Item>
-                    <Divider />
-                    <Button block onClick={() => setSeats([])}>Clear</Button>
-                    <Button htmlType="submit" type="primary" block style={{ marginTop: 8 }}>
-                        Save Room
-                    </Button>
-                </Form>
+                    roomTypes={roomTypes}
+                    seatTypes={seatTypes}
+                    onSave={handleSave}
+                    onClear={() => setSeats([])}
+                />
             </div>
         </div>
     );

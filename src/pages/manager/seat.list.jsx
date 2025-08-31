@@ -3,10 +3,22 @@ import { useParams } from "react-router-dom";
 import { Tooltip, Row, Col } from "antd";
 import { fetchAllSeatByRoomIdAPI, fetchRoomByIdAPI } from "@/services/api.service";
 
+const CELL = 36;       // chiều rộng 1 ghế đơn
+const GAP = 5;         // khoảng cách giữa các ghế
+const DOUBLE = CELL * 2; // chiều rộng ghế đôi (2 ghế + 1 gap ở giữa)
+
 const SeatListPage = () => {
     const { id } = useParams();
     const [seats, setSeats] = useState([]);
     const [room, setRoom] = useState(null);
+
+    const maxCol = Math.max(
+        ...seats.map((s) => {
+            const nums = s.name.slice(1).split("-");
+            return Math.max(...nums.map((n) => parseInt(n, 10)));
+        }),
+        0
+    );
 
     useEffect(() => {
         fetchSeats();
@@ -48,31 +60,29 @@ const SeatListPage = () => {
         });
     });
 
-    // style ghế
     const getSeatStyle = (seat) => {
         const base = {
+            width: "100%",
+            height: CELL * 0.9,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            borderRadius: 6,
+            borderRadius: 4,
             fontSize: 12,
             fontWeight: 500,
             cursor: seat.active ? "pointer" : "not-allowed",
             color: "#fff",
             border: "1px solid #999",
+            boxSizing: "border-box",
         };
-
-        if (seat.booked) {
-            return { ...base, backgroundColor: "#ff4d4f", width: 35, height: 35 };
-        }
 
         switch (seat.seatType?.name) {
             case "VIP":
-                return { ...base, backgroundColor: seat.active ? "#fa8c16" : "#d9d9d9", width: 35, height: 35 };
+                return { ...base, backgroundColor: seat.active ? "#fa8c16" : "#d9d9d9" }; // cam sáng vừa phải
             case "Đôi":
-                return { ...base, backgroundColor: seat.active ? "#ff4d4f" : "#d9d9d9", width: 70, height: 35 };
-            default:
-                return { ...base, backgroundColor: seat.active ? "#52c41a" : "#d9d9d9", width: 35, height: 35 };
+                return { ...base, backgroundColor: seat.active ? "#ff7875" : "#d9d9d9" }; // đỏ hồng nhẹ
+            default: // Thường
+                return { ...base, backgroundColor: seat.active ? "#bfbfbf" : "#d9d9d9" }; // xám trung
         }
     };
 
@@ -100,33 +110,92 @@ const SeatListPage = () => {
             {Object.keys(rows)
                 .sort()
                 .map((row) => (
-                    <Row key={row} gutter={[8, 8]} align="middle" justify="center" style={{ marginBottom: 20 }}>
-                        {/* ký hiệu hàng */}
-                        <Col>
+                    <Row
+                        key={row}
+                        gutter={[GAP, GAP]}
+                        justify="center"
+                        align="middle"
+                        wrap={false} // không cho xuống hàng để giữ layout chuẩn
+                        style={{ marginBottom: 5 }}
+                    >
+                        {/* Ký hiệu hàng */}
+                        <Col flex="24px" style={{ textAlign: "right", marginRight: 10 }}>
                             <strong>{row}</strong>
                         </Col>
-                        {rows[row].map((seat) => (
-                            <Col key={seat.id}>
-                                <Tooltip title={`Ghế ${seat.name} (${seat.seatType?.name})`}>
-                                    <div style={getSeatStyle(seat)}>{seat.name.slice(1)}</div>
-                                </Tooltip>
-                            </Col>
-                        ))}
+
+                        {Array.from({ length: maxCol }, (_, i) => {
+                            const colNum = i + 1;
+
+                            // tìm ghế trùng cột
+                            const seat = rows[row]?.find((s) => {
+                                if (s.name.includes("-")) {
+                                    const [start, end] = s.name
+                                        .slice(1)
+                                        .split("-")
+                                        .map((n) => parseInt(n, 10));
+                                    return colNum >= start && colNum <= end;
+                                }
+                                return parseInt(s.name.slice(1), 10) === colNum;
+                            });
+
+                            if (!seat) {
+                                // ô trống để giữ cột
+                                return (
+                                    <Col key={`${row}-${colNum}`} flex={`${CELL}px`}>
+                                        <div style={{ width: "100%", height: CELL }} />
+                                    </Col>
+                                );
+                            }
+
+                            if (seat.name.includes("-")) {
+                                // chỉ render 1 lần tại cột start, với ô flex = tổng 2 ghế + 1 gap
+                                const [start] = seat.name
+                                    .slice(1)
+                                    .split("-")
+                                    .map((n) => parseInt(n, 10));
+                                if (colNum !== start) return null;
+
+                                return (
+                                    <Col key={seat.id} flex={`${DOUBLE}px`}>
+                                        <Tooltip title={`Ghế ${seat.name} (${seat.seatType?.name})`}>
+                                            <div style={getSeatStyle(seat)}>{seat.name.slice(1)}</div>
+                                        </Tooltip>
+                                    </Col>
+
+                                );
+                            }
+
+                            // ghế đơn
+                            return (
+                                <Col key={seat.id} flex={`${CELL}px`}>
+                                    <Tooltip title={`Ghế ${seat.name} (${seat.seatType?.name})`}>
+                                        <div style={getSeatStyle(seat)}>{seat.name.slice(1)}</div>
+                                    </Tooltip>
+                                </Col>
+                            );
+                        })}
                     </Row>
                 ))}
 
             {/* Legend */}
-            <div style={{ marginTop: 40, display: "flex", gap: 30, justifyContent: "center", flexWrap: "wrap" }}>
-                <Legend color="#52c41a" label="Thường" />
+            <div
+                style={{
+                    marginTop: 40,
+                    display: "flex",
+                    gap: 30,
+                    justifyContent: "center",
+                    flexWrap: "wrap",
+                }}
+            >
+                <Legend color="#bfbfbf" label="Thường" />
                 <Legend color="#fa8c16" label="VIP" />
-                <Legend color="#ff4d4f" label="Đôi" wide />
-                <Legend color="#d9d9d9" label="Inactive" />
+                <Legend color="#ff7875" label="Đôi" wide />
+                <Legend color="#999999" label="Inactive" />
             </div>
         </div>
     );
 };
 
-// component legend gọn gàng
 const Legend = ({ color, label, wide }) => (
     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <div style={{ width: wide ? 40 : 20, height: 20, background: color, borderRadius: 4 }} />
