@@ -174,9 +174,13 @@ const createRoomAPI = (cinemaId, name, roomTypeId, seats) => {
     return axios.post("api/v1/rooms", data);
 }
 
+const changeSeatStatusAPI = (id) => {
+    return axios.put(`/api/v1/seats/change-status/${id}`);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
     updateCinemaApi, fetchAllRoomAPI, fetchAllRoomTypeAPI, createRoomApi, changeRoomStatusAPI, findCinemaByIdAPI,
-    fetchRoomByIdAPI, updateRoomApi, fetchAllSeatByRoomIdAPI, fetchAllSeatTypeAPI, createRoomAPI
+    fetchRoomByIdAPI, updateRoomApi, fetchAllSeatByRoomIdAPI, fetchAllSeatTypeAPI, createRoomAPI, changeSeatStatusAPI
 }
