@@ -1,16 +1,12 @@
-import { changeSeatStatusAPI, fetchAllSeatTypeAPI } from "@/services/api.service";
+import { changeSeatStatusAPI, changeSeatTypeAPI } from "@/services/api.service";
 import { Form, Input, Modal, notification, Popconfirm, Select, Switch } from "antd";
 import { useEffect, useState } from "react";
 
-const SeatModal = (props) => {
+const SeatModalUpdate = (props) => {
 
-    const { isModalOpen, setIsModalOpen, seatSelected, setSeatSelected, fetchSeats } = props;
-    const [seatType, setSeatType] = useState([]);
+    const { isModalOpen, setIsModalOpen, seatSelected, setSeatSelected, fetchSeats, seatType } = props;
+
     const [form] = Form.useForm();
-
-    useEffect(() => {
-        fetchSeatsType();
-    }, []);
 
     useEffect(() => {
         if (seatSelected) {
@@ -27,17 +23,24 @@ const SeatModal = (props) => {
         form.resetFields();
     }
 
-    const onFinish = (values) => {
-        console.log('Form values:', values);
+    const onFinish = async (values) => {
+        const res = await changeSeatTypeAPI(seatSelected.id, values.type);
+        if (res && res.data) {
+            notification.success({
+                message: "Success",
+                description: "Seat updated successfully",
+            })
+            fetchSeats();
+        } else {
+            notification.error({
+                message: "Error",
+                description: JSON.stringify(res.message) || "Failed to update seat",
+            })
+        }
         handleRefresh();
     };
 
-    const fetchSeatsType = async () => {
-        const res = await fetchAllSeatTypeAPI();
-        if (res && res.data) {
-            setSeatType(res.data);
-        }
-    }
+
 
     const changeSeatStatus = async (id) => {
         const res = await changeSeatStatusAPI(id);
@@ -59,7 +62,7 @@ const SeatModal = (props) => {
 
     return (
         <Modal
-            title={seatSelected ? `Update Seat ${seatSelected.name}` : "Create Seat"}
+            title={seatSelected ? `Update Seat ${seatSelected.name}` : "Loading..."}
             closable={{ 'aria-label': 'Custom Close Button' }}
             open={isModalOpen}
             onOk={() => form.submit()}
@@ -75,7 +78,7 @@ const SeatModal = (props) => {
                     name="type"
                     rules={[{ required: true, message: "Vui lòng chọn type!" }]}
                 >
-                    <Select placeholder="Chọn role" style={{ width: "100%" }}>
+                    <Select placeholder="Chọn type" style={{ width: "100%" }}>
                         {seatType && seatType.length > 0 && seatType.map((item) => (
                             <Select.Option key={item.id} value={item.id}>{item.name}</Select.Option>
                         ))}
@@ -98,4 +101,4 @@ const SeatModal = (props) => {
         </Modal>
     )
 }
-export default SeatModal;
+export default SeatModalUpdate;

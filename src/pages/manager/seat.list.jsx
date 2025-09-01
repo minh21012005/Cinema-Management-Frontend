@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Tooltip, Row, Col } from "antd";
-import { fetchAllSeatByRoomIdAPI, fetchRoomByIdAPI } from "@/services/api.service";
-import SeatModal from "@/components/seat/seat.modal";
+import { Tooltip, Row, Col, Button } from "antd";
+import { fetchAllSeatByRoomIdAPI, fetchAllSeatTypeAPI, fetchRoomByIdAPI } from "@/services/api.service";
+import SeatModalUpdate from "@/components/seat/seat.modal.update";
+import SeatModalCreate from "@/components/seat/seat.modal.create";
 
 const CELL = 36;       // chiều rộng 1 ghế đơn
 const GAP = 5;         // khoảng cách giữa các ghế
@@ -13,7 +14,9 @@ const SeatListPage = () => {
     const [seats, setSeats] = useState([]);
     const [room, setRoom] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
     const [seatSelected, setSeatSelected] = useState(null);
+    const [seatType, setSeatType] = useState([]);
 
     const maxCol = Math.max(
         ...seats.map((s) => {
@@ -27,6 +30,17 @@ const SeatListPage = () => {
         fetchSeats();
         fetchRoom();
     }, [id]);
+
+    useEffect(() => {
+        fetchSeatsType();
+    }, []);
+
+    const fetchSeatsType = async () => {
+        const res = await fetchAllSeatTypeAPI();
+        if (res && res.data) {
+            setSeatType(res.data);
+        }
+    }
 
     const fetchRoom = async () => {
         try {
@@ -94,9 +108,22 @@ const SeatListPage = () => {
         setIsModalOpen(true);
     }
 
+    const showModalCreate = () => {
+        setIsModalCreateOpen(true);
+    }
+
+    const handleCreateRoom = () => {
+        // logic tạo phòng chiếu mới
+    }
+
     return (
         <>
-            <div style={{ padding: 24, textAlign: "center" }}>
+            <div style={{ display: "flex", justifyContent: "end", alignItems: "center" }}>
+                <Button type="primary" onClick={showModalCreate} >
+                    Create Seat
+                </Button>
+            </div>
+            <div style={{ padding: 12, textAlign: "center" }}>
                 <h2 style={{ fontSize: 20, fontWeight: "bold", marginBottom: 20 }}>
                     {room ? room.name : "Loading..."}
                 </h2>
@@ -202,12 +229,20 @@ const SeatListPage = () => {
                     <Legend color="#999999" label="Inactive" />
                 </div>
             </div>
-            <SeatModal
+            <SeatModalCreate
+                isModalCreateOpen={isModalCreateOpen}
+                setIsModalCreateOpen={setIsModalCreateOpen}
+                fetchSeats={fetchSeats}
+                seatType={seatType}
+                id={id}
+            />
+            <SeatModalUpdate
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}
                 seatSelected={seatSelected}
                 setSeatSelected={setSeatSelected}
                 fetchSeats={fetchSeats}
+                seatType={seatType}
             />
         </>
     );
