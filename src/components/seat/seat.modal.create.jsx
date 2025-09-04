@@ -46,7 +46,10 @@ const SeatModalCreate = (props) => {
                             <Form.Item
                                 label="Row"
                                 name="row"
-                                rules={[{ type: "number", min: 1, max: 15 }]}
+                                rules={[
+                                    { required: true, message: "Vui lòng nhập số hàng!" },
+                                    { type: "number", min: 1, max: 15 }
+                                ]}
                             >
                                 <InputNumber min={1} max={15} style={{ width: "100%" }} />
                             </Form.Item>
@@ -55,7 +58,10 @@ const SeatModalCreate = (props) => {
                             <Form.Item
                                 label="Col"
                                 name="col"
-                                rules={[{ type: "number", min: 1, max: 20 }]}
+                                rules={[
+                                    { required: true, message: "Vui lòng nhập số cột!" },
+                                    { type: "number", min: 1, max: 20 }
+                                ]}
                             >
                                 <InputNumber min={1} max={20} style={{ width: "100%" }} />
                             </Form.Item>

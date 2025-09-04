@@ -182,10 +182,21 @@ const createSeatAPI = (row, col, typeId, roomId) => {
     return axios.post(URL_BACKEND, data);
 }
 
+const fetchAllMoviesAPI = (current, pageSize, title, category) => {
+    return axios.get("/api/v1/movies", {
+        params: {
+            page: current,
+            size: pageSize,
+            title: title || null, // nếu không có tên thì truyền null
+            category: category || null // nếu không có category thì truyền null
+        }
+    });
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
     updateCinemaApi, fetchAllRoomAPI, fetchAllRoomTypeAPI, changeRoomStatusAPI, findCinemaByIdAPI, fetchRoomByIdAPI,
     updateRoomApi, fetchAllSeatByRoomIdAPI, fetchAllSeatTypeAPI, createRoomAPI, changeSeatStatusAPI, changeSeatTypeAPI,
-    createSeatAPI
+    createSeatAPI, fetchAllMoviesAPI
 }
