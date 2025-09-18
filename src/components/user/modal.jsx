@@ -21,7 +21,7 @@ const ModalUser = (props) => {
                 <p>ID: {dataUserDetail.id}</p>
                 <p>Name: {dataUserDetail.name}</p>
                 <p>Email: {dataUserDetail.email}</p>
-                <p>Role: {dataUserDetail.role.name}</p>
+                <p>Role ID: {dataUserDetail.roleId}</p>
                 <p>Phone: {dataUserDetail.phone}</p>
                 <p>Address: {dataUserDetail.address}</p>
                 <p>
@@ -29,7 +29,6 @@ const ModalUser = (props) => {
                         ? dataUserDetail.dateOfBirth.split("-").reverse().join("/")
                         : ""}
                 </p>
-                <p>Status: {dataUserDetail.enabled ? 'Enabled' : 'Disabled'}</p>
             </div>
                 :
                 <div></div>

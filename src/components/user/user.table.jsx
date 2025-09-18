@@ -15,7 +15,7 @@ const UserTable = (props) => {
             title: "STT",
             render: (_, record, index) => {
                 return (
-                    <div>{(index + 1) + (current - 1) * pageSize}</div>
+                    <div>{index + 1 + current * pageSize}</div>
                 )
             }
         },
@@ -35,7 +35,7 @@ const UserTable = (props) => {
             title: "Role",
             dataIndex: "role",
             key: "role",
-            render: (role) => role?.name || "", // lấy name trong role object
+            render: (text) => text || "", // lấy name trong role object
         },
         {
             title: "Action",
@@ -85,14 +85,15 @@ const UserTable = (props) => {
 
     const onChange = (pagination, filters, sorter, extra) => {
         if (pagination && pagination.current) {
-            if (+pagination.current !== +current) {
-                setCurrent(+pagination.current);
+            const newCurrent = pagination.current - 1; // convert 1-based (Antd) -> 0-based (API)
+            if (newCurrent !== current) {
+                setCurrent(newCurrent);
             }
         }
 
         if (pagination && pagination.pageSize) {
-            if (+pagination.pageSize !== +pageSize) {
-                setPageSize(+pagination.pageSize);
+            if (pagination.pageSize !== pageSize) {
+                setPageSize(pagination.pageSize);
             }
         }
     };
@@ -104,7 +105,7 @@ const UserTable = (props) => {
                 rowKey={"id"}
                 pagination={
                     {
-                        current: current,
+                        current: current + 1,
                         pageSize: pageSize,
                         showSizeChanger: true,
                         total: total,

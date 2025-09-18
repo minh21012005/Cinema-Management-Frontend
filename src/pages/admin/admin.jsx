@@ -9,7 +9,7 @@ const { Search } = Input;
 
 const AdminPage = () => {
     const [dataUser, setDataUser] = useState([]);
-    const [current, setCurrent] = useState(1);
+    const [current, setCurrent] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [total, setTotal] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -85,10 +85,10 @@ const AdminPage = () => {
         if (value) {
             let trimmedValue = value.trim();
             setEmailSearch(trimmedValue);
-            setCurrent(1); // reset về trang đầu tiên khi tìm kiếm
+            setCurrent(); // reset về trang đầu tiên khi tìm kiếm
         } else {
             setEmailSearch(null); // nếu không có giá trị tìm kiếm thì reset
-            setCurrent(1); // reset về trang đầu tiên
+            setCurrent(0); // reset về trang đầu tiên
         }
     }
 
@@ -124,7 +124,7 @@ const AdminPage = () => {
                                     style={{ width: 120 }}
                                     options={roleList.map(role => ({
                                         label: role.name,
-                                        value: role.name
+                                        value: role.id
                                     }))}
                                 />
                             </Space>
@@ -255,9 +255,11 @@ const AdminPage = () => {
                                 rules={[{ required: true, message: "Vui lòng chọn role!" }]}
                             >
                                 <Select placeholder="Chọn role" style={{ width: "100%" }}>
-                                    <Select.Option value="1">Admin</Select.Option>
-                                    <Select.Option value="2">Manager</Select.Option>
-                                    <Select.Option value="3">Staff</Select.Option>
+                                    {roleList.map((role) => (
+                                        <Select.Option key={role.id} value={role.id}>
+                                            {role.code}
+                                        </Select.Option>
+                                    ))}
                                 </Select>
                             </Form.Item>
                         </Form>

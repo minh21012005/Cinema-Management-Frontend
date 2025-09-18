@@ -77,9 +77,9 @@ instance.interceptors.response.use(function (response) {
         }
     }
 
-    if (error.response?.status === 404) {
-        window.location.href = "/404";
-    }
+    // if (error.response?.status === 404) {
+    //     window.location.href = "/404";
+    // }
 
     if (error.response && error.response.data) return error.response.data;
     return Promise.reject(error);

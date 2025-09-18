@@ -1,7 +1,7 @@
 import axios from "./axios.customize";
 
 const loginApi = (email, password) => {
-    const URL_BACKEND = "/api/v1/auth/login";
+    const URL_BACKEND = "/auth-service/api/v1/auth/login";
     const data = {
         username: email,
         password: password
@@ -10,12 +10,12 @@ const loginApi = (email, password) => {
 }
 
 const logoutApi = () => {
-    const URL_BACKEND = "/api/v1/auth/logout";
+    const URL_BACKEND = "/auth-service/api/v1/auth/logout";
     return axios.post(URL_BACKEND);
 }
 
 const registerUserApi = (name, email, password, phone, address, dateOfBirth, gender) => {
-    const URL_BACKEND = "/api/v1/auth/register";
+    const URL_BACKEND = "/auth-service/api/v1/auth/register";
     const data = {
         name: name,
         email: email,
@@ -29,37 +29,37 @@ const registerUserApi = (name, email, password, phone, address, dateOfBirth, gen
 }
 
 const getAccountApi = () => {
-    const URL_BACKEND = "/api/v1/auth/account";
+    const URL_BACKEND = "/auth-service/api/v1/auth/account";
     return axios.get(URL_BACKEND);
 }
 
 const refreshTokenApi = () => {
-    return axios.post("/api/v1/auth/refresh", {}, {
+    return axios.post("/auth-service/api/v1/auth/refresh", {}, {
         withCredentials: true // gửi cookie refresh token lên server
     });
 }
 
-const fetchAllUserAPI = (current, pageSize, email, role) => {
-    return axios.get("/api/v1/users", {
+const fetchAllUserAPI = (current, pageSize, email, roleId) => {
+    return axios.get("/user-service/api/v1/users", {
         params: {
             page: current,
             size: pageSize,
             email: email || null, // nếu không có email thì truyền null
-            role: role || null // nếu không có role thì truyền null
+            roleId: roleId || null // nếu không có role thì truyền null
         }
     });
 };
 
 const changeUserStatusAPI = (userId) => {
-    return axios.put(`/api/v1/users/change-status/${userId}`);
+    return axios.put(`/auth-service/api/v1/users/change-status/${userId}`);
 }
 
 const fetchUser = (userId) => {
-    return axios.get(`/api/v1/users/${userId}`);
+    return axios.get(`/user-service/api/v1/users/${userId}`);
 }
 
 const createUserApi = (name, email, password, phone, address, dateOfBirth, gender, roleId) => {
-    const URL_BACKEND = "/api/v1/users/register";
+    const URL_BACKEND = "/user-service/api/v1/users";
     const data = {
         name: name,
         email: email,
@@ -84,7 +84,7 @@ const fetchCinemaAPI = (current, pageSize, name) => {
 };
 
 const fetchAllRoleAPI = () => {
-    return axios.get("/api/v1/roles");
+    return axios.get("/auth-service/api/v1/roles");
 }
 
 const createCinemaApi = (name, city, address, phone) => {
