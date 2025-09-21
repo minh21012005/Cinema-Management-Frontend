@@ -8,7 +8,7 @@ const { Search } = Input;
 
 const CinemaListPage = () => {
     const [dataCinema, setDataCinema] = useState([]);
-    const [current, setCurrent] = useState(1);
+    const [current, setCurrent] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [total, setTotal] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,10 +39,10 @@ const CinemaListPage = () => {
         if (value) {
             let trimmedValue = value.trim();
             setNameSearch(trimmedValue);
-            setCurrent(1);
+            setCurrent(0);
         } else {
             setNameSearch(null);
-            setCurrent(1);
+            setCurrent(0);
         }
     };
 

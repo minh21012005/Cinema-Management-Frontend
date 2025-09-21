@@ -74,7 +74,7 @@ const createUserApi = (name, email, password, phone, address, dateOfBirth, gende
 }
 
 const fetchCinemaAPI = (current, pageSize, name) => {
-    return axios.get("/api/v1/cinemas", {
+    return axios.get("/cinema-service/api/v1/cinemas/fetch-all", {
         params: {
             page: current,
             size: pageSize,
@@ -88,7 +88,7 @@ const fetchAllRoleAPI = () => {
 }
 
 const createCinemaApi = (name, city, address, phone) => {
-    const URL_BACKEND = "/api/v1/cinemas";
+    const URL_BACKEND = "/cinema-service/api/v1/cinemas";
     const data = {
         name: name,
         city: city,
@@ -99,13 +99,12 @@ const createCinemaApi = (name, city, address, phone) => {
 }
 
 const changeCinemaStatusAPI = (id) => {
-    return axios.put(`/api/v1/cinemas/change-status/${id}`);
+    return axios.put(`/cinema-service/api/v1/cinemas/change-status/${id}`);
 }
 
 const updateCinemaApi = (id, name, city, address, phone) => {
-    const URL_BACKEND = "api/v1/cinemas";
+    const URL_BACKEND = `/cinema-service/api/v1/cinemas/${id}`;
     const data = {
-        id: id,
         name: name,
         city: city,
         address: address,
@@ -115,29 +114,28 @@ const updateCinemaApi = (id, name, city, address, phone) => {
 }
 
 const fetchAllRoomAPI = (id) => {
-    return axios.get(`api/v1/cinemas/${id}/rooms`);
+    return axios.get(`/cinema-service/api/v1/rooms/cinemas/${id}`);
 }
 
 const fetchAllRoomTypeAPI = () => {
-    return axios.get("api/v1/rooms/types");
+    return axios.get("/cinema-service/api/v1/rooms/types");
 }
 
 const changeRoomStatusAPI = (id) => {
-    return axios.put(`/api/v1/rooms/change-status/${id}`);
+    return axios.put(`/cinema-service/api/v1/rooms/change-status/${id}`);
 }
 
 const findCinemaByIdAPI = (id) => {
-    return axios.get(`api/v1/cinemas/${id}`);
+    return axios.get(`/cinema-service/api/v1/cinemas/${id}`);
 }
 
 const fetchRoomByIdAPI = (id) => {
-    return axios.get(`api/v1/rooms/${id}`);
+    return axios.get(`/cinema-service/api/v1/rooms/${id}`);
 }
 
 const updateRoomApi = (id, name, typeId) => {
-    const URL_BACKEND = "api/v1/rooms";
+    const URL_BACKEND = `/cinema-service/api/v1/rooms/${id}`;
     const data = {
-        id: id,
         name: name,
         typeId: typeId
     }
@@ -145,11 +143,11 @@ const updateRoomApi = (id, name, typeId) => {
 }
 
 const fetchAllSeatByRoomIdAPI = (roomId) => {
-    return axios.get(`api/v1/rooms/${roomId}/seats`);
+    return axios.get(`/cinema-service/api/v1/seats/rooms/${roomId}`);
 }
 
 const fetchAllSeatTypeAPI = () => {
-    return axios.get("api/v1/seats/types");
+    return axios.get("/cinema-service/api/v1/seats/types");
 }
 
 const createRoomAPI = (cinemaId, name, roomTypeId, seats) => {
@@ -159,20 +157,20 @@ const createRoomAPI = (cinemaId, name, roomTypeId, seats) => {
         roomTypeId: roomTypeId,
         seats: seats
     }
-    return axios.post("api/v1/rooms", data);
+    return axios.post("/cinema-service/api/v1/rooms/create", data);
 }
 
 const changeSeatStatusAPI = (id) => {
-    return axios.put(`/api/v1/seats/change-status/${id}`);
+    return axios.put(`/cinema-service/api/v1/seats/change-status/${id}`);
 }
 
 const changeSeatTypeAPI = (id, typeId) => {
-    const URL_BACKEND = `/api/v1/seats/${id}/type/${typeId}`;
+    const URL_BACKEND = `/cinema-service/api/v1/seats/${id}/type/${typeId}`;
     return axios.put(URL_BACKEND);
 }
 
 const createSeatAPI = (row, col, typeId, roomId) => {
-    const URL_BACKEND = `/api/v1/seats`;
+    const URL_BACKEND = `/cinema-service/api/v1/seats`;
     const data = {
         row: row,
         col: col,

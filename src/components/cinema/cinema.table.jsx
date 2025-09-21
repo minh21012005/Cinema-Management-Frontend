@@ -17,7 +17,7 @@ const CinemaTable = (props) => {
             title: "STT",
             render: (_, record, index) => {
                 return (
-                    <div>{(index + 1) + (current - 1) * pageSize}</div>
+                    <div>{index + 1 + current * pageSize}</div>
                 )
             }
         },
@@ -78,6 +78,7 @@ const CinemaTable = (props) => {
     ];
 
     const changeStatus = async (id) => {
+        console.log(id)
         try {
             await changeCinemaStatusAPI(id);
             loadCinema(); // reload user data after changing status
@@ -88,14 +89,15 @@ const CinemaTable = (props) => {
 
     const onChange = (pagination, filters, sorter, extra) => {
         if (pagination && pagination.current) {
-            if (+pagination.current !== +current) {
-                setCurrent(+pagination.current);
+            const newCurrent = pagination.current - 1; // convert 1-based (Antd) -> 0-based (API)
+            if (newCurrent !== current) {
+                setCurrent(newCurrent);
             }
         }
 
         if (pagination && pagination.pageSize) {
-            if (+pagination.pageSize !== +pageSize) {
-                setPageSize(+pagination.pageSize);
+            if (pagination.pageSize !== pageSize) {
+                setPageSize(pagination.pageSize);
             }
         }
     };
@@ -156,6 +158,10 @@ const CinemaTable = (props) => {
                 rowKey={"id"}
                 pagination={
                     {
+                        current: current + 1,
+                        pageSize: pageSize,
+                        showSizeChanger: true,
+                        total: total,
                         showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} rows</div>) }
                     }}
                 onChange={onChange}

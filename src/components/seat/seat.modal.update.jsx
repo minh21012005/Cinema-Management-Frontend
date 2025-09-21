@@ -95,7 +95,6 @@ const SeatModalUpdate = (props) => {
                     checked={seatSelected?.active}
                     checkedChildren="Enabled"
                     unCheckedChildren="Disabled"
-                    onClick={(e) => e.preventDefault()} // chặn đổi trạng thái ngay lập tức
                 />
             </Popconfirm>
         </Modal>

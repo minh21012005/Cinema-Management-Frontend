@@ -43,7 +43,6 @@ const RoomTable = (props) => {
                             checked={record.active}
                             checkedChildren="Enabled"
                             unCheckedChildren="Disabled"
-                            onClick={(e) => e.preventDefault()} // chặn đổi trạng thái ngay lập tức
                         />
                     </Popconfirm>
                 </Space>
