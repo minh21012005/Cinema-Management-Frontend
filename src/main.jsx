@@ -19,6 +19,7 @@ import RoomListPage from './pages/manager/room.list.jsx';
 import SeatListPage from './pages/manager/seat.list.jsx';
 import RoomCreate from './pages/manager/room.create.jsx';
 import MovieListPage from './pages/manager/movie.list.jsx';
+import ShowTimeListPage from './pages/manager/showtime.list.jsx';
 
 const router = createBrowserRouter([
   {
@@ -63,6 +64,10 @@ const router = createBrowserRouter([
       {
         path: "movies",
         element: <MovieListPage />,
+      },
+      {
+        path: "cinemas/:id/showtime",
+        element: <ShowTimeListPage />,
       },
     ],
   },

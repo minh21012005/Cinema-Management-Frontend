@@ -1,8 +1,8 @@
 import { changeCinemaStatusAPI, updateCinemaApi } from "@/services/api.service";
-import { EditOutlined } from "@ant-design/icons";
+import { EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { Form, Input, Modal, notification, Popconfirm, Space, Switch, Table } from "antd";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const CinemaTable = (props) => {
 
@@ -11,6 +11,7 @@ const CinemaTable = (props) => {
     const [cinemaSelected, setCinemaSelected] = useState(null);
 
     const [form] = Form.useForm();
+    const nav = useNavigate();
 
     const columns = [
         {
@@ -54,6 +55,9 @@ const CinemaTable = (props) => {
             key: "action",
             render: (_, record) => (
                 <Space size="middle">
+                    <EyeOutlined style={{ color: "#1677ff" }}
+                        onClick={() => { nav(`/manager/cinemas/${record.id}/showtime`) }}
+                    />
                     <EditOutlined
                         onClick={() => {
                             handleUpdate(record.id)

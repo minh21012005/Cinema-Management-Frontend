@@ -191,10 +191,45 @@ const fetchAllMoviesAPI = (current, pageSize, title, category) => {
     });
 }
 
+const fetchShowtimeByCinemaAPI = (id, current, pageSize, title, roomId) => {
+    const URL_BACKEND = `/cinema-service/api/v1/showtime/cinemas/${id}`;
+    return axios.get(URL_BACKEND, {
+        params: {
+            page: current,
+            size: pageSize,
+            title: title || null,
+            roomId: roomId || null
+        }
+    });
+}
+
+const fetchRoomByCinemaAPI = (id) => {
+    return axios.get(`/cinema-service/api/v1/rooms/cinemas/${id}`);
+}
+
+const fetchActiveMovies = () => {
+    return axios.get(`/movie-service/api/v1/movies/active`);
+}
+
+const createShowtimeAPI = (roomId, movieId, startTime) => {
+    const URL_BACKEND = `/cinema-service/api/v1/showtime`;
+    const data = {
+        roomId: roomId,
+        movieId: movieId,
+        startTime: startTime
+    }
+    return axios.post(URL_BACKEND, data);
+}
+
+const changeShowtimeStatusAPI = (id) => {
+    return axios.put(`/cinema-service/api/v1/showtime/change-status/${id}`);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
     updateCinemaApi, fetchAllRoomAPI, fetchAllRoomTypeAPI, changeRoomStatusAPI, findCinemaByIdAPI, fetchRoomByIdAPI,
     updateRoomApi, fetchAllSeatByRoomIdAPI, fetchAllSeatTypeAPI, createRoomAPI, changeSeatStatusAPI, changeSeatTypeAPI,
-    createSeatAPI, fetchAllMoviesAPI
+    createSeatAPI, fetchAllMoviesAPI, fetchShowtimeByCinemaAPI, fetchRoomByCinemaAPI, fetchActiveMovies, createShowtimeAPI,
+    changeShowtimeStatusAPI
 }
