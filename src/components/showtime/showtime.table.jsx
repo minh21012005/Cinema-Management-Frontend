@@ -80,9 +80,14 @@ const ShowTimeTable = (props) => {
             const res = await changeShowtimeStatusAPI(id);
             if (res.data) {
                 fetchShowtimeByCinema();
+            } else {
+                notification.error({
+                    message: "Error",
+                    description: JSON.stringify(res.message) || "Failed to update showtime",
+                })
             }
         } catch (error) {
-            console.error("Failed to change user status:", error);
+            console.error("Failed to change showtime status:", error);
         }
     }
 

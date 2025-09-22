@@ -87,8 +87,16 @@ const RoomTable = (props) => {
 
     const changeStatus = async (id) => {
         try {
-            await changeRoomStatusAPI(id);
-            loadRoom();
+            const res = await changeRoomStatusAPI(id);
+            if (res.data) {
+                loadRoom();
+            } else {
+                notification.error({
+                    message: "Cập nhật phòng thất bại",
+                    description: JSON.stringify(res.message)
+                });
+            }
+
         } catch (error) {
             console.error("Failed to change room status:", error);
         }

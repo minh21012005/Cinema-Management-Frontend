@@ -40,8 +40,6 @@ const SeatModalUpdate = (props) => {
         handleRefresh();
     };
 
-
-
     const changeSeatStatus = async (id) => {
         const res = await changeSeatStatusAPI(id);
         if (res && res.data) {
@@ -54,7 +52,7 @@ const SeatModalUpdate = (props) => {
         } else {
             notification.error({
                 message: "Error",
-                description: "Failed to change seat status",
+                description: JSON.stringify(res.message)
             })
         }
     }
