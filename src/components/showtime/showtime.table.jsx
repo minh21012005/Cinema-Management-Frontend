@@ -2,9 +2,14 @@ import { changeShowtimeStatusAPI } from "@/services/api.service";
 import { EditOutlined } from "@ant-design/icons";
 import { notification, Popconfirm, Space, Switch, Table } from "antd";
 import dayjs from "dayjs";
+import { useState } from "react";
+import ShowtimeModalUpdate from "./showtime.modal.update";
 
 const ShowTimeTable = (props) => {
-    const { dataShowtime, setDataShowtime, current, pageSize, total, setCurrent, setPageSize, fetchShowtimeByCinema } = props;
+    const { dataShowtime, setDataShowtime, current, pageSize, total,
+        setCurrent, setPageSize, fetchShowtimeByCinema, roomList, movieList } = props;
+    const [isModalUpdateOpen, setIsModalUpdateOpen] = useState(false);
+    const [showTimeSelected, setShowtimeSelected] = useState(null);
 
     const columns = [
         {
@@ -91,21 +96,38 @@ const ShowTimeTable = (props) => {
         }
     }
 
+    const handleUpdate = async (id) => {
+        const showTimeSelected = dataShowtime.find(s => s.id === id);
+        setShowtimeSelected(showTimeSelected);
+        setIsModalUpdateOpen(true);
+    }
+
     return (
-        <Table
-            columns={columns}
-            dataSource={dataShowtime || []}
-            rowKey="id"
-            pagination={
-                {
-                    current: current + 1,
-                    pageSize: pageSize,
-                    showSizeChanger: true,
-                    total: total,
-                    showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} rows</div>) }
-                }}
-            onChange={onChange}
-        />
+        <>
+            <Table
+                columns={columns}
+                dataSource={dataShowtime || []}
+                rowKey="id"
+                pagination={
+                    {
+                        current: current + 1,
+                        pageSize: pageSize,
+                        showSizeChanger: true,
+                        total: total,
+                        showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} rows</div>) }
+                    }}
+                onChange={onChange}
+            />
+            <ShowtimeModalUpdate
+                isModalUpdateOpen={isModalUpdateOpen}
+                setIsModalUpdateOpen={setIsModalUpdateOpen}
+                roomList={roomList}
+                movieList={movieList}
+                setShowtimeSelected={setShowtimeSelected}
+                showTimeSelected={showTimeSelected}
+                fetchShowtimeByCinema={fetchShowtimeByCinema}
+            />
+        </>
     );
 };
 

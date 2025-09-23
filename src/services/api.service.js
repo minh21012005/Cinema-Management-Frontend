@@ -227,11 +227,21 @@ const changeShowtimeStatusAPI = (id) => {
     return axios.put(`/cinema-service/api/v1/showtime/change-status/${id}`);
 }
 
+const updateShowtimeAPI = (id, roomId, movieId, startTime) => {
+    const URL_BACKEND = `/cinema-service/api/v1/showtime/${id}`;
+    const data = {
+        roomId: roomId,
+        movieId: movieId,
+        startTime: startTime
+    };
+    return axios.put(URL_BACKEND, data);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
     updateCinemaApi, fetchAllRoomAPI, fetchAllRoomTypeAPI, changeRoomStatusAPI, findCinemaByIdAPI, fetchRoomByIdAPI,
     updateRoomApi, fetchAllSeatByRoomIdAPI, fetchAllSeatTypeAPI, createRoomAPI, changeSeatStatusAPI, changeSeatTypeAPI,
     createSeatAPI, fetchAllMoviesAPI, fetchShowtimeByCinemaAPI, fetchRoomByCinemaAPI, fetchActiveMovies, createShowtimeAPI,
-    changeShowtimeStatusAPI
+    changeShowtimeStatusAPI, updateShowtimeAPI
 }

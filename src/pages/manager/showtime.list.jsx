@@ -133,6 +133,8 @@ const ShowTimeListPage = () => {
                 setCurrent={setCurrent}
                 setPageSize={setPageSize}
                 fetchShowtimeByCinema={fetchShowtimeByCinema}
+                roomList={roomList}
+                movieList={movieList}
             />
             <ShowtimeModalCreate
                 isModalOpen={isModalOpen}
