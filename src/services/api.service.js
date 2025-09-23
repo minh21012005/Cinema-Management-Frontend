@@ -6,7 +6,9 @@ const loginApi = (email, password) => {
         username: email,
         password: password
     }
-    return axios.post(URL_BACKEND, data);
+    return axios.post(URL_BACKEND, data, {
+        withCredentials: true // <-- bắt buộc để cookie được lưu
+    });
 }
 
 const logoutApi = () => {

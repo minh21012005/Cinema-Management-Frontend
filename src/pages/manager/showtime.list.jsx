@@ -1,6 +1,6 @@
 import ShowtimeModalCreate from "@/components/showtime/showtime.modal.create";
 import ShowTimeTable from "@/components/showtime/showtime.table";
-import { fetchActiveMovies, fetchRoomByCinemaAPI, fetchShowtimeByCinemaAPI } from "@/services/api.service";
+import { fetchActiveMovies, fetchRoomByCinemaAPI, fetchShowtimeByCinemaAPI, findCinemaByIdAPI } from "@/services/api.service";
 import { Button, Input, Select, Space } from "antd";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -9,6 +9,7 @@ const { Search } = Input;
 const ShowTimeListPage = () => {
 
     const { id } = useParams();
+    const [cinemaDetails, setCinemaDetails] = useState(null);
     const [current, setCurrent] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [total, setTotal] = useState(0);
@@ -23,6 +24,7 @@ const ShowTimeListPage = () => {
         fetchShowtimeByCinema();
         fetchRoomList();
         fetchMovieList();
+        fetchCinema();
     }, [current, pageSize, titleSearch, roomSelected]);
 
     const fetchRoomList = async () => {
@@ -68,6 +70,13 @@ const ShowTimeListPage = () => {
         }
     };
 
+    const fetchCinema = async () => {
+        const res = await findCinemaByIdAPI(id);
+        if (res.data) {
+            setCinemaDetails(res.data);
+        }
+    };
+
     const showModal = () => {
         setIsModalOpen(true);
     }
@@ -75,27 +84,40 @@ const ShowTimeListPage = () => {
     return (
         <>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '330px' }}>
-                    <Space direction="vertical">
-                        <Search
-                            placeholder="Nhập title..."
-                            allowClear
-                            onSearch={onSearch}
-                            style={{ width: 200 }}
-                        />
-                    </Space>
-                    <Space wrap>
-                        <Select
-                            placeholder="Select room"
-                            allowClear
-                            onChange={handleChange}
-                            style={{ width: 120 }}
-                            options={roomList.map(room => ({
-                                label: room.name,
-                                value: room.id
-                            }))}
-                        />
-                    </Space>
+                <div style={{ display: 'flex', flex: 1, gap: '10px', alignItems: 'center' }}>
+                    <h2
+                        style={{
+                            margin: 0,
+                            fontFamily: "Inter, sans-serif",
+                            fontWeight: 600,
+                            fontSize: "1.5rem",
+                            lineHeight: 1.4,
+                            color: "#1a1a1a",
+                            letterSpacing: "-0.5px",
+                            flexShrink: 1,        // cho phép co nhỏ
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap', // 1 dòng, chữ dài bị ... 
+                        }}
+                        title={cinemaDetails?.name} // hover xem full name
+                    >
+                        {cinemaDetails ? cinemaDetails.name : "Loading..."}
+                    </h2>
+
+                    <Search
+                        placeholder="Nhập title..."
+                        allowClear
+                        onSearch={onSearch}
+                        style={{ width: 200 }}
+                    />
+
+                    <Select
+                        placeholder="Select room"
+                        allowClear
+                        onChange={handleChange}
+                        style={{ width: 120 }}
+                        options={roomList.map(room => ({ label: room.name, value: room.id }))}
+                    />
                 </div>
 
                 <Button type="primary" onClick={showModal}>
