@@ -1,10 +1,11 @@
 import ShowtimeModalCreate from "@/components/showtime/showtime.modal.create";
 import ShowTimeTable from "@/components/showtime/showtime.table";
 import { fetchActiveMovies, fetchRoomByCinemaAPI, fetchShowtimeByCinemaAPI, findCinemaByIdAPI } from "@/services/api.service";
-import { Button, Input, Select, Space } from "antd";
+import { Button, DatePicker, Input, Select } from "antd";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 const { Search } = Input;
+const { RangePicker } = DatePicker;
 
 const ShowTimeListPage = () => {
 
@@ -15,6 +16,7 @@ const ShowTimeListPage = () => {
     const [total, setTotal] = useState(0);
     const [titleSearch, setTitleSearch] = useState(null);
     const [roomSelected, setRoomSelected] = useState(null);
+    const [dateRange, setDateRange] = useState(null);
     const [roomList, setRoomList] = useState([]);
     const [movieList, setMovieList] = useState([]);
     const [dataShowtime, setDataShowtime] = useState([]);
@@ -25,7 +27,7 @@ const ShowTimeListPage = () => {
         fetchRoomList();
         fetchMovieList();
         fetchCinema();
-    }, [current, pageSize, titleSearch, roomSelected]);
+    }, [current, pageSize, titleSearch, roomSelected, dateRange]);
 
     const fetchRoomList = async () => {
         const res = await fetchRoomByCinemaAPI(id);
@@ -35,7 +37,11 @@ const ShowTimeListPage = () => {
     }
 
     const fetchShowtimeByCinema = async () => {
-        const res = await fetchShowtimeByCinemaAPI(id, current, pageSize, titleSearch, roomSelected);
+        const fromDate = dateRange?.[0] ? dateRange[0].format("YYYY-MM-DD") : null;
+        const toDate = dateRange?.[1] ? dateRange[1].format("YYYY-MM-DD") : null;
+
+        const res = await fetchShowtimeByCinemaAPI(id, current, pageSize, titleSearch, roomSelected, fromDate, toDate);
+
         if (res.data) {
             setDataShowtime(res.data.result)
             setCurrent(res.data.meta.page);
@@ -117,6 +123,11 @@ const ShowTimeListPage = () => {
                         onChange={handleChange}
                         style={{ width: 120 }}
                         options={roomList.map(room => ({ label: room.name, value: room.id }))}
+                    />
+
+                    <RangePicker
+                        format="YYYY-MM-DD"
+                        onChange={(values) => setDateRange(values)}
                     />
                 </div>
 

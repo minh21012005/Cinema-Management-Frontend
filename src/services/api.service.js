@@ -182,25 +182,27 @@ const createSeatAPI = (row, col, typeId, roomId) => {
     return axios.post(URL_BACKEND, data);
 }
 
-const fetchAllMoviesAPI = (current, pageSize, title, category) => {
-    return axios.get("/api/v1/movies", {
+const fetchAllMoviesAPI = (current, pageSize, title, categoryId) => {
+    return axios.get("/movie-service/api/v1/movies/all", {
         params: {
             page: current,
             size: pageSize,
             title: title || null, // nếu không có tên thì truyền null
-            category: category || null // nếu không có category thì truyền null
+            categoryId: categoryId || null // nếu không có category thì truyền null
         }
     });
 }
 
-const fetchShowtimeByCinemaAPI = (id, current, pageSize, title, roomId) => {
+const fetchShowtimeByCinemaAPI = (id, current, pageSize, title, roomId, fromDate, toDate) => {
     const URL_BACKEND = `/cinema-service/api/v1/showtime/cinemas/${id}`;
     return axios.get(URL_BACKEND, {
         params: {
             page: current,
             size: pageSize,
             title: title || null,
-            roomId: roomId || null
+            roomId: roomId || null,
+            fromDate: fromDate || null,
+            toDate: toDate || null
         }
     });
 }

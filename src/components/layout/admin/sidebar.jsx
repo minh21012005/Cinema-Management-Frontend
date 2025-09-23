@@ -17,9 +17,7 @@ const Sidebar = () => {
     const pathToKey = useMemo(() => [
         { pattern: /^\/manager$/, key: "cinema-management" },
         { pattern: /^\/manager\/movies/, key: "movie" },
-        { pattern: /^\/manager\/category/, key: "category" },
         { pattern: /^\/manager\/rating/, key: "rating" },
-        { pattern: /^\/manager\/showtime/, key: "showtime" },
         { pattern: /^\/manager\/food/, key: "food" },
         { pattern: /^\/manager\/combo/, key: "combo" },
         { pattern: /^\/manager\/ticket-report/, key: "ticket-report" },
@@ -66,15 +64,7 @@ const Sidebar = () => {
                         label: 'Movies',
                         children: [
                             { label: 'Movie', key: 'movie', onClick: () => nav('/manager/movies') },
-                            { label: 'Category', key: 'category', onClick: () => nav('/manager/category') },
                             { label: 'Rating', key: 'rating', onClick: () => nav('/manager/rating') },
-                        ],
-                    },
-                    {
-                        type: 'group',
-                        label: 'Showtime',
-                        children: [
-                            { label: 'Showtime', key: 'showtime', onClick: () => nav('/manager/showtime') },
                         ],
                     },
                 ],

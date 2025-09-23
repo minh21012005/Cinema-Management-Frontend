@@ -4,7 +4,7 @@ import { render } from "nprogress";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import MovieDrawer from "./movie.drawer";
-// import { changeMovieStatusAPI, updateMovieApi } from "@/services/api.service"; // nếu có API
+import dayjs from "dayjs";
 
 const MovieTable = (props) => {
     const { dataMovie, loadMovie, current, pageSize, total, setCurrent, setPageSize } = props;
@@ -15,9 +15,11 @@ const MovieTable = (props) => {
     const columns = [
         {
             title: "STT",
-            render: (_, record, index) => (
-                <div>{(index + 1) + (current - 1) * pageSize}</div>
-            )
+            render: (_, record, index) => {
+                return (
+                    <div>{index + 1 + current * pageSize}</div>
+                )
+            }
         },
         {
             title: "Title",
@@ -27,7 +29,7 @@ const MovieTable = (props) => {
         },
         {
             title: "Category",
-            dataIndex: "categories",
+            dataIndex: "categoryCodes",
             key: "category",
             render: (categories) => categories.join(", "),
         },
@@ -40,11 +42,13 @@ const MovieTable = (props) => {
             title: "Release Date",
             dataIndex: "releaseDate",
             key: "releaseDate",
+            render: (date) => date ? dayjs(date).format("DD/MM/YYYY") : "",
         },
         {
             title: "End Date",
             dataIndex: "endDate",
             key: "endDate",
+            render: (date) => date ? dayjs(date).format("DD/MM/YYYY") : "",
         },
         {
             title: "Action",
@@ -96,12 +100,18 @@ const MovieTable = (props) => {
         }
     };
 
-    const onChange = (pagination) => {
-        if (pagination?.current && +pagination.current !== +current) {
-            setCurrent(+pagination.current);
+    const onChange = (pagination, filters, sorter, extra) => {
+        if (pagination && pagination.current) {
+            const newCurrent = pagination.current - 1; // convert 1-based (Antd) -> 0-based (API)
+            if (newCurrent !== current) {
+                setCurrent(newCurrent);
+            }
         }
-        if (pagination?.pageSize && +pagination.pageSize !== +pageSize) {
-            setPageSize(+pagination.pageSize);
+
+        if (pagination && pagination.pageSize) {
+            if (pagination.pageSize !== pageSize) {
+                setPageSize(pagination.pageSize);
+            }
         }
     };
 
@@ -113,7 +123,7 @@ const MovieTable = (props) => {
                 rowKey="id"
                 pagination={{
                     total: total,
-                    current: current,
+                    current: current + 1,
                     pageSize: pageSize,
                     showTotal: (total, range) => (
                         <div>{range[0]}-{range[1]} trên {total} movies</div>

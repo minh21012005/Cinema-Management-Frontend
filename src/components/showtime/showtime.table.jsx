@@ -14,7 +14,11 @@ const ShowTimeTable = (props) => {
     const columns = [
         {
             title: "STT",
-            render: (_, __, index) => index + 1
+            render: (_, record, index) => {
+                return (
+                    <div>{index + 1 + current * pageSize}</div>
+                )
+            }
         },
         {
             title: "Phòng",
@@ -114,7 +118,7 @@ const ShowTimeTable = (props) => {
                         pageSize: pageSize,
                         showSizeChanger: true,
                         total: total,
-                        showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} rows</div>) }
+                        showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} showtimes</div>) }
                     }}
                 onChange={onChange}
             />

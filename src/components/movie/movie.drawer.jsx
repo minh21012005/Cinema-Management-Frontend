@@ -21,13 +21,15 @@ const MovieDrawer = (props) => {
                 {movieSelected ? <div style={{ display: "flex", gap: "10px", flexDirection: "column" }}>
                     <p>ID: {movieSelected.id}</p>
                     <p>Title: {movieSelected.title}</p>
-                    <p>Categories: {movieSelected.categories.join(", ")}</p>
+                    <p>
+                        Categories: {movieSelected?.categoryCodes?.length > 0
+                            ? movieSelected.categoryCodes.map(c => c.toLowerCase()).join(", ")
+                            : "N/A"}
+                    </p>
                     <p>Duration (min): {movieSelected.durationInMinutes}</p>
                     <p>Release Date: {movieSelected.releaseDate}</p>
                     <p>End Date: {movieSelected.endDate}</p>
-                    <p>Rating: {movieSelected.rating}</p>
                     <p>Description: {movieSelected.description}</p>
-                    <p>Active: {movieSelected.active ? "Enabled" : "Disabled"}</p>
                 </div>
                     :
                     <div></div>
