@@ -1,7 +1,7 @@
 import { Form, DatePicker, Modal, Select, notification, Input, InputNumber, Button, Row, Col, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useState } from "react";
-import { createMovieAPI, getMediaUrlAPI, uploadFileAPI } from "@/services/api.service";
+import { commitFileAPI, createMovieAPI, getMediaUrlAPI, uploadTempFileAPI } from "@/services/api.service";
 
 const MovieCreateModal = (props) => {
     const { isModalCreateOpen, setIsModalCreateOpen, categories, loadMovie } = props;
@@ -16,29 +16,39 @@ const MovieCreateModal = (props) => {
     };
 
     const onFinish = async (values) => {
-        let release = values.releaseDate.format("YYYY-MM-DD");
-        let end = values.endDate ? values.endDate.format("YYYY-MM-DD") : null;
-        const res = await createMovieAPI(values.title, values.description,
-            values.durationInMinutes, release, end, values.posterKey, values.categoryIds)
-        if (res.data) {
-            notification.success({
-                message: "Success",
-                description: "Tạo phim thành công!"
-            })
-            handleCancel();
-            loadMovie();
+        const resCommit = await commitFileAPI(values.posterKey, "movies");
+        if (resCommit.data) {
+            let newKey = resCommit.data;
+            let release = values.releaseDate.format("YYYY-MM-DD");
+            let end = values.endDate ? values.endDate.format("YYYY-MM-DD") : null;
+            const res = await createMovieAPI(values.title, values.description,
+                values.durationInMinutes, release, end, newKey, values.categoryIds)
+            if (res.data) {
+                notification.success({
+                    message: "Success",
+                    description: "Tạo phim thành công!"
+                })
+                handleCancel();
+                loadMovie();
+            } else {
+                notification.error({
+                    message: "Failed",
+                    description: JSON.stringify(res.message)
+                })
+            }
         } else {
             notification.error({
                 message: "Failed",
-                description: JSON.stringify(res.message)
+                description: "Upload file lỗi!"
             })
         }
+
     };
 
     const handleUpload = async ({ file }) => {
         setUploading(true);
         try {
-            const res = await uploadFileAPI(file, "movies"); // call API upload file
+            const res = await uploadTempFileAPI(file); // call API upload file
             if (res.data) {
                 notification.success({
                     message: "Success",

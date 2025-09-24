@@ -243,19 +243,6 @@ const fetchAllCategoryActive = () => {
     return axios.get(`/movie-service/api/v1/categories/all`);
 }
 
-const uploadFileAPI = (file, type) => {
-    const URL_BACKEND = `media-service/api/v1/media/upload`;
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("type", type);
-
-    return axios.post(URL_BACKEND, formData, {
-        headers: {
-            "Content-Type": "multipart/form-data",
-        },
-    });
-};
-
 const getMediaUrlAPI = (objectKey) => {
     const URL_BACKEND = `media-service/api/v1/media/url`;
     return axios.get(URL_BACKEND, {
@@ -280,11 +267,34 @@ const createMovieAPI = (title, description, durationInMinutes, releaseDate, endD
     return axios.post(URL_BACKEND, data);
 }
 
+const uploadTempFileAPI = (file) => {
+    const URL_BACKEND = `media-service/api/v1/media/upload/temp`;
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return axios.post(URL_BACKEND, formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+}
+
+const commitFileAPI = (objectKey, type) => {
+    const URL_BACKEND = `media-service/api/v1/media/commit`;
+    return axios.post(URL_BACKEND, null, {
+        params: {
+            objectKey: objectKey,
+            type: type
+        }
+    });
+};
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
     updateCinemaApi, fetchAllRoomAPI, fetchAllRoomTypeAPI, changeRoomStatusAPI, findCinemaByIdAPI, fetchRoomByIdAPI,
     updateRoomApi, fetchAllSeatByRoomIdAPI, fetchAllSeatTypeAPI, createRoomAPI, changeSeatStatusAPI, changeSeatTypeAPI,
     createSeatAPI, fetchAllMoviesAPI, fetchShowtimeByCinemaAPI, fetchRoomByCinemaAPI, fetchActiveMovies, createShowtimeAPI,
-    changeShowtimeStatusAPI, updateShowtimeAPI, fetchAllCategoryActive, uploadFileAPI, createMovieAPI, getMediaUrlAPI
+    changeShowtimeStatusAPI, updateShowtimeAPI, fetchAllCategoryActive, createMovieAPI, getMediaUrlAPI, uploadTempFileAPI,
+    commitFileAPI
 }
