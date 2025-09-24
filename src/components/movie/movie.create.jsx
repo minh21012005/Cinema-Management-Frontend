@@ -39,7 +39,7 @@ const MovieCreateModal = (props) => {
         } else {
             notification.error({
                 message: "Failed",
-                description: "Upload file lỗi!"
+                description: "Không có ảnh hoặc up load file lỗi!"
             })
         }
 
@@ -136,7 +136,11 @@ const MovieCreateModal = (props) => {
                     </Col>
                 </Row>
 
-                <Form.Item label="Poster">
+                <Form.Item
+                    label="Poster"
+                    name="poster"
+                    rules={[{ required: true, message: "Vui lòng chọn poster cho phim!" }]}
+                >
                     <Upload
                         customRequest={handleUpload}
                         showUploadList={false}

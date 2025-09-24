@@ -12,18 +12,22 @@ const MovieListPage = () => {
     const [current, setCurrent] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [total, setTotal] = useState(0);
-    const [movieSelected, setMovieSelected] = useState(null);
     const [categories, setCategories] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [titleSearch, setTitleSearch] = useState(null);
+    const [categorySelected, setCategorySelected] = useState([]);
+    const [dateRange, setDateRange] = useState(null);
     const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
 
     useEffect(() => {
         loadMovie();
         loadCategories();
-    }, [current, pageSize]);
+    }, [current, pageSize, titleSearch, categorySelected, dateRange]);
 
     const loadMovie = async () => {
-        const res = await fetchAllMoviesAPI(current, pageSize);
+        const fromDate = dateRange?.[0] ? dateRange[0].format("YYYY-MM-DD") : null;
+        const toDate = dateRange?.[1] ? dateRange[1].format("YYYY-MM-DD") : null;
+
+        const res = await fetchAllMoviesAPI(current, pageSize, titleSearch, categorySelected, fromDate, toDate);
         if (res.data) {
             setDataMovie(res.data.result);
             setCurrent(res.data.meta.page);
@@ -40,11 +44,22 @@ const MovieListPage = () => {
     }
 
     const onSearch = (value, _e, info) => {
-
+        if (value) {
+            let trimmedValue = value.trim();
+            setTitleSearch(trimmedValue);
+            setCurrent(); // reset về trang đầu tiên khi tìm kiếm
+        } else {
+            setTitleSearch(null); // nếu không có giá trị tìm kiếm thì reset
+            setCurrent(0); // reset về trang đầu tiên
+        }
     }
 
     const handleChange = value => {
-
+        if (value) {
+            setCategorySelected(value);
+        } else {
+            setCategorySelected(null); // nếu không có giá trị thì reset
+        }
     };
 
     const showModal = () => {
@@ -66,8 +81,8 @@ const MovieListPage = () => {
                         placeholder="Select category"
                         allowClear
                         onChange={handleChange}
-                        style={{ width: 150 }}
-                    // options={roomList.map(room => ({ label: room.name, value: room.id }))}
+                        style={{ width: 180 }}
+                        options={categories.map(c => ({ label: c.name, value: c.id }))}
                     />
 
                     <RangePicker
@@ -88,7 +103,6 @@ const MovieListPage = () => {
                 total={total}
                 setCurrent={setCurrent}
                 setPageSize={setPageSize}
-                isModalOpen={isModalOpen}
             />
             <MovieCreateModal
                 loadMovie={loadMovie}

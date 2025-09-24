@@ -1,16 +1,16 @@
 import { EditOutlined } from "@ant-design/icons";
 import { Space, Switch, Popconfirm, Table } from "antd";
-import { render } from "nprogress";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import MovieDrawer from "./movie.drawer";
 import dayjs from "dayjs";
+import { getMediaUrlAPI } from "@/services/api.service";
 
 const MovieTable = (props) => {
     const { dataMovie, loadMovie, current, pageSize, total, setCurrent, setPageSize } = props;
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [movieSelected, setMovieSelected] = useState(null);
+    const [urlPoster, setUrlPoster] = useState(null);
 
     const columns = [
         {
@@ -79,6 +79,7 @@ const MovieTable = (props) => {
 
     const handleSelectMovie = (record) => {
         setMovieSelected(record);
+        fetchUrlPoster(record.posterKey)
         setIsDrawerOpen(true);
     }
 
@@ -115,6 +116,13 @@ const MovieTable = (props) => {
         }
     };
 
+    const fetchUrlPoster = async (posterKey) => {
+        const res = await getMediaUrlAPI(posterKey)
+        if (res.data) {
+            setUrlPoster(res.data)
+        }
+    }
+
     return (
         <>
             <Table
@@ -136,6 +144,8 @@ const MovieTable = (props) => {
                 setIsDrawerOpen={setIsDrawerOpen}
                 movieSelected={movieSelected}
                 setMovieSelected={setMovieSelected}
+                urlPoster={urlPoster}
+                setUrlPoster={setUrlPoster}
             />
         </>
     );

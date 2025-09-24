@@ -182,13 +182,15 @@ const createSeatAPI = (row, col, typeId, roomId) => {
     return axios.post(URL_BACKEND, data);
 }
 
-const fetchAllMoviesAPI = (current, pageSize, title, categoryId) => {
+const fetchAllMoviesAPI = (current, pageSize, title, categoryId, fromDate, toDate) => {
     return axios.get("/movie-service/api/v1/movies/all", {
         params: {
             page: current,
             size: pageSize,
             title: title || null, // nếu không có tên thì truyền null
-            categoryId: categoryId || null // nếu không có category thì truyền null
+            categoryId: categoryId || null, // nếu không có category thì truyền null,
+            fromDate: fromDate || null,
+            toDate: toDate || null
         }
     });
 }
