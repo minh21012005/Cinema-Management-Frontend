@@ -239,11 +239,52 @@ const updateShowtimeAPI = (id, roomId, movieId, startTime) => {
     return axios.put(URL_BACKEND, data);
 }
 
+const fetchAllCategoryActive = () => {
+    return axios.get(`/movie-service/api/v1/categories/all`);
+}
+
+const uploadFileAPI = (file, type) => {
+    const URL_BACKEND = `media-service/api/v1/media/upload`;
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("type", type);
+
+    return axios.post(URL_BACKEND, formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+};
+
+const getMediaUrlAPI = (objectKey) => {
+    const URL_BACKEND = `media-service/api/v1/media/url`;
+    return axios.get(URL_BACKEND, {
+        params: {
+            objectKey: objectKey,
+            expireSeconds: 3600
+        }
+    });
+};
+
+const createMovieAPI = (title, description, durationInMinutes, releaseDate, endDate, posterKey, categoryIds) => {
+    const URL_BACKEND = "/movie-service/api/v1/movies";
+    const data = {
+        title: title,
+        description: description,
+        durationInMinutes: durationInMinutes,
+        releaseDate: releaseDate,
+        endDate: endDate || null,
+        posterKey: posterKey,
+        categoryIds: categoryIds
+    };
+    return axios.post(URL_BACKEND, data);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
     updateCinemaApi, fetchAllRoomAPI, fetchAllRoomTypeAPI, changeRoomStatusAPI, findCinemaByIdAPI, fetchRoomByIdAPI,
     updateRoomApi, fetchAllSeatByRoomIdAPI, fetchAllSeatTypeAPI, createRoomAPI, changeSeatStatusAPI, changeSeatTypeAPI,
     createSeatAPI, fetchAllMoviesAPI, fetchShowtimeByCinemaAPI, fetchRoomByCinemaAPI, fetchActiveMovies, createShowtimeAPI,
-    changeShowtimeStatusAPI, updateShowtimeAPI
+    changeShowtimeStatusAPI, updateShowtimeAPI, fetchAllCategoryActive, uploadFileAPI, createMovieAPI, getMediaUrlAPI
 }

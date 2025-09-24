@@ -1,5 +1,6 @@
+import MovieCreateModal from "@/components/movie/movie.create";
 import MovieTable from "@/components/movie/movie.table";
-import { fetchAllMoviesAPI } from "@/services/api.service";
+import { fetchAllCategoryActive, fetchAllMoviesAPI } from "@/services/api.service";
 import { Button, DatePicker, Input, Select } from "antd";
 import { useEffect, useState } from "react";
 const { Search } = Input;
@@ -12,10 +13,13 @@ const MovieListPage = () => {
     const [pageSize, setPageSize] = useState(10);
     const [total, setTotal] = useState(0);
     const [movieSelected, setMovieSelected] = useState(null);
+    const [categories, setCategories] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
 
     useEffect(() => {
         loadMovie();
+        loadCategories();
     }, [current, pageSize]);
 
     const loadMovie = async () => {
@@ -28,6 +32,13 @@ const MovieListPage = () => {
         }
     };
 
+    const loadCategories = async () => {
+        const res = await fetchAllCategoryActive();
+        if (res.data) {
+            setCategories(res.data)
+        }
+    }
+
     const onSearch = (value, _e, info) => {
 
     }
@@ -37,6 +48,7 @@ const MovieListPage = () => {
     };
 
     const showModal = () => {
+        setIsModalCreateOpen(true)
     }
 
     return (
@@ -77,6 +89,12 @@ const MovieListPage = () => {
                 setCurrent={setCurrent}
                 setPageSize={setPageSize}
                 isModalOpen={isModalOpen}
+            />
+            <MovieCreateModal
+                loadMovie={loadMovie}
+                categories={categories}
+                isModalCreateOpen={isModalCreateOpen}
+                setIsModalCreateOpen={setIsModalCreateOpen}
             />
         </>
     )
