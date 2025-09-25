@@ -255,7 +255,7 @@ const getMediaUrlAPI = (objectKey) => {
     });
 };
 
-const createMovieAPI = (title, description, durationInMinutes, releaseDate, endDate, posterKey, categoryIds, trailerUrl) => {
+const createMovieAPI = (title, description, durationInMinutes, releaseDate, endDate, posterKey, categoryIds, trailerUrl, director, cast) => {
     const URL_BACKEND = "/movie-service/api/v1/movies";
     const data = {
         title: title,
@@ -265,7 +265,9 @@ const createMovieAPI = (title, description, durationInMinutes, releaseDate, endD
         endDate: endDate || null,
         posterKey: posterKey,
         categoryIds: categoryIds,
-        trailerUrl: trailerUrl || null
+        trailerUrl: trailerUrl || null,
+        director: director,
+        cast: cast || null
     };
     return axios.post(URL_BACKEND, data);
 }
@@ -296,7 +298,7 @@ const changeMovieStatusAPI = (id) => {
     return axios.put(`/movie-service/api/v1/movies/change-status/${id}`);
 }
 
-const updateMovieAPI = (id, title, description, durationInMinutes, releaseDate, endDate, posterKey, categoryIds, trailerUrl) => {
+const updateMovieAPI = (id, title, description, durationInMinutes, releaseDate, endDate, posterKey, categoryIds, trailerUrl, director, cast) => {
     const URL_BACKEND = `/movie-service/api/v1/movies/${id}`;
     const data = {
         title: title,
@@ -306,7 +308,9 @@ const updateMovieAPI = (id, title, description, durationInMinutes, releaseDate, 
         endDate: endDate || null,
         posterKey: posterKey,
         categoryIds: categoryIds,
-        trailerUrl: trailerUrl
+        trailerUrl: trailerUrl || null,
+        director: director,
+        cast: cast || null
     };
     return axios.put(URL_BACKEND, data);
 }

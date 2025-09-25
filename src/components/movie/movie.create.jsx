@@ -21,8 +21,8 @@ const MovieCreateModal = (props) => {
             let newKey = resCommit.data;
             let release = values.releaseDate.format("YYYY-MM-DD");
             let end = values.endDate ? values.endDate.format("YYYY-MM-DD") : null;
-            const res = await createMovieAPI(values.title, values.description,
-                values.durationInMinutes, release, end, newKey, values.categoryIds, values.trailerUrl)
+            const res = await createMovieAPI(values.title, values.description, values.durationInMinutes, release,
+                end, newKey, values.categoryIds, values.trailerUrl, values.director, values.cast)
             if (res.data) {
                 notification.success({
                     message: "Success",
@@ -134,6 +134,22 @@ const MovieCreateModal = (props) => {
                         </Form.Item>
                     </Col>
                 </Row>
+
+                <Form.Item
+                    label="Director"
+                    name="director"
+                    rules={[{ required: true, message: "Vui lòng nhập tên đạo diễn!" }]}
+                >
+                    <Input placeholder="Nhập tên đạo diễn..." />
+                </Form.Item>
+
+                {/* Cast */}
+                <Form.Item
+                    label="Cast"
+                    name="cast"
+                >
+                    <Input.TextArea rows={2} placeholder="Nhập danh sách diễn viên (cách nhau bằng dấu phẩy)" />
+                </Form.Item>
 
                 <Form.Item
                     label="Trailer URL"

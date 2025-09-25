@@ -33,6 +33,12 @@ const MovieDrawer = (props) => {
                                         ? movieSelected.categoryNames.join(", ")
                                         : "N/A"}
                                 </Descriptions.Item>
+                                <Descriptions.Item label="Director">
+                                    {movieSelected.director || "N/A"}
+                                </Descriptions.Item>
+                                <Descriptions.Item label="Cast">
+                                    {movieSelected.cast || "N/A"}
+                                </Descriptions.Item>
                                 <Descriptions.Item label="Duration">
                                     {movieSelected.durationInMinutes} min
                                 </Descriptions.Item>

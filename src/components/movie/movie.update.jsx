@@ -30,6 +30,8 @@ const MovieUpdateModal = (props) => {
                 releaseDate: movieUpdateSelected.releaseDate ? dayjs(movieUpdateSelected.releaseDate) : null,
                 endDate: movieUpdateSelected.endDate ? dayjs(movieUpdateSelected.endDate) : null,
                 categoryIds: selectedCategoryIds,
+                director: movieUpdateSelected.director,
+                cast: movieUpdateSelected.cast,
                 posterKey: movieUpdateSelected.posterKey,
                 trailerUrl: movieUpdateSelected.trailerUrl
             });
@@ -65,7 +67,9 @@ const MovieUpdateModal = (props) => {
             end,
             newKey,
             values.categoryIds,
-            values.trailerUrl
+            values.trailerUrl,
+            values.director,
+            values.cast
         );
 
         if (res.data) {
@@ -181,6 +185,22 @@ const MovieUpdateModal = (props) => {
                         </Form.Item>
                     </Col>
                 </Row>
+
+                <Form.Item
+                    label="Director"
+                    name="director"
+                    rules={[{ required: true, message: "Vui lòng nhập tên đạo diễn!" }]}
+                >
+                    <Input placeholder="Nhập tên đạo diễn..." />
+                </Form.Item>
+
+                {/* Cast */}
+                <Form.Item
+                    label="Cast"
+                    name="cast"
+                >
+                    <Input.TextArea rows={2} placeholder="Nhập danh sách diễn viên (cách nhau bằng dấu phẩy)" />
+                </Form.Item>
 
                 <Form.Item
                     label="Trailer URL"
