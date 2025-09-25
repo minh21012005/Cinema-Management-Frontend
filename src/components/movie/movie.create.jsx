@@ -22,7 +22,7 @@ const MovieCreateModal = (props) => {
             let release = values.releaseDate.format("YYYY-MM-DD");
             let end = values.endDate ? values.endDate.format("YYYY-MM-DD") : null;
             const res = await createMovieAPI(values.title, values.description,
-                values.durationInMinutes, release, end, newKey, values.categoryIds)
+                values.durationInMinutes, release, end, newKey, values.categoryIds, values.trailerUrl)
             if (res.data) {
                 notification.success({
                     message: "Success",
@@ -134,6 +134,19 @@ const MovieCreateModal = (props) => {
                         </Form.Item>
                     </Col>
                 </Row>
+
+                <Form.Item
+                    label="Trailer URL"
+                    name="trailerUrl"
+                    rules={[
+                        {
+                            pattern: /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}.*$/,
+                            message: "Vui lòng nhập link YouTube hợp lệ!"
+                        }
+                    ]}
+                >
+                    <Input placeholder="https://www.youtube.com/watch?v=xxxx" />
+                </Form.Item>
 
                 <Form.Item
                     label="Poster"

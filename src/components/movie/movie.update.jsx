@@ -30,7 +30,8 @@ const MovieUpdateModal = (props) => {
                 releaseDate: movieUpdateSelected.releaseDate ? dayjs(movieUpdateSelected.releaseDate) : null,
                 endDate: movieUpdateSelected.endDate ? dayjs(movieUpdateSelected.endDate) : null,
                 categoryIds: selectedCategoryIds,
-                posterKey: movieUpdateSelected.posterKey
+                posterKey: movieUpdateSelected.posterKey,
+                trailerUrl: movieUpdateSelected.trailerUrl
             });
             setUrlPoster(movieUpdateSelected.posterKey || null);
         }
@@ -63,7 +64,8 @@ const MovieUpdateModal = (props) => {
             release,
             end,
             newKey,
-            values.categoryIds
+            values.categoryIds,
+            values.trailerUrl
         );
 
         if (res.data) {
@@ -181,6 +183,19 @@ const MovieUpdateModal = (props) => {
                 </Row>
 
                 <Form.Item
+                    label="Trailer URL"
+                    name="trailerUrl"
+                    rules={[
+                        {
+                            pattern: /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}.*$/,
+                            message: "Vui lòng nhập link YouTube hợp lệ!"
+                        }
+                    ]}
+                >
+                    <Input placeholder="https://www.youtube.com/watch?v=xxxx" />
+                </Form.Item>
+
+                <Form.Item
                     label="Poster"
                     name="poster"
                 >
@@ -190,14 +205,13 @@ const MovieUpdateModal = (props) => {
                     >
                         <Button icon={<UploadOutlined />} loading={uploading}>Upload Poster</Button>
                     </Upload>
-                    {urlPoster && (
+                    {(previewUrl || urlPoster) && (
                         <div style={{ marginTop: 8 }}>
-                            <img src={urlPoster} alt="Poster Preview" style={{ width: 200, borderRadius: 8 }} />
-                        </div>
-                    )}
-                    {previewUrl && (
-                        <div style={{ marginTop: 8 }}>
-                            <img src={previewUrl} alt="Poster Preview" style={{ width: 200, borderRadius: 8 }} />
+                            <img
+                                src={previewUrl || urlPoster}
+                                alt="Poster Preview"
+                                style={{ width: 200, borderRadius: 8 }}
+                            />
                         </div>
                     )}
                 </Form.Item>
