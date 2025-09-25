@@ -103,6 +103,7 @@ const MovieListPage = () => {
                 total={total}
                 setCurrent={setCurrent}
                 setPageSize={setPageSize}
+                categories={categories}
             />
             <MovieCreateModal
                 loadMovie={loadMovie}

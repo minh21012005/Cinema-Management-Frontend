@@ -28,8 +28,8 @@ const MovieDrawer = (props) => {
                             <Descriptions.Item label="ID">{movieSelected.id}</Descriptions.Item>
                             <Descriptions.Item label="Title">{movieSelected.title}</Descriptions.Item>
                             <Descriptions.Item label="Categories">
-                                {movieSelected?.categoryCodes?.length > 0
-                                    ? movieSelected.categoryCodes.map((c) => c.toLowerCase()).join(", ")
+                                {movieSelected?.categoryNames?.length > 0
+                                    ? movieSelected.categoryNames.map((c) => c).join(", ")
                                     : "N/A"}
                             </Descriptions.Item>
                             <Descriptions.Item label="Duration">

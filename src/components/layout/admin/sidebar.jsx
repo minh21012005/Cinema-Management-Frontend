@@ -16,6 +16,7 @@ const Sidebar = () => {
     // Map URL -> key (dùng regex để match cả sub-path)
     const pathToKey = useMemo(() => [
         { pattern: /^\/manager$/, key: "cinema-management" },
+        { pattern: /^\/manager\/cinemas/, key: "cinema-management" },
         { pattern: /^\/manager\/movies/, key: "movie" },
         { pattern: /^\/manager\/rating/, key: "rating" },
         { pattern: /^\/manager\/food/, key: "food" },

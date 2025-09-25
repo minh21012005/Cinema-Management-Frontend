@@ -1,15 +1,17 @@
 import { EditOutlined } from "@ant-design/icons";
-import { Space, Switch, Popconfirm, Table } from "antd";
+import { Space, Switch, Popconfirm, Table, notification } from "antd";
 import { useState } from "react";
 import MovieDrawer from "./movie.drawer";
 import dayjs from "dayjs";
-import { getMediaUrlAPI } from "@/services/api.service";
+import { changeMovieStatusAPI, getMediaUrlAPI } from "@/services/api.service";
+import MovieUpdateModal from "./movie.update";
 
 const MovieTable = (props) => {
-    const { dataMovie, loadMovie, current, pageSize, total, setCurrent, setPageSize } = props;
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const { dataMovie, loadMovie, categories, current, pageSize, total, setCurrent, setPageSize } = props;
+    const [isModalUpdateOpen, setIsModalUpdateOpen] = useState(false);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [movieSelected, setMovieSelected] = useState(null);
+    const [movieUpdateSelected, setMovieUpdateSelected] = useState(null);
     const [urlPoster, setUrlPoster] = useState(null);
 
     const columns = [
@@ -29,9 +31,9 @@ const MovieTable = (props) => {
         },
         {
             title: "Category",
-            dataIndex: "categoryCodes",
+            dataIndex: "categoryNames",
             key: "category",
-            render: (categories) => categories.join(", "),
+            render: (c) => c.join(", "),
         },
         {
             title: "Duration (min)",
@@ -85,19 +87,26 @@ const MovieTable = (props) => {
 
     const changeStatus = async (id) => {
         try {
-            // await changeMovieStatusAPI(id); // gọi API đổi trạng thái
-            loadMovie(); // reload lại danh sách phim
+            const res = await changeMovieStatusAPI(id); // gọi API đổi trạng thái
+            if (res.data) {
+                loadMovie(); // reload lại danh sách phim
+            } else {
+                notification.error({
+                    message: "Failed",
+                    description: JSON.stringify(res.message)
+                })
+            }
         } catch (error) {
             console.error("Failed to change movie status:", error);
         }
     };
 
     const handleUpdate = (id) => {
-        setIsModalOpen(true);
         const movie = dataMovie.find(item => item.id === id);
         if (movie) {
-            setMovieSelected(movie);
-            // mở modal để sửa (tương tự CinemaTable)
+            setMovieUpdateSelected(movie);
+            fetchUrlPoster(movie.posterKey)
+            setIsModalUpdateOpen(true);
         }
     };
 
@@ -146,6 +155,16 @@ const MovieTable = (props) => {
                 setMovieSelected={setMovieSelected}
                 urlPoster={urlPoster}
                 setUrlPoster={setUrlPoster}
+            />
+            <MovieUpdateModal
+                loadMovie={loadMovie}
+                isModalUpdateOpen={isModalUpdateOpen}
+                setIsModalUpdateOpen={setIsModalUpdateOpen}
+                movieUpdateSelected={movieUpdateSelected}
+                setMovieUpdateSelected={setMovieUpdateSelected}
+                urlPoster={urlPoster}
+                setUrlPoster={setUrlPoster}
+                categories={categories}
             />
         </>
     );

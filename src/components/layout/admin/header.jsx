@@ -26,7 +26,7 @@ const HeaderLayout = () => {
     const items = [
         {
             key: "username",
-            label: <strong>{user.name}</strong>,
+            label: <strong>{user.email}</strong>,
         },
         {
             type: "divider",

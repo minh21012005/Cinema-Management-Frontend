@@ -1,46 +1,89 @@
 import { Form, DatePicker, Modal, Select, notification, Input, InputNumber, Button, Row, Col, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import { useState } from "react";
-import { commitFileAPI, createMovieAPI, getMediaUrlAPI, uploadTempFileAPI } from "@/services/api.service";
+import { useEffect, useState } from "react";
+import dayjs from "dayjs";
+import { commitFileAPI, deleteFileAPI, getMediaUrlAPI, updateMovieAPI, uploadTempFileAPI } from "@/services/api.service";
 
-const MovieCreateModal = (props) => {
-    const { isModalCreateOpen, setIsModalCreateOpen, categories, loadMovie } = props;
+const MovieUpdateModal = (props) => {
+    const { isModalUpdateOpen, setIsModalUpdateOpen, movieUpdateSelected,
+        setMovieUpdateSelected, urlPoster, setUrlPoster, categories, loadMovie } = props;
     const [form] = Form.useForm();
     const [uploading, setUploading] = useState(false);
     const [previewUrl, setPreviewUrl] = useState(null);
 
     const handleCancel = () => {
         form.resetFields();
+        setMovieUpdateSelected(null);
         setPreviewUrl(null);
-        setIsModalCreateOpen(false);
+        setIsModalUpdateOpen(false);
     };
 
+    useEffect(() => {
+        if (movieUpdateSelected) {
+            const selectedCategoryIds = categories
+                .filter(c => movieUpdateSelected.categoryCodes.includes(c.code)) // c.code là code của category từ API
+                .map(c => c.id);
+            form.setFieldsValue({
+                title: movieUpdateSelected.title,
+                description: movieUpdateSelected.description,
+                durationInMinutes: movieUpdateSelected.durationInMinutes,
+                releaseDate: movieUpdateSelected.releaseDate ? dayjs(movieUpdateSelected.releaseDate) : null,
+                endDate: movieUpdateSelected.endDate ? dayjs(movieUpdateSelected.endDate) : null,
+                categoryIds: selectedCategoryIds,
+                posterKey: movieUpdateSelected.posterKey
+            });
+            setUrlPoster(movieUpdateSelected.posterKey || null);
+        }
+    }, [movieUpdateSelected]);
+
     const onFinish = async (values) => {
-        const resCommit = await commitFileAPI(values.posterKey, "movies");
-        if (resCommit.data) {
-            let newKey = resCommit.data;
-            let release = values.releaseDate.format("YYYY-MM-DD");
-            let end = values.endDate ? values.endDate.format("YYYY-MM-DD") : null;
-            const res = await createMovieAPI(values.title, values.description,
-                values.durationInMinutes, release, end, newKey, values.categoryIds)
-            if (res.data) {
-                notification.success({
-                    message: "Success",
-                    description: "Tạo phim thành công!"
-                })
-                handleCancel();
-                loadMovie();
-            } else {
-                notification.error({
-                    message: "Failed",
-                    description: JSON.stringify(res.message)
-                })
+        let newKey = values.posterKey; // key mới sau upload temp
+        let oldKey = movieUpdateSelected.posterKey; // poster cũ
+
+        // Nếu có poster mới thì commit
+        if (newKey && newKey !== oldKey) {
+            const resCommit = await commitFileAPI(newKey, "movies");
+            if (!resCommit.data) {
+                notification.error({ message: "Commit poster thất bại!" });
+                return;
             }
+            newKey = resCommit.data;
+        } else {
+            newKey = oldKey; // không đổi poster
+        }
+
+        let release = values.releaseDate.format("YYYY-MM-DD");
+        let end = values.endDate ? values.endDate.format("YYYY-MM-DD") : null;
+
+        const res = await updateMovieAPI(
+            movieUpdateSelected.id,
+            values.title,
+            values.description,
+            values.durationInMinutes,
+            release,
+            end,
+            newKey,
+            values.categoryIds
+        );
+
+        if (res.data) {
+            notification.success({
+                message: "Success",
+                description: "Cập nhật phim thành công!"
+            });
+
+            // Nếu có poster mới thì xóa poster cũ
+            if (oldKey && newKey !== oldKey) {
+                await deleteFileAPI(oldKey);
+            }
+
+            handleCancel();
+            loadMovie();
         } else {
             notification.error({
                 message: "Failed",
-                description: "Không có ảnh hoặc up load file lỗi!"
-            })
+                description: JSON.stringify(res.message)
+            });
         }
     };
 
@@ -72,12 +115,12 @@ const MovieCreateModal = (props) => {
 
     return (
         <Modal
-            title="Create Movie"
-            open={isModalCreateOpen}
+            title="Update Movie"
+            open={isModalUpdateOpen}
             onOk={() => form.submit()}
             onCancel={handleCancel}
             maskClosable={true}
-            okText="CREATE"
+            okText="UPDATE"
             width={700}
         >
             <Form form={form} layout="vertical" onFinish={onFinish}>
@@ -120,7 +163,9 @@ const MovieCreateModal = (props) => {
 
                 <Row gutter={16}>
                     <Col span={12}>
-                        <Form.Item label="End Date" name="endDate">
+                        <Form.Item
+                            label="End Date"
+                            name="endDate">
                             <DatePicker style={{ width: "100%" }} />
                         </Form.Item>
                     </Col>
@@ -138,7 +183,6 @@ const MovieCreateModal = (props) => {
                 <Form.Item
                     label="Poster"
                     name="poster"
-                    rules={[{ required: true, message: "Vui lòng chọn poster cho phim!" }]}
                 >
                     <Upload
                         customRequest={handleUpload}
@@ -146,6 +190,11 @@ const MovieCreateModal = (props) => {
                     >
                         <Button icon={<UploadOutlined />} loading={uploading}>Upload Poster</Button>
                     </Upload>
+                    {urlPoster && (
+                        <div style={{ marginTop: 8 }}>
+                            <img src={urlPoster} alt="Poster Preview" style={{ width: 200, borderRadius: 8 }} />
+                        </div>
+                    )}
                     {previewUrl && (
                         <div style={{ marginTop: 8 }}>
                             <img src={previewUrl} alt="Poster Preview" style={{ width: 200, borderRadius: 8 }} />
@@ -160,4 +209,4 @@ const MovieCreateModal = (props) => {
     );
 };
 
-export default MovieCreateModal;
+export default MovieUpdateModal;

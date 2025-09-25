@@ -291,6 +291,32 @@ const commitFileAPI = (objectKey, type) => {
     });
 };
 
+const changeMovieStatusAPI = (id) => {
+    return axios.put(`/movie-service/api/v1/movies/change-status/${id}`);
+}
+
+const updateMovieAPI = (id, title, description, durationInMinutes, releaseDate, endDate, posterKey, categoryIds) => {
+    const URL_BACKEND = `/movie-service/api/v1/movies/${id}`;
+    const data = {
+        title: title,
+        description: description,
+        durationInMinutes: durationInMinutes,
+        releaseDate: releaseDate,
+        endDate: endDate || null,
+        posterKey: posterKey,
+        categoryIds: categoryIds
+    };
+    return axios.put(URL_BACKEND, data);
+}
+
+const deleteFileAPI = (key) => {
+    return axios.delete(`/media-service/api/v1/media`, {
+        params: {
+            key: key
+        }
+    });
+};
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -298,5 +324,5 @@ export {
     updateRoomApi, fetchAllSeatByRoomIdAPI, fetchAllSeatTypeAPI, createRoomAPI, changeSeatStatusAPI, changeSeatTypeAPI,
     createSeatAPI, fetchAllMoviesAPI, fetchShowtimeByCinemaAPI, fetchRoomByCinemaAPI, fetchActiveMovies, createShowtimeAPI,
     changeShowtimeStatusAPI, updateShowtimeAPI, fetchAllCategoryActive, createMovieAPI, getMediaUrlAPI, uploadTempFileAPI,
-    commitFileAPI
+    commitFileAPI, changeMovieStatusAPI, updateMovieAPI, deleteFileAPI
 }
