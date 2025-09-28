@@ -2,7 +2,6 @@ import FoodModalCreate from "@/components/food/food.create";
 import FoodTable from "@/components/food/food.table";
 import { fetchAllFoodAPI, fetchFoodTypeActiveAPI, getMediaUrlAPI, uploadTempFileAPI } from "@/services/api.service";
 import { Button, Input, notification, Select } from "antd";
-import { set } from "nprogress";
 import { useEffect, useState } from "react";
 const { Search } = Input;
 
@@ -126,6 +125,15 @@ const FoodListPage = () => {
                 loading={loading}
                 setCurrent={setCurrent}
                 setPageSize={setPageSize}
+                foodTypeList={foodTypeList}
+                handleUpload={handleUpload}
+                uploading={uploading}
+                setUploading={setUploading}
+                imageKey={imageKey}
+                setImageKey={setImageKey}
+                previewUrl={previewUrl}
+                setPreviewUrl={setPreviewUrl}
+                fetchFoodList={fetchFoodList}
             />
             <FoodModalCreate
                 isModalOpen={isModalOpen}

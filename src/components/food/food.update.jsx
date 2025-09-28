@@ -1,61 +1,112 @@
-import { commitFileAPI, createFoodAPI } from "@/services/api.service";
+import { commitFileAPI, deleteFileAPI, getMediaUrlAPI, updateFoodAPI } from "@/services/api.service";
 import { UploadOutlined } from "@ant-design/icons";
-import { Form, Input, InputNumber, Modal, Select, Checkbox, notification, Upload, Button } from "antd";
-import { useEffect } from "react";
+import { Button, Checkbox, Form, Input, InputNumber, Modal, notification, Select, Upload } from "antd";
+import { useEffect, useState } from "react";
 
-const FoodModalCreate = (props) => {
-    const { isModalOpen, setIsModalOpen, handleUpload, foodTypeList, fetchFoodList,
-        uploading, previewUrl, setPreviewUrl, imageKey, setImageKey } = props;
+const FoodUpdateModal = (props) => {
+    const { isModalUpdateOpen, setIsModalUpdateOpen, foodSelected, setFoodSelected, fetchFoodList,
+        foodTypeList, handleUpload, imageKey, setImageKey, previewUrl, setPreviewUrl, uploading } = props;
+
     const [form] = Form.useForm();
 
-    const handleCancel = () => {
-        form.resetFields();
-        setImageKey(null);
-        setPreviewUrl(null);
-        setIsModalOpen(false);
-    };
+    useEffect(() => {
+        if (foodSelected) {
+            const selectedType = foodTypeList.find(c => foodSelected.typeName === c.name);
+            form.setFieldsValue({
+                code: foodSelected.code,
+                name: foodSelected.name,
+                price: foodSelected.price,
+                description: foodSelected.description,
+                typeId: selectedType ? selectedType.id : null,
+                imageKey: foodSelected.imageKey,
+                available: foodSelected.available
+            });
+            setImageKey(foodSelected.imageKey || null);
+            fetchUrl(foodSelected.imageKey || null);
+        }
+    }, [foodSelected]);
 
     useEffect(() => {
         if (imageKey) {
-            form.setFieldValue("imageKey", imageKey);
+            form.setFieldsValue({ imageKey });
         }
     }, [imageKey]);
 
-    const onFinish = async (values) => {
-        const resCommit = await commitFileAPI(values.imageKey, "foods");
-        if (resCommit.data) {
-            let newKey = resCommit.data;
-            const res = await createFoodAPI(values.code, values.name, values.price, values.description,
-                newKey, values.typeId, values.available)
+    const fetchUrl = async (key) => {
+        if (key) {
+            const res = await getMediaUrlAPI(key);
             if (res.data) {
-                notification.success({
-                    message: "Success",
-                    description: "Tạo đồ ăn thành công!"
-                })
-                handleCancel();
-                fetchFoodList();
-            } else {
-                notification.error({
-                    message: "Failed",
-                    description: JSON.stringify(res.message)
-                })
+                setPreviewUrl(res.data);
             }
+        } else {
+            setPreviewUrl(null);
+        }
+    }
+
+    const handleCancel = () => {
+        form.resetFields();
+        setFoodSelected(null);
+        setPreviewUrl(null);
+        setImageKey(null);
+        setIsModalUpdateOpen(false);
+    };
+
+    const onFinish = async (values) => {
+        let newKey = values.imageKey; // key mới sau upload temp
+        let oldKey = foodSelected.imageKey; // poster cũ
+
+        // Nếu có image mới thì commit
+        if (newKey && newKey !== oldKey) {
+            const resCommit = await commitFileAPI(newKey, "foods");
+            if (!resCommit.data) {
+                notification.error({ message: "Commit image thất bại!" });
+                return;
+            }
+            newKey = resCommit.data;
+        } else {
+            newKey = oldKey; // không đổi poster
+        }
+
+        const res = await updateFoodAPI(
+            foodSelected.id,
+            values.code,
+            values.name,
+            values.price,
+            values.description,
+            newKey,
+            values.typeId,
+            values.available
+        );
+
+        if (res.data) {
+            notification.success({
+                message: "Success",
+                description: "Cập nhật đồ ăn thành công!"
+            });
+
+            // Nếu có ảnh mới thì xóa ảnh cũ
+            if (oldKey && newKey !== oldKey) {
+                await deleteFileAPI(oldKey);
+            }
+
+            handleCancel();
+            fetchFoodList();
         } else {
             notification.error({
                 message: "Failed",
-                description: "Không có ảnh hoặc up load file lỗi!"
-            })
+                description: JSON.stringify(res.message)
+            });
         }
     };
 
     return (
         <Modal
-            title="Create Food"
-            open={isModalOpen}
+            title="Update Food"
+            open={isModalUpdateOpen}
             onOk={() => form.submit()}
             onCancel={handleCancel}
             maskClosable={true}
-            okText="CREATE"
+            okText="UPDATE"
             width={700}
         >
             <Form form={form} layout="vertical" onFinish={onFinish}>
@@ -115,8 +166,6 @@ const FoodModalCreate = (props) => {
 
                 <Form.Item
                     label="Image"
-                    name="image"
-                    rules={[{ required: true, message: "Vui lòng chọn ảnh cho món ăn!" }]}
                 >
                     <Upload
                         customRequest={handleUpload}
@@ -141,6 +190,6 @@ const FoodModalCreate = (props) => {
             </Form>
         </Modal>
     );
-};
+}
 
-export default FoodModalCreate;
+export default FoodUpdateModal;

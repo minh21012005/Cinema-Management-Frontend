@@ -352,6 +352,20 @@ const fetchFoodTypeActiveAPI = () => {
     return axios.get("/cinema-service/api/v1/foodtypes/active");
 }
 
+const updateFoodAPI = (id, code, name, price, description, imageKey, typeId, available) => {
+    const URL_BACKEND = `/cinema-service/api/v1/foods/${id}`;
+    const data = {
+        code: code,
+        name: name,
+        price: price,
+        description: description || null,
+        imageKey: imageKey,
+        typeId: typeId,
+        available: available
+    };
+    return axios.put(URL_BACKEND, data);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -359,5 +373,6 @@ export {
     updateRoomApi, fetchAllSeatByRoomIdAPI, fetchAllSeatTypeAPI, createRoomAPI, changeSeatStatusAPI, changeSeatTypeAPI,
     createSeatAPI, fetchAllMoviesAPI, fetchShowtimeByCinemaAPI, fetchRoomByCinemaAPI, fetchActiveMovies, createShowtimeAPI,
     changeShowtimeStatusAPI, updateShowtimeAPI, fetchAllCategoryActive, createMovieAPI, getMediaUrlAPI, uploadTempFileAPI,
-    commitFileAPI, changeMovieStatusAPI, updateMovieAPI, deleteFileAPI, fetchAllFoodAPI, createFoodAPI, fetchFoodTypeActiveAPI
+    commitFileAPI, changeMovieStatusAPI, updateMovieAPI, deleteFileAPI, fetchAllFoodAPI, createFoodAPI, fetchFoodTypeActiveAPI,
+    updateFoodAPI
 }
