@@ -19,7 +19,7 @@ const Sidebar = () => {
         { pattern: /^\/manager\/cinemas/, key: "cinema-management" },
         { pattern: /^\/manager\/movies/, key: "movie" },
         { pattern: /^\/manager\/rating/, key: "rating" },
-        { pattern: /^\/manager\/food/, key: "food" },
+        { pattern: /^\/manager\/foods/, key: "food" },
         { pattern: /^\/manager\/combo/, key: "combo" },
         { pattern: /^\/manager\/ticket-report/, key: "ticket-report" },
         { pattern: /^\/manager\/food-report/, key: "food-report" },
@@ -79,7 +79,7 @@ const Sidebar = () => {
                         type: 'group',
                         label: 'Food & Combo',
                         children: [
-                            { label: 'Food', key: 'food', onClick: () => nav('/manager/food') },
+                            { label: 'Food', key: 'food', onClick: () => nav('/manager/foods') },
                             { label: 'Combo', key: 'combo', onClick: () => nav('/manager/combo') },
                         ],
                     },

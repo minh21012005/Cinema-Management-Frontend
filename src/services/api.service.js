@@ -323,6 +323,35 @@ const deleteFileAPI = (key) => {
     });
 };
 
+const fetchAllFoodAPI = (current, pageSize, name, typeId) => {
+    return axios.get("/cinema-service/api/v1/foods/all", {
+        params: {
+            page: current,
+            size: pageSize,
+            name: name || null, // nếu không có tên thì truyền null
+            typeId: typeId || null // nếu không có loại thì truyền null
+        }
+    });
+}
+
+const createFoodAPI = (code, name, price, description, imageKey, typeId, available) => {
+    const URL_BACKEND = "/cinema-service/api/v1/foods";
+    const data = {
+        code: code,
+        name: name,
+        price: price,
+        description: description || null,
+        imageKey: imageKey,
+        typeId: typeId,
+        available: available
+    };
+    return axios.post(URL_BACKEND, data);
+}
+
+const fetchFoodTypeActiveAPI = () => {
+    return axios.get("/cinema-service/api/v1/foodtypes/active");
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -330,5 +359,5 @@ export {
     updateRoomApi, fetchAllSeatByRoomIdAPI, fetchAllSeatTypeAPI, createRoomAPI, changeSeatStatusAPI, changeSeatTypeAPI,
     createSeatAPI, fetchAllMoviesAPI, fetchShowtimeByCinemaAPI, fetchRoomByCinemaAPI, fetchActiveMovies, createShowtimeAPI,
     changeShowtimeStatusAPI, updateShowtimeAPI, fetchAllCategoryActive, createMovieAPI, getMediaUrlAPI, uploadTempFileAPI,
-    commitFileAPI, changeMovieStatusAPI, updateMovieAPI, deleteFileAPI
+    commitFileAPI, changeMovieStatusAPI, updateMovieAPI, deleteFileAPI, fetchAllFoodAPI, createFoodAPI, fetchFoodTypeActiveAPI
 }
