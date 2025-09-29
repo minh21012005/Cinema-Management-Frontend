@@ -416,6 +416,22 @@ const fetchRolesWithPaginationAPI = (current, pageSize, name) => {
     });
 }
 
+const fetchPermissionsActiveAPI = () => {
+    return axios.get("/auth-service/api/v1/permissions/active");
+}
+
+const createRoleAPI = (name, code, description, active, permissionIds) => {
+    const URL_BACKEND = "/auth-service/api/v1/roles";
+    const data = {
+        name: name,
+        code: code,
+        description: description || null,
+        active: active || true,
+        permissionIds: permissionIds || []
+    };
+    return axios.post(URL_BACKEND, data);
+};
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -424,5 +440,6 @@ export {
     createSeatAPI, fetchAllMoviesAPI, fetchShowtimeByCinemaAPI, fetchRoomByCinemaAPI, fetchActiveMovies, createShowtimeAPI,
     changeShowtimeStatusAPI, updateShowtimeAPI, fetchAllCategoryActive, createMovieAPI, getMediaUrlAPI, uploadTempFileAPI,
     commitFileAPI, changeMovieStatusAPI, updateMovieAPI, deleteFileAPI, fetchAllFoodAPI, createFoodAPI, fetchFoodTypeActiveAPI,
-    updateFoodAPI, fetchAllCombosAPI, createComboAPI, fetchAllFoodsActiveAPI, updateComboAPI, fetchRolesWithPaginationAPI
+    updateFoodAPI, fetchAllCombosAPI, createComboAPI, fetchAllFoodsActiveAPI, updateComboAPI, fetchRolesWithPaginationAPI,
+    fetchPermissionsActiveAPI, createRoleAPI
 }

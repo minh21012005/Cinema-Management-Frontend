@@ -1,5 +1,6 @@
+import RoleCreateModal from "@/components/role/role.create";
 import RoleTable from "@/components/role/role.table";
-import { fetchRolesWithPaginationAPI } from "@/services/api.service";
+import { fetchPermissionsActiveAPI, fetchRolesWithPaginationAPI } from "@/services/api.service";
 import { Button, Space } from "antd";
 import Search from "antd/es/input/Search";
 import { useEffect, useState } from "react";
@@ -12,9 +13,10 @@ const RoleListPage = () => {
     const [dataRole, setDataRole] = useState([]);
     const [roleSearch, setRoleSearch] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-
+    const [listPermission, setListPermission] = useState([]);
 
     useEffect(() => { loadRole(); }, [current, pageSize, roleSearch]);
+    useEffect(() => { fetchPermissionList(); }, []);
 
     const loadRole = async () => {
         const res = await fetchRolesWithPaginationAPI(current, pageSize, roleSearch);
@@ -26,6 +28,12 @@ const RoleListPage = () => {
         }
     }
 
+    const fetchPermissionList = async () => {
+        const res = await fetchPermissionsActiveAPI();
+        if (res && res.data) {
+            setListPermission(res.data);
+        }
+    }
 
     const onSearch = (value, _e, info) => {
         if (value) {
@@ -64,6 +72,12 @@ const RoleListPage = () => {
                 setPageSize={setPageSize}
                 dataRole={dataRole}
                 roleSearch={roleSearch}
+            />
+            <RoleCreateModal
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+                loadRole={loadRole}
+                listPermission={listPermission}
             />
         </>
     );

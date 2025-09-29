@@ -9,7 +9,7 @@ const RoleTable = (props) => {
     const { dataRole, loadRole, current, pageSize, total, setCurrent, setPageSize, onEdit } = props;
 
     const columns = [
-        { title: "STT", render: (_, __, index) => index + 1 + current * pageSize },
+        { title: "ID", dataIndex: "id", key: "id" },
         { title: "Code", dataIndex: "code", key: "code" },
         { title: "Name", dataIndex: "name", key: "name" },
         {
