@@ -8,7 +8,6 @@ import {
 import RegisterPage from './pages/register.jsx';
 import { AuthWrapper } from './components/context/auth.context.jsx';
 import PrivateRouteAdmin from './pages/admin/private.route.admin.jsx';
-import AdminPage from './pages/admin/admin.jsx';
 import ErrorPage from './pages/error.jsx';
 import PrivateRouteManager from './pages/manager/private.route.manager.jsx';
 import PrivateRouteStaff from './pages/staff/private.route.manager.jsx';
@@ -22,6 +21,9 @@ import MovieListPage from './pages/manager/movie.list.jsx';
 import ShowTimeListPage from './pages/manager/showtime.list.jsx';
 import FoodListPage from './pages/manager/food.list.jsx';
 import ComboListPage from './pages/manager/combo.list.jsx';
+import AdminLayout from './pages/admin/index.jsx';
+import RoleListPage from './pages/admin/role.list.jsx';
+import UserPage from './pages/admin/user.list.jsx';
 
 const router = createBrowserRouter([
   {
@@ -33,10 +35,24 @@ const router = createBrowserRouter([
     path: "/admin",
     element: (
       <PrivateRouteAdmin>
-        <AdminPage />
+        <AdminLayout />
       </PrivateRouteAdmin>
     ),
     errorElement: <ErrorPage />,
+    children: [
+      {
+        index: true,
+        element: <UserPage />  // Trang mặc định
+      },
+      {
+        path: "roles",
+        element: <RoleListPage />   // Trang quản lý Role
+      },
+      // {
+      //   path: "permissions",
+      //   element: <PermissionPage /> // Trang quản lý Permission
+      // }
+    ]
   },
   {
     path: "/manager",

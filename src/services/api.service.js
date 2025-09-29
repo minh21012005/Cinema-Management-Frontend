@@ -406,6 +406,16 @@ const updateComboAPI = (id, name, price, description, imageKey, available, foods
     return axios.put(URL_BACKEND, data);
 };
 
+const fetchRolesWithPaginationAPI = (current, pageSize, name) => {
+    return axios.get("/auth-service/api/v1/roles/all", {
+        params: {
+            page: current,
+            size: pageSize,
+            name: name || null, // nếu không có tên thì truyền null
+        }
+    });
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -414,5 +424,5 @@ export {
     createSeatAPI, fetchAllMoviesAPI, fetchShowtimeByCinemaAPI, fetchRoomByCinemaAPI, fetchActiveMovies, createShowtimeAPI,
     changeShowtimeStatusAPI, updateShowtimeAPI, fetchAllCategoryActive, createMovieAPI, getMediaUrlAPI, uploadTempFileAPI,
     commitFileAPI, changeMovieStatusAPI, updateMovieAPI, deleteFileAPI, fetchAllFoodAPI, createFoodAPI, fetchFoodTypeActiveAPI,
-    updateFoodAPI, fetchAllCombosAPI, createComboAPI, fetchAllFoodsActiveAPI, updateComboAPI
+    updateFoodAPI, fetchAllCombosAPI, createComboAPI, fetchAllFoodsActiveAPI, updateComboAPI, fetchRolesWithPaginationAPI
 }

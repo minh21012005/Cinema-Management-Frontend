@@ -1,5 +1,6 @@
 import {
-    BankOutlined, BarChartOutlined, DashboardOutlined, SearchOutlined, SettingOutlined,
+    ApartmentOutlined,
+    BankOutlined, BarChartOutlined, DashboardOutlined, LockOutlined, SearchOutlined, SettingOutlined,
     ShopOutlined, ShoppingCartOutlined, UserOutlined, VideoCameraOutlined
 } from "@ant-design/icons";
 import { Menu } from "antd";
@@ -32,7 +33,9 @@ const Sidebar = () => {
         { pattern: /^\/sell-food/, key: "sell-food" },
         { pattern: /^\/manage-orders/, key: "manage-orders" },
         { pattern: /^\/customer-lookup/, key: "customer-lookup" },
-        { pattern: /^\/admin/, key: "user" },
+        { pattern: /^\/admin$/, key: "user" },
+        { pattern: /^\/admin\/roles/, key: "role" },
+        { pattern: /^\/admin\/permissions/, key: "permission" },
     ], []);
 
     const matched = pathToKey.find(p => p.pattern.test(location.pathname));
@@ -44,8 +47,20 @@ const Sidebar = () => {
                 label: 'User',
                 key: 'user',
                 icon: <UserOutlined />,
-                onClick: () => nav('/admin')
-            }
+                onClick: () => nav('/admin'),
+            },
+            {
+                label: 'Role',
+                key: 'role',
+                icon: <ApartmentOutlined />,
+                onClick: () => nav('/admin/roles'),
+            },
+            {
+                label: 'Permission',
+                key: 'permission',
+                icon: <LockOutlined />,
+                onClick: () => nav('/admin/permissions'),
+            },
         ];
     } else if (user.role.name === "MANAGER") {
         items = [
