@@ -1,92 +1,123 @@
-import { commitFileAPI, createComboAPI } from "@/services/api.service";
+import { commitFileAPI, deleteFileAPI, getMediaUrlAPI, updateComboAPI } from "@/services/api.service";
 import { UploadOutlined } from "@ant-design/icons";
-import {
-    Form,
-    Input,
-    InputNumber,
-    Modal,
-    Checkbox,
-    notification,
-    Upload,
-    Button,
-    Select,
-} from "antd";
+import { Button, Checkbox, Form, Input, InputNumber, Modal, notification, Select, Upload } from "antd";
 import { useEffect } from "react";
 
-const ComboCreateModal = (props) => {
-    const {
-        isModalOpen,
-        setIsModalOpen,
-        handleUpload,
-        fetchComboList,
-        uploading,
-        previewUrl,
-        setPreviewUrl,
-        imageKey,
-        setImageKey,
-        foodList
-    } = props;
+const ComboUpdateModal = (props) => {
+    const { isModalUpdateOpen, setIsModalUpdateOpen, comboSelected, setComboSelected, fetchComboList,
+        foodList, handleUpload, imageKey, setImageKey, previewUrl, setPreviewUrl, uploading } = props;
 
     const [form] = Form.useForm();
 
-    const handleCancel = () => {
-        form.resetFields();
-        setImageKey(null);
-        setPreviewUrl(null);
-        setIsModalOpen(false);
-    };
+    useEffect(() => {
+        if (comboSelected) {
+            form.setFieldsValue({
+                code: comboSelected.code,
+                name: comboSelected.name,
+                price: comboSelected.price,
+                description: comboSelected.description,
+                foods: comboSelected.foods
+                    ? comboSelected.foods.map(f => ({
+                        foodId: f.foodId,
+                        quantity: f.quantity
+                    }))
+                    : [],
+                imageKey: comboSelected.imageKey,
+                available: comboSelected.available
+            });
+            console.log("comboSelected", comboSelected);
+            setImageKey(comboSelected.imageKey || null);
+            fetchUrl(comboSelected.imageKey || null);
+        }
+    }, [comboSelected, foodList]);
 
     useEffect(() => {
         if (imageKey) {
-            form.setFieldValue("imageKey", imageKey);
+            form.setFieldsValue({ imageKey });
         }
     }, [imageKey]);
 
-    const onFinish = async (values) => {
-        console.log("Received values:", values);
-        const resCommit = await commitFileAPI(values.imageKey, "combos");
-        if (resCommit.data) {
-            let newKey = resCommit.data;
-            const res = await createComboAPI(
-                values.name,
-                values.price,
-                values.description,
-                newKey,
-                values.available,
-                values.foods
-            );
+    const fetchUrl = async (key) => {
+        if (key) {
+            const res = await getMediaUrlAPI(key);
             if (res.data) {
-                notification.success({
-                    message: "Success",
-                    description: "Tạo combo thành công!",
-                });
-                handleCancel();
-                fetchComboList();
-            } else {
-                notification.error({
-                    message: "Failed",
-                    description: JSON.stringify(res.message),
-                });
+                setPreviewUrl(res.data);
             }
+        } else {
+            setPreviewUrl(null);
+        }
+    };
+
+    const handleCancel = () => {
+        form.resetFields();
+        setComboSelected(null);
+        setPreviewUrl(null);
+        setImageKey(null);
+        setIsModalUpdateOpen(false);
+    };
+
+    const onFinish = async (values) => {
+        let newKey = values.imageKey;
+        let oldKey = comboSelected.imageKey;
+
+        // Nếu có image mới thì commit
+        if (newKey && newKey !== oldKey) {
+            const resCommit = await commitFileAPI(newKey, "combos");
+            if (!resCommit.data) {
+                notification.error({ message: "Commit image thất bại!" });
+                return;
+            }
+            newKey = resCommit.data;
+        } else {
+            newKey = oldKey;
+        }
+
+        const res = await updateComboAPI(
+            comboSelected.id,
+            values.name,
+            values.price,
+            values.description,
+            newKey,
+            values.available,
+            values.foods
+        );
+
+        if (res.data) {
+            notification.success({
+                message: "Success",
+                description: "Cập nhật combo thành công!"
+            });
+
+            if (oldKey && newKey !== oldKey) {
+                await deleteFileAPI(oldKey);
+            }
+
+            handleCancel();
+            fetchComboList();
         } else {
             notification.error({
                 message: "Failed",
-                description: "Không có ảnh hoặc upload file lỗi!",
+                description: JSON.stringify(res.message)
             });
         }
     };
 
     return (
         <Modal
-            title="Create Combo"
-            open={isModalOpen}
+            title="Update Combo"
+            open={isModalUpdateOpen}
             onOk={() => form.submit()}
             onCancel={handleCancel}
             maskClosable={true}
-            okText="CREATE"
+            okText="UPDATE"
             width={700}
         >
             <Form form={form} layout="vertical" onFinish={onFinish}>
+                {/* Code */}
+                <Form.Item label="Combo Code" name="code">
+                    <Input disabled />
+                </Form.Item>
+
                 {/* Name */}
                 <Form.Item
                     label="Combo Name"
@@ -116,11 +147,13 @@ const ComboCreateModal = (props) => {
                 </Form.Item>
 
                 {/* Foods */}
+                {/* Foods */}
                 <Form.List name="foods">
                     {(fields, { add, remove }) => (
                         <>
                             {fields.map(({ key, name, ...restField }) => (
                                 <div key={key} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                                    {/* Select món ăn */}
                                     <Form.Item
                                         {...restField}
                                         name={[name, "foodId"]}
@@ -140,6 +173,8 @@ const ComboCreateModal = (props) => {
                                             }))}
                                         />
                                     </Form.Item>
+
+                                    {/* Số lượng */}
                                     <Form.Item
                                         {...restField}
                                         name={[name, "quantity"]}
@@ -148,6 +183,7 @@ const ComboCreateModal = (props) => {
                                     >
                                         <InputNumber min={1} placeholder="Số lượng" style={{ width: "100%" }} />
                                     </Form.Item>
+
                                     <Button danger onClick={() => remove(name)}>Xóa</Button>
                                 </div>
                             ))}
@@ -160,25 +196,14 @@ const ComboCreateModal = (props) => {
                     )}
                 </Form.List>
 
-
                 {/* Image */}
-                <Form.Item
-                    label="Image"
-                    name="image"
-                    rules={[{ required: true, message: "Vui lòng chọn ảnh cho combo!" }]}
-                >
+                <Form.Item label="Image">
                     <Upload customRequest={handleUpload} showUploadList={false}>
-                        <Button icon={<UploadOutlined />} loading={uploading}>
-                            Upload Image
-                        </Button>
+                        <Button icon={<UploadOutlined />} loading={uploading}>Upload Image</Button>
                     </Upload>
                     {previewUrl && (
                         <div style={{ marginTop: 8 }}>
-                            <img
-                                src={previewUrl}
-                                alt="Image Preview"
-                                style={{ width: 200, borderRadius: 8 }}
-                            />
+                            <img src={previewUrl} alt="Image Preview" style={{ width: 200, borderRadius: 8 }} />
                         </div>
                     )}
                 </Form.Item>
@@ -195,4 +220,4 @@ const ComboCreateModal = (props) => {
     );
 };
 
-export default ComboCreateModal;
+export default ComboUpdateModal;

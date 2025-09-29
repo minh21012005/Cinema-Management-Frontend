@@ -1,9 +1,11 @@
 import { Table, Tag } from "antd";
 import { useState } from "react";
 import ComboImage from "./combo.image";
+import ComboUpdateModal from "./combo.update";
 
 const ComboTable = (props) => {
-    const { dataCombo, current, pageSize, total, setCurrent, setPageSize, fetchComboList } = props;
+    const { dataCombo, current, pageSize, total, setCurrent, setPageSize, fetchComboList, foodList,
+        handleUpload, uploading, imageKey, setImageKey, previewUrl, setPreviewUrl } = props;
 
     const [isModalUpdateOpen, setIsModalUpdateOpen] = useState(false);
     const [comboSelected, setComboSelected] = useState(null);
@@ -17,7 +19,7 @@ const ComboTable = (props) => {
             title: "Mã combo",
             dataIndex: "code",
             key: "code",
-            render: (text, record) => <a onClick={() => handleUpdate(record.id)}>{text}</a>,
+            render: (text, record) => <a onClick={() => showModalUpdate(record.id)}>{text}</a>,
         },
         {
             title: "Tên combo",
@@ -58,7 +60,7 @@ const ComboTable = (props) => {
         }
     };
 
-    const handleUpdate = (id) => {
+    const showModalUpdate = (id) => {
         const combo = dataCombo.find((c) => c.id === id);
         setComboSelected(combo);
         setIsModalUpdateOpen(true);
@@ -82,6 +84,20 @@ const ComboTable = (props) => {
                     ),
                 }}
                 onChange={onChange}
+            />
+            <ComboUpdateModal
+                isModalUpdateOpen={isModalUpdateOpen}
+                setIsModalUpdateOpen={setIsModalUpdateOpen}
+                comboSelected={comboSelected}
+                setComboSelected={setComboSelected}
+                fetchComboList={fetchComboList}
+                foodList={foodList}
+                handleUpload={handleUpload}
+                uploading={uploading}
+                imageKey={imageKey}
+                setImageKey={setImageKey}
+                previewUrl={previewUrl}
+                setPreviewUrl={setPreviewUrl}
             />
         </>
     );

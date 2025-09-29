@@ -110,6 +110,13 @@ const ComboListPage = () => {
                 setCurrent={setCurrent}
                 setPageSize={setPageSize}
                 fetchComboList={fetchComboList}
+                foodList={foodList}
+                handleUpload={handleUpload}
+                uploading={uploading}
+                imageKey={imageKey}
+                setImageKey={setImageKey}
+                previewUrl={previewUrl}
+                setPreviewUrl={setPreviewUrl}
             />
             <ComboCreateModal
                 isModalOpen={isModalOpen}

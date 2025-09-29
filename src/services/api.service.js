@@ -393,6 +393,19 @@ const createComboAPI = (name, price, description, imageKey, available, foods) =>
     return axios.post(URL_BACKEND, data);
 };
 
+const updateComboAPI = (id, name, price, description, imageKey, available, foods) => {
+    const URL_BACKEND = `/cinema-service/api/v1/combos/${id}`;
+    const data = {
+        name: name,
+        price: price,
+        description: description || null,
+        imageKey: imageKey,
+        available: available,
+        foods: foods || [] // [{ foodId: 1, quantity: 2 }]
+    };
+    return axios.put(URL_BACKEND, data);
+};
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -401,5 +414,5 @@ export {
     createSeatAPI, fetchAllMoviesAPI, fetchShowtimeByCinemaAPI, fetchRoomByCinemaAPI, fetchActiveMovies, createShowtimeAPI,
     changeShowtimeStatusAPI, updateShowtimeAPI, fetchAllCategoryActive, createMovieAPI, getMediaUrlAPI, uploadTempFileAPI,
     commitFileAPI, changeMovieStatusAPI, updateMovieAPI, deleteFileAPI, fetchAllFoodAPI, createFoodAPI, fetchFoodTypeActiveAPI,
-    updateFoodAPI, fetchAllCombosAPI, createComboAPI, fetchAllFoodsActiveAPI
+    updateFoodAPI, fetchAllCombosAPI, createComboAPI, fetchAllFoodsActiveAPI, updateComboAPI
 }
