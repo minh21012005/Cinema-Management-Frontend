@@ -80,7 +80,7 @@ const Sidebar = () => {
                         label: 'Food & Combo',
                         children: [
                             { label: 'Food', key: 'food', onClick: () => nav('/manager/foods') },
-                            { label: 'Combo', key: 'combo', onClick: () => nav('/manager/combo') },
+                            { label: 'Combo', key: 'combo', onClick: () => nav('/manager/combos') },
                         ],
                     },
                 ],

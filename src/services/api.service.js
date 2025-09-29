@@ -366,6 +366,33 @@ const updateFoodAPI = (id, code, name, price, description, imageKey, typeId, ava
     return axios.put(URL_BACKEND, data);
 }
 
+const fetchAllFoodsActiveAPI = () => {
+    return axios.get("/cinema-service/api/v1/foods/active");
+}
+
+const fetchAllCombosAPI = (current, pageSize, name) => {
+    return axios.get("/cinema-service/api/v1/combos/all", {
+        params: {
+            page: current,
+            size: pageSize,
+            name: name || null, // nếu không có tên thì truyền null
+        }
+    });
+}
+
+const createComboAPI = (name, price, description, imageKey, available, foods) => {
+    const URL_BACKEND = "/cinema-service/api/v1/combos";
+    const data = {
+        name: name,
+        price: price,
+        description: description || null,
+        imageKey: imageKey,
+        available: available,
+        foods: foods || [] // [{ foodId: 1, quantity: 2 }]
+    };
+    return axios.post(URL_BACKEND, data);
+};
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -374,5 +401,5 @@ export {
     createSeatAPI, fetchAllMoviesAPI, fetchShowtimeByCinemaAPI, fetchRoomByCinemaAPI, fetchActiveMovies, createShowtimeAPI,
     changeShowtimeStatusAPI, updateShowtimeAPI, fetchAllCategoryActive, createMovieAPI, getMediaUrlAPI, uploadTempFileAPI,
     commitFileAPI, changeMovieStatusAPI, updateMovieAPI, deleteFileAPI, fetchAllFoodAPI, createFoodAPI, fetchFoodTypeActiveAPI,
-    updateFoodAPI
+    updateFoodAPI, fetchAllCombosAPI, createComboAPI, fetchAllFoodsActiveAPI
 }

@@ -21,6 +21,7 @@ import RoomCreate from './pages/manager/room.create.jsx';
 import MovieListPage from './pages/manager/movie.list.jsx';
 import ShowTimeListPage from './pages/manager/showtime.list.jsx';
 import FoodListPage from './pages/manager/food.list.jsx';
+import ComboListPage from './pages/manager/combo.list.jsx';
 
 const router = createBrowserRouter([
   {
@@ -73,6 +74,10 @@ const router = createBrowserRouter([
       {
         path: "foods",
         element: <FoodListPage />,
+      },
+      {
+        path: "combos",
+        element: <ComboListPage />,
       },
     ],
   },
