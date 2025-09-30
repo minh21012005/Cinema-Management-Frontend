@@ -1,16 +1,18 @@
 import { EyeOutlined, EditOutlined } from "@ant-design/icons";
 import { Space, Table, Tag } from "antd";
 import { useState } from "react";
+import RoleUpdateModal from "./role.update";
+import { render } from "nprogress";
 
 const RoleTable = (props) => {
-    const [isModalDetailOpen, setIsModalDetailOpen] = useState(false);
-    const [dataRoleDetail, setDataRoleDetail] = useState(null);
+    const [isModalUpdateOpen, setIsModalUpdateOpen] = useState(false);
+    const [roleData, setRoleData] = useState(null);
 
-    const { dataRole, loadRole, current, pageSize, total, setCurrent, setPageSize, onEdit } = props;
+    const { dataRole, loadRole, current, pageSize, total, setCurrent, setPageSize, listPermission } = props;
 
     const columns = [
         { title: "ID", dataIndex: "id", key: "id" },
-        { title: "Code", dataIndex: "code", key: "code" },
+        { title: "Code", dataIndex: "code", key: "code", render: (text) => <a>{text}</a> },
         { title: "Name", dataIndex: "name", key: "name" },
         {
             title: "Status",
@@ -27,13 +29,6 @@ const RoleTable = (props) => {
             key: "action",
             render: (_, record) => (
                 <Space size="middle">
-                    <EyeOutlined
-                        style={{ cursor: "pointer", color: "#1677ff" }}
-                        onClick={() => {
-                            setDataRoleDetail(record);
-                            setIsModalDetailOpen(true);
-                        }}
-                    />
                     <EditOutlined
                         style={{ cursor: "pointer", color: "#faad14" }}
                         onClick={() => onEdit(record)} // gọi hàm update từ props
@@ -42,6 +37,11 @@ const RoleTable = (props) => {
             ),
         },
     ];
+
+    const onEdit = (record) => {
+        setRoleData(record);
+        setIsModalUpdateOpen(true);
+    }
 
     const onChange = (pagination, filters, sorter, extra) => {
         if (pagination && pagination.current) {
@@ -72,6 +72,14 @@ const RoleTable = (props) => {
                     showTotal: (total, range) => `${range[0]}-${range[1]} trên ${total} rows`,
                 }}
                 onChange={onChange}
+            />
+            <RoleUpdateModal
+                listPermission={listPermission}
+                setIsModalUpdateOpen={setIsModalUpdateOpen}
+                isModalUpdateOpen={isModalUpdateOpen}
+                loadRole={loadRole}
+                roleData={roleData}
+                setRoleData={setRoleData}
             />
         </>
     );

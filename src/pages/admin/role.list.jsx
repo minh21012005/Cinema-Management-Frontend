@@ -72,6 +72,8 @@ const RoleListPage = () => {
                 setPageSize={setPageSize}
                 dataRole={dataRole}
                 roleSearch={roleSearch}
+                listPermission={listPermission}
+                loadRole={loadRole}
             />
             <RoleCreateModal
                 isModalOpen={isModalOpen}

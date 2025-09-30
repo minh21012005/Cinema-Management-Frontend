@@ -103,9 +103,14 @@ const UserPage = () => {
         <>
             {/* Thanh chứa nút Create User */}
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '350px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', width: '330px' }}>
                     <Space direction="vertical">
-                        <Search placeholder="Nhập email..." onSearch={onSearch} enterButton />
+                        <Search
+                            placeholder="Nhập email..."
+                            allowClear
+                            onSearch={onSearch}
+                            style={{ width: 200 }}
+                        />
                     </Space>
                     <Space wrap>
                         <Select

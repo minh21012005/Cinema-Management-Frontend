@@ -432,6 +432,11 @@ const createRoleAPI = (name, code, description, active, permissionIds) => {
     return axios.post(URL_BACKEND, data);
 };
 
+const updateRoleAPI = (id, payload) => {
+    const URL_BACKEND = `/auth-service/api/v1/roles/${id}`;
+    return axios.put(URL_BACKEND, payload);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -441,5 +446,5 @@ export {
     changeShowtimeStatusAPI, updateShowtimeAPI, fetchAllCategoryActive, createMovieAPI, getMediaUrlAPI, uploadTempFileAPI,
     commitFileAPI, changeMovieStatusAPI, updateMovieAPI, deleteFileAPI, fetchAllFoodAPI, createFoodAPI, fetchFoodTypeActiveAPI,
     updateFoodAPI, fetchAllCombosAPI, createComboAPI, fetchAllFoodsActiveAPI, updateComboAPI, fetchRolesWithPaginationAPI,
-    fetchPermissionsActiveAPI, createRoleAPI
+    fetchPermissionsActiveAPI, createRoleAPI, updateRoleAPI
 }
