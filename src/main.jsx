@@ -11,7 +11,6 @@ import PrivateRouteAdmin from './pages/admin/private.route.admin.jsx';
 import ErrorPage from './pages/error.jsx';
 import PrivateRouteManager from './pages/manager/private.route.manager.jsx';
 import PrivateRouteStaff from './pages/staff/private.route.manager.jsx';
-import StaffPage from './pages/staff/staff.jsx';
 import ManagerLayout from './pages/manager/index.jsx';
 import CinemaListPage from './pages/manager/cinema.list.jsx';
 import RoomListPage from './pages/manager/room.list.jsx';
@@ -25,6 +24,8 @@ import AdminLayout from './pages/admin/index.jsx';
 import RoleListPage from './pages/admin/role.list.jsx';
 import UserPage from './pages/admin/user.list.jsx';
 import PermissionListPage from './pages/admin/permission.list.jsx';
+import SellTicketPage from './pages/staff/ticket.sell.jsx';
+import StaffLayout from './pages/staff/index.jsx';
 
 const router = createBrowserRouter([
   {
@@ -102,10 +103,16 @@ const router = createBrowserRouter([
     path: "/staff",
     element: (
       <PrivateRouteStaff>
-        <StaffPage />
+        <StaffLayout />
       </PrivateRouteStaff>
     ),
     errorElement: <ErrorPage />,
+    children: [
+      {
+        index: true,
+        element: <SellTicketPage />,
+      },
+    ],
   },
   {
     path: "/login",

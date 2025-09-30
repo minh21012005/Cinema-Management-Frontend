@@ -464,6 +464,10 @@ const createPermissionAPI = (name, code, method, apiPath, module, description, a
 const updatePermissionAPI = (id, payload) => {
     const URL_BACKEND = `/auth-service/api/v1/permissions/${id}`;
     return axios.put(URL_BACKEND, payload);
+};
+
+const fetchCinemasActiveAPI = () => {
+    return axios.get("/cinema-service/api/v1/cinemas/active");
 }
 
 export {
@@ -476,5 +480,5 @@ export {
     commitFileAPI, changeMovieStatusAPI, updateMovieAPI, deleteFileAPI, fetchAllFoodAPI, createFoodAPI, fetchFoodTypeActiveAPI,
     updateFoodAPI, fetchAllCombosAPI, createComboAPI, fetchAllFoodsActiveAPI, updateComboAPI, fetchRolesWithPaginationAPI,
     fetchPermissionsActiveAPI, createRoleAPI, updateRoleAPI, fetchPermissionsWithPaginationAPI, createPermissionAPI,
-    updatePermissionAPI
+    updatePermissionAPI, fetchCinemasActiveAPI
 }

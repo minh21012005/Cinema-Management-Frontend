@@ -26,7 +26,7 @@ const Sidebar = () => {
         { pattern: /^\/manager\/food-report/, key: "food-report" },
         { pattern: /^\/manager\/staff/, key: "staff" },
         { pattern: /^\/manager\/settings/, key: "settings" },
-        { pattern: /^\/dashboard/, key: "dashboard" },
+        { pattern: /^\/staff$/, key: "sell-ticket" },
         { pattern: /^\/ticket/, key: "ticket" },
         { pattern: /^\/sell-ticket/, key: "sell-ticket" },
         { pattern: /^\/manage-tickets/, key: "manage-tickets" },
@@ -139,12 +139,6 @@ const Sidebar = () => {
     } else if (user.role.name === "STAFF") {
         items = [
             {
-                label: 'Dashboard',
-                key: 'dashboard',
-                icon: <DashboardOutlined />,
-                onClick: () => nav('/dashboard')
-            },
-            {
                 label: 'Ticket',
                 key: 'ticket',
                 icon: <ShoppingCartOutlined />,
@@ -153,7 +147,7 @@ const Sidebar = () => {
                         type: 'group',
                         label: 'Ticket Sales',
                         children: [
-                            { label: 'Sell Ticket', key: 'sell-ticket', onClick: () => nav('/sell-ticket') },
+                            { label: 'Sell Ticket', key: 'sell-ticket', onClick: () => nav('/staff') },
                             { label: 'Manage Tickets', key: 'manage-tickets', onClick: () => nav('/manage-tickets') },
                         ],
                     },
