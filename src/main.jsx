@@ -24,6 +24,7 @@ import ComboListPage from './pages/manager/combo.list.jsx';
 import AdminLayout from './pages/admin/index.jsx';
 import RoleListPage from './pages/admin/role.list.jsx';
 import UserPage from './pages/admin/user.list.jsx';
+import PermissionListPage from './pages/admin/permission.list.jsx';
 
 const router = createBrowserRouter([
   {
@@ -48,10 +49,10 @@ const router = createBrowserRouter([
         path: "roles",
         element: <RoleListPage />   // Trang quản lý Role
       },
-      // {
-      //   path: "permissions",
-      //   element: <PermissionPage /> // Trang quản lý Permission
-      // }
+      {
+        path: "permissions",
+        element: <PermissionListPage /> // Trang quản lý Permission
+      }
     ]
   },
   {

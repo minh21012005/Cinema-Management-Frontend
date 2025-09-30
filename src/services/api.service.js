@@ -406,12 +406,12 @@ const updateComboAPI = (id, name, price, description, imageKey, available, foods
     return axios.put(URL_BACKEND, data);
 };
 
-const fetchRolesWithPaginationAPI = (current, pageSize, name) => {
+const fetchRolesWithPaginationAPI = (current, pageSize, code) => {
     return axios.get("/auth-service/api/v1/roles/all", {
         params: {
             page: current,
             size: pageSize,
-            name: name || null, // nếu không có tên thì truyền null
+            code: code || null, // nếu không có tên thì truyền null
         }
     });
 }
@@ -437,6 +437,30 @@ const updateRoleAPI = (id, payload) => {
     return axios.put(URL_BACKEND, payload);
 }
 
+const fetchPermissionsWithPaginationAPI = (current, pageSize, module) => {
+    return axios.get("/auth-service/api/v1/permissions/all", {
+        params: {
+            page: current,
+            size: pageSize,
+            module: module || null, // nếu không có tên thì truyền null
+        }
+    });
+}
+
+const createPermissionAPI = (name, code, method, apiPath, module, description, active) => {
+    const URL_BACKEND = "/auth-service/api/v1/permissions";
+    const data = {
+        name: name,
+        code: code,
+        method: method,
+        apiPath: apiPath,
+        module: module,
+        description: description || null,
+        active: active || true
+    };
+    return axios.post(URL_BACKEND, data);
+};
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -446,5 +470,5 @@ export {
     changeShowtimeStatusAPI, updateShowtimeAPI, fetchAllCategoryActive, createMovieAPI, getMediaUrlAPI, uploadTempFileAPI,
     commitFileAPI, changeMovieStatusAPI, updateMovieAPI, deleteFileAPI, fetchAllFoodAPI, createFoodAPI, fetchFoodTypeActiveAPI,
     updateFoodAPI, fetchAllCombosAPI, createComboAPI, fetchAllFoodsActiveAPI, updateComboAPI, fetchRolesWithPaginationAPI,
-    fetchPermissionsActiveAPI, createRoleAPI, updateRoleAPI
+    fetchPermissionsActiveAPI, createRoleAPI, updateRoleAPI, fetchPermissionsWithPaginationAPI, createPermissionAPI
 }

@@ -52,7 +52,7 @@ const RoleListPage = () => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', width: '350px' }}>
                     <Space direction="vertical">
                         <Search
-                            placeholder="Nhập name..."
+                            placeholder="Nhập code..."
                             allowClear
                             onSearch={onSearch}
                             style={{ width: 200 }}
