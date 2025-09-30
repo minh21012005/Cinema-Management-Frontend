@@ -1,7 +1,7 @@
 import { EditOutlined } from "@ant-design/icons";
 import { Space, Table, Tag } from "antd";
-import { render } from "nprogress";
 import { useState } from "react";
+import PermissionUpdateModal from "./permission.update";
 
 const PermissionTable = (props) => {
     const [isModalUpdateOpen, setIsModalUpdateOpen] = useState(false);
@@ -90,6 +90,13 @@ const PermissionTable = (props) => {
                     showTotal: (total, range) => `${range[0]}-${range[1]} trên ${total} rows`,
                 }}
                 onChange={onChange}
+            />
+            <PermissionUpdateModal
+                isModalUpdateOpen={isModalUpdateOpen}
+                setIsModalUpdateOpen={setIsModalUpdateOpen}
+                permissionData={permissionData}
+                setPermissionData={setPermissionData}
+                loadPermission={loadPermission}
             />
         </>
     );

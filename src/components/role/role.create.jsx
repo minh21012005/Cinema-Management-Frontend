@@ -1,6 +1,6 @@
 import { createRoleAPI } from "@/services/api.service";
-import { Modal, Form, Input, Switch, Button, Select, notification } from "antd";
-import { useState, useEffect } from "react";
+import { Modal, Form, Input, Switch, Select, notification } from "antd";
+import { useState } from "react";
 
 const { Option } = Select;
 

@@ -1,8 +1,7 @@
-import { EyeOutlined, EditOutlined } from "@ant-design/icons";
+import { EditOutlined } from "@ant-design/icons";
 import { Space, Table, Tag } from "antd";
 import { useState } from "react";
 import RoleUpdateModal from "./role.update";
-import { render } from "nprogress";
 
 const RoleTable = (props) => {
     const [isModalUpdateOpen, setIsModalUpdateOpen] = useState(false);
