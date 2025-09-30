@@ -8,12 +8,7 @@ const RoleCreateModal = (props) => {
     const { isModalOpen, setIsModalOpen, loadRole, listPermission } = props;
 
     const [form] = Form.useForm();
-    const [permissions, setPermissions] = useState([]);
     const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-
-    }, []);
 
     const handleOk = async (values) => {
         const res = await createRoleAPI(
@@ -93,18 +88,17 @@ const RoleCreateModal = (props) => {
                         allowClear
                         showSearch
                         optionFilterProp="children"
-                        filterOption={(input, option) => {
-                            const perm = listPermission.find(p => p.id === option.value);
-                            return (
-                                perm?.name.toLowerCase().includes(input.toLowerCase()) ||
-                                perm?.code.toLowerCase().includes(input.toLowerCase())
-                            );
-                        }}
                     >
-                        {listPermission.map((perm) => (
-                            <Option key={perm.id} value={perm.id}>
-                                {perm.name} ({perm.code})
-                            </Option>
+                        {[...new Set(listPermission.map(p => p.module))].map((module) => (
+                            <Select.OptGroup key={module} label={module}>
+                                {listPermission
+                                    .filter(p => p.module === module)
+                                    .map((perm) => (
+                                        <Option key={perm.id} value={perm.id}>
+                                            {perm.name} ({perm.code})
+                                        </Option>
+                                    ))}
+                            </Select.OptGroup>
                         ))}
                     </Select>
                 </Form.Item>
