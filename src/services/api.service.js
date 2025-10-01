@@ -466,8 +466,18 @@ const updatePermissionAPI = (id, payload) => {
     return axios.put(URL_BACKEND, payload);
 };
 
-const fetchCinemasActiveAPI = () => {
-    return axios.get("/cinema-service/api/v1/cinemas/active");
+const fetchShowtimeInDayForStaffAPI = (current, pageSize, title) => {
+    return axios.get("/cinema-service/api/v1/showtime/inday", {
+        params: {
+            page: current,
+            size: pageSize,
+            title: title || null
+        }
+    });
+}
+
+const fetchSeatLayoutAPI = (id) => {
+    return axios.get(`/cinema-service/api/v1/seats/fetch-by-showtime/${id}`);
 }
 
 export {
@@ -480,5 +490,5 @@ export {
     commitFileAPI, changeMovieStatusAPI, updateMovieAPI, deleteFileAPI, fetchAllFoodAPI, createFoodAPI, fetchFoodTypeActiveAPI,
     updateFoodAPI, fetchAllCombosAPI, createComboAPI, fetchAllFoodsActiveAPI, updateComboAPI, fetchRolesWithPaginationAPI,
     fetchPermissionsActiveAPI, createRoleAPI, updateRoleAPI, fetchPermissionsWithPaginationAPI, createPermissionAPI,
-    updatePermissionAPI, fetchCinemasActiveAPI
+    updatePermissionAPI, fetchShowtimeInDayForStaffAPI, fetchSeatLayoutAPI
 }

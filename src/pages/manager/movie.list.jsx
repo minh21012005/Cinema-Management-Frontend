@@ -47,7 +47,7 @@ const MovieListPage = () => {
         if (value) {
             let trimmedValue = value.trim();
             setTitleSearch(trimmedValue);
-            setCurrent(); // reset về trang đầu tiên khi tìm kiếm
+            setCurrent(0); // reset về trang đầu tiên khi tìm kiếm
         } else {
             setTitleSearch(null); // nếu không có giá trị tìm kiếm thì reset
             setCurrent(0); // reset về trang đầu tiên
