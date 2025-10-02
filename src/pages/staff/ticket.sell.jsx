@@ -7,17 +7,15 @@ import {
     Input,
     Button,
     Divider,
-    Tabs,
-    InputNumber,
     Pagination,
 } from "antd";
 import { fetchAllCombosActiveAPI, fetchAllFoodsActiveAPI, fetchSeatLayoutAPI, fetchShowtimeInDayForStaffAPI } from "@/services/api.service";
 import StaffSellImage from "@/pages/staff/staff.sell.image";
 import Search from "antd/es/input/Search";
 import SeatLayout from "@/components/seat/seat.layout";
+import FoodComboTab from "./foodcombo.tab";
 
 const { Text } = Typography;
-const { TabPane } = Tabs;
 
 const SellTicketPage = () => {
     // ---------------- State ----------------
@@ -102,8 +100,8 @@ const SellTicketPage = () => {
         }
     };
 
-    const changeFoodQty = (id, qty) => {
-        setCartFood((prev) => ({ ...prev, [id]: qty }));
+    const changeFoodQty = (type, id, qty) => {
+        setCartFood((prev) => ({ ...prev, [`${type}-${id}`]: qty }));
     };
 
     const ticketPrice = (seat) => {
@@ -117,8 +115,14 @@ const SellTicketPage = () => {
 
     const totalFoodCombo = Object.entries(cartFood)
         .filter(([_, qty]) => qty > 0)
-        .reduce((sum, [id, qty]) => {
-            const item = [...foods, ...combos].find((f) => f.id === Number(id));
+        .reduce((sum, [key, qty]) => {
+            const [type, id] = key.split("-");
+            let item;
+            if (type === "food") {
+                item = foods.find((f) => String(f.id) === id);
+            } else if (type === "combo") {
+                item = combos.find((c) => String(c.id) === id);
+            }
             return sum + (item ? item.price * qty : 0);
         }, 0);
 
@@ -217,92 +221,18 @@ const SellTicketPage = () => {
                         toggleSeat={toggleSeat}
                     />
 
-                    {/* Step 4: Food / Combo */}
                     {selectedShowtime && (
                         <Card title="Food / Combo">
-                            <Tabs defaultActiveKey="food">
-                                <TabPane tab="Food" key="food">
-                                    <Input
-                                        placeholder="Search Food"
-                                        value={foodSearch}
-                                        onChange={(e) => setFoodSearch(e.target.value)}
-                                        style={{ marginBottom: 10 }}
-                                    />
-                                    <Row gutter={16} style={{ maxHeight: 250, overflowY: "auto" }}>
-                                        {foods
-                                            .filter((f) => f.name.toLowerCase().includes(foodSearch.toLowerCase()))
-                                            .map((f) => (
-                                                <Col key={f.id} span={6}>
-                                                    <Card style={{ textAlign: "center" }}>
-                                                        {/* Hiển thị ảnh food */}
-                                                        <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
-                                                            <StaffSellImage imageKey={f.imageKey} width={120} height={120} />
-                                                        </div>
-
-                                                        <Text strong>{f.name}</Text>
-                                                        <br />
-                                                        <Text>{f.price}k</Text>
-                                                        <InputNumber
-                                                            min={0}
-                                                            value={cartFood[f.id] || 0}
-                                                            onChange={(val) => changeFoodQty(f.id, val)}
-                                                            style={{ width: "100%", marginTop: 8 }}
-                                                        />
-                                                    </Card>
-                                                </Col>
-                                            ))}
-                                    </Row>
-                                </TabPane>
-
-                                <TabPane tab="Combo" key="combo">
-                                    <Input
-                                        placeholder="Search Combo"
-                                        value={comboSearch}
-                                        onChange={(e) => setComboSearch(e.target.value)}
-                                        style={{ marginBottom: 10 }}
-                                    />
-                                    <Row gutter={16} style={{ maxHeight: 250, overflowY: "auto" }}>
-                                        {combos
-                                            .filter((c) => c.name.toLowerCase().includes(comboSearch.toLowerCase()))
-                                            .map((c) => (
-                                                <Col key={c.id} span={6}>
-                                                    <Card style={{ textAlign: "center" }}>
-                                                        {/* Hiển thị ảnh combo */}
-                                                        <div
-                                                            style={{
-                                                                display: "flex",
-                                                                justifyContent: "center",
-                                                                marginBottom: 8,
-                                                            }}
-                                                        >
-                                                            <StaffSellImage imageKey={c.imageKey} width={120} height={120} />
-                                                        </div>
-
-                                                        <Text strong>{c.name}</Text>
-                                                        <br />
-                                                        <Text>{c.price}k</Text>
-                                                        <br />
-
-                                                        {/* Liệt kê chi tiết food trong combo */}
-                                                        <div style={{ margin: "8px 0", fontSize: 12, color: "#555", textAlign: "left" }}>
-                                                            {c.foods.map((f) => (
-                                                                <div key={f.foodId}>
-                                                                    - {f.foodName} x {f.quantity}
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                        <InputNumber
-                                                            min={0}
-                                                            value={cartFood[c.id] || 0}
-                                                            onChange={(val) => changeFoodQty(c.id, val)}
-                                                            style={{ width: "100%", marginTop: 8 }}
-                                                        />
-                                                    </Card>
-                                                </Col>
-                                            ))}
-                                    </Row>
-                                </TabPane>
-                            </Tabs>
+                            <FoodComboTab
+                                foods={foods}
+                                combos={combos}
+                                foodSearch={foodSearch}
+                                comboSearch={comboSearch}
+                                setFoodSearch={setFoodSearch}
+                                setComboSearch={setComboSearch}
+                                cartFood={cartFood}
+                                changeFoodQty={changeFoodQty}
+                            />
                         </Card>
                     )}
                 </Col>
@@ -326,11 +256,17 @@ const SellTicketPage = () => {
                         <Text strong>Food / Combo:</Text>
                         {Object.entries(cartFood)
                             .filter(([_, qty]) => qty > 0)
-                            .map(([id, qty]) => {
-                                const item = [...foods, ...combos].find((f) => f.id === Number(id));
+                            .map(([key, qty]) => {
+                                const [type, id] = key.split("-");
+                                let item;
+                                if (type === "food") {
+                                    item = foods.find((f) => f.id === Number(id));
+                                } else if (type === "combo") {
+                                    item = combos.find((c) => c.id === Number(id));
+                                }
                                 return (
-                                    <div key={id}>
-                                        {item.name} x {qty} = {item.price * qty}k
+                                    <div key={key}>
+                                        {item?.name} x {qty} = {item?.price * qty}k
                                     </div>
                                 );
                             })}
@@ -375,15 +311,28 @@ const SellTicketPage = () => {
                                     })
                                 );
 
-                                console.log(
-                                    "Food/Combo Details:",
-                                    Object.entries(cartFood)
-                                        .filter(([_, qty]) => qty > 0)
-                                        .map(([id, qty]) => {
-                                            const item = [...foods, ...combos].find((f) => f.id === Number(id));
-                                            return { id: item.id, name: item.name, price: item.price, quantity: qty };
-                                        })
-                                );
+                                // ✅ Log Food & Combo chi tiết
+                                const foodComboDetails = Object.entries(cartFood)
+                                    .filter(([_, qty]) => qty > 0)
+                                    .map(([key, qty]) => {
+                                        const [type, id] = key.split("-");
+                                        let item;
+                                        if (type === "food") {
+                                            item = foods.find((f) => f.id === Number(id));
+                                        } else if (type === "combo") {
+                                            item = combos.find((c) => c.id === Number(id));
+                                        }
+                                        return {
+                                            type,                     // "food" hoặc "combo"
+                                            id: item?.id,
+                                            name: item?.name,
+                                            quantity: qty,
+                                            unitPrice: item?.price,
+                                            totalPrice: item ? item.price * qty : 0,
+                                        };
+                                    });
+
+                                console.log("Food / Combo Details:", foodComboDetails);
 
                                 console.log("Customer Name:", customerName);
                                 console.log("Customer Phone:", customerPhone);
