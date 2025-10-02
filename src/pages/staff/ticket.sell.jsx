@@ -11,12 +11,12 @@ import {
     InputNumber,
     Pagination,
 } from "antd";
-import { fetchSeatLayoutAPI, fetchShowtimeInDayForStaffAPI } from "@/services/api.service";
-import MovieImage from "@/components/movie/movie.image";
+import { fetchAllCombosActiveAPI, fetchAllFoodsActiveAPI, fetchSeatLayoutAPI, fetchShowtimeInDayForStaffAPI } from "@/services/api.service";
+import StaffSellImage from "@/pages/staff/staff.sell.image";
 import Search from "antd/es/input/Search";
 import SeatLayout from "@/components/seat/seat.layout";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { TabPane } = Tabs;
 
 const SellTicketPage = () => {
@@ -34,6 +34,8 @@ const SellTicketPage = () => {
     const [total, setTotal] = useState(0);
     const [title, setTitle] = useState("");
     const [seatLayouts, setSeatLayouts] = useState([]);
+    const [foods, setFoods] = useState([]);
+    const [combos, setCombos] = useState([]);
 
     // ---------------- Fetch API ----------------
     useEffect(() => {
@@ -43,6 +45,11 @@ const SellTicketPage = () => {
     useEffect(() => {
         fetchSeatLayout();
     }, [selectedShowtime]);
+
+    useEffect(() => {
+        fetchFoods();
+        fetchCombos();
+    }, []);
 
     const fetchShowtimes = async () => {
         const res = await fetchShowtimeInDayForStaffAPI(current, pageSize, title);
@@ -61,6 +68,20 @@ const SellTicketPage = () => {
         }
     };
 
+    const fetchFoods = async () => {
+        const res = await fetchAllFoodsActiveAPI();
+        if (res.data) {
+            setFoods(res.data);
+        }
+    }
+
+    const fetchCombos = async () => {
+        const res = await fetchAllCombosActiveAPI();
+        if (res.data) {
+            setCombos(res.data);
+        }
+    }
+
     const onSearch = (value, _e, info) => {
         if (value) {
             let trimmedValue = value.trim();
@@ -71,17 +92,6 @@ const SellTicketPage = () => {
             setCurrent(0); // reset về trang đầu tiên
         }
     }
-
-    const foods = [
-        { id: 1, name: "Popcorn", price: 50 },
-        { id: 2, name: "Coke", price: 30 },
-        { id: 3, name: "Nachos", price: 40 },
-    ];
-
-    const combos = [
-        { id: 101, name: "Combo 1", price: 100 },
-        { id: 102, name: "Combo 2", price: 150 },
-    ];
 
     // ---------------- Handlers ----------------
     const toggleSeat = (seatId) => {
@@ -116,8 +126,6 @@ const SellTicketPage = () => {
 
     return (
         <div style={{ padding: 20 }}>
-            <Title level={2}>Sell Ticket & Food/Combo</Title>
-
             {/* Filter theo tên phim */}
             <Search
                 placeholder="Nhập movie title..."
@@ -130,7 +138,7 @@ const SellTicketPage = () => {
                 {/* Left Panel */}
                 <Col span={16}>
                     {/* Step 1: Select Showtime */}
-                    <Card title="Step 1: Select Showtime" style={{ marginBottom: 20 }}>
+                    <Card title="Showtime" style={{ marginBottom: 20 }}>
                         <Row gutter={[16, 16]}>
                             {showtimeData.map((s) => (
                                 <Col key={s.id} span={6}>
@@ -160,7 +168,7 @@ const SellTicketPage = () => {
                                                 flexGrow: 1,
                                             }}
                                         >
-                                            <MovieImage posterKey={s.posterKey} width={160} height={220} />
+                                            <StaffSellImage imageKey={s.posterKey} width={160} height={220} />
                                         </div>
 
                                         <div style={{ marginTop: 10 }}>
@@ -211,7 +219,7 @@ const SellTicketPage = () => {
 
                     {/* Step 4: Food / Combo */}
                     {selectedShowtime && (
-                        <Card title="Step 4: Food / Combo">
+                        <Card title="Food / Combo">
                             <Tabs defaultActiveKey="food">
                                 <TabPane tab="Food" key="food">
                                     <Input
@@ -225,7 +233,12 @@ const SellTicketPage = () => {
                                             .filter((f) => f.name.toLowerCase().includes(foodSearch.toLowerCase()))
                                             .map((f) => (
                                                 <Col key={f.id} span={6}>
-                                                    <Card>
+                                                    <Card style={{ textAlign: "center" }}>
+                                                        {/* Hiển thị ảnh food */}
+                                                        <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
+                                                            <StaffSellImage imageKey={f.imageKey} width={120} height={120} />
+                                                        </div>
+
                                                         <Text strong>{f.name}</Text>
                                                         <br />
                                                         <Text>{f.price}k</Text>
@@ -253,10 +266,31 @@ const SellTicketPage = () => {
                                             .filter((c) => c.name.toLowerCase().includes(comboSearch.toLowerCase()))
                                             .map((c) => (
                                                 <Col key={c.id} span={6}>
-                                                    <Card>
+                                                    <Card style={{ textAlign: "center" }}>
+                                                        {/* Hiển thị ảnh combo */}
+                                                        <div
+                                                            style={{
+                                                                display: "flex",
+                                                                justifyContent: "center",
+                                                                marginBottom: 8,
+                                                            }}
+                                                        >
+                                                            <StaffSellImage imageKey={c.imageKey} width={120} height={120} />
+                                                        </div>
+
                                                         <Text strong>{c.name}</Text>
                                                         <br />
                                                         <Text>{c.price}k</Text>
+                                                        <br />
+
+                                                        {/* Liệt kê chi tiết food trong combo */}
+                                                        <div style={{ margin: "8px 0", fontSize: 12, color: "#555", textAlign: "left" }}>
+                                                            {c.foods.map((f) => (
+                                                                <div key={f.foodId}>
+                                                                    - {f.foodName} x {f.quantity}
+                                                                </div>
+                                                            ))}
+                                                        </div>
                                                         <InputNumber
                                                             min={0}
                                                             value={cartFood[c.id] || 0}

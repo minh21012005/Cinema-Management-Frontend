@@ -1,16 +1,16 @@
 import { getMediaUrlAPI } from "@/services/api.service";
 import { useEffect, useState } from "react";
 
-const MovieImage = ({ posterKey, width = 160, height = 240 }) => {
+const StaffSellImage = ({ imageKey, width = 160, height = 240 }) => {
     const [url, setUrl] = useState(null);
 
     useEffect(() => {
-        if (posterKey) {
-            getMediaUrlAPI(posterKey).then(res => setUrl(res.data));
+        if (imageKey) {
+            getMediaUrlAPI(imageKey).then(res => setUrl(res.data));
         }
-    }, [posterKey]);
+    }, [imageKey]);
 
-    if (!posterKey) return (
+    if (!imageKey) return (
         <div
             style={{
                 width,
@@ -43,4 +43,4 @@ const MovieImage = ({ posterKey, width = 160, height = 240 }) => {
     );
 };
 
-export default MovieImage;
+export default StaffSellImage;

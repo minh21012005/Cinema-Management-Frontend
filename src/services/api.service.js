@@ -370,6 +370,10 @@ const fetchAllFoodsActiveAPI = () => {
     return axios.get("/cinema-service/api/v1/foods/active");
 }
 
+const fetchAllCombosActiveAPI = () => {
+    return axios.get("/cinema-service/api/v1/combos/active");
+}
+
 const fetchAllCombosAPI = (current, pageSize, name) => {
     return axios.get("/cinema-service/api/v1/combos/all", {
         params: {
@@ -490,5 +494,5 @@ export {
     commitFileAPI, changeMovieStatusAPI, updateMovieAPI, deleteFileAPI, fetchAllFoodAPI, createFoodAPI, fetchFoodTypeActiveAPI,
     updateFoodAPI, fetchAllCombosAPI, createComboAPI, fetchAllFoodsActiveAPI, updateComboAPI, fetchRolesWithPaginationAPI,
     fetchPermissionsActiveAPI, createRoleAPI, updateRoleAPI, fetchPermissionsWithPaginationAPI, createPermissionAPI,
-    updatePermissionAPI, fetchShowtimeInDayForStaffAPI, fetchSeatLayoutAPI
+    updatePermissionAPI, fetchShowtimeInDayForStaffAPI, fetchSeatLayoutAPI, fetchAllCombosActiveAPI
 }
