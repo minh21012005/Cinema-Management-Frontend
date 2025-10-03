@@ -9,11 +9,13 @@ import {
     Divider,
     Pagination,
 } from "antd";
-import { fetchAllCombosActiveAPI, fetchAllFoodsActiveAPI, fetchSeatLayoutAPI, fetchShowtimeInDayForStaffAPI } from "@/services/api.service";
+import { fetchAllCombosActiveAPI, fetchAllFoodsActiveAPI, fetchSeatLayoutAPI, fetchShowtimeInDayForStaffAPI, staffHandleBookingAPI } from "@/services/api.service";
 import StaffSellImage from "@/pages/staff/staff.sell.image";
 import Search from "antd/es/input/Search";
 import SeatLayout from "@/components/seat/seat.layout";
 import FoodComboTab from "./foodcombo.tab";
+import SockJS from "sockjs-client";
+import * as StompJs from "@stomp/stompjs"; // ✔ Đúng
 
 const { Text } = Typography;
 
@@ -34,6 +36,61 @@ const SellTicketPage = () => {
     const [seatLayouts, setSeatLayouts] = useState([]);
     const [foods, setFoods] = useState([]);
     const [combos, setCombos] = useState([]);
+
+    const [stompClient, setStompClient] = useState(null);
+    const token = window.localStorage.getItem("access_token");
+    const socketUrl = `http://localhost:8086/ws?accessToken=${token}`; // endpoint WebSocket
+
+    // --------------- Init WebSocket ----------------
+    useEffect(() => {
+        const socket = new SockJS(socketUrl);
+        const client = StompJs.Stomp.over(socket);
+
+        client.connect(
+            (frame) => {
+                console.log("Connected to WebSocket:", frame);
+                // Subcribe nếu muốn nhận message từ server
+                client.subscribe("/topic", (message) => {
+                    console.log("Received from WS:", message.body);
+                });
+            },
+            (error) => {
+                console.error("WebSocket connection error:", error);
+            }
+        );
+
+        setStompClient(client);
+
+        return () => {
+            if (client) client.disconnect();
+        };
+    }, []);
+
+    // Lắng nghe ghế bị book
+    useEffect(() => {
+        if (stompClient && selectedShowtime) {
+            const subscription = stompClient.subscribe(
+                `/topic/seats/${selectedShowtime}`,
+                (message) => {
+                    const bookedSeats = JSON.parse(message.body);
+                    console.log("Ghế vừa bị book:", bookedSeats);
+
+                    // 👉 Cập nhật seatLayouts: đánh dấu ghế booked ngay lập tức
+                    setSeatLayouts((prevSeats) =>
+                        prevSeats.map((seat) =>
+                            bookedSeats.includes(seat.id)
+                                ? { ...seat, booked: true } // thêm flag booked
+                                : seat
+                        )
+                    );
+                }
+            );
+
+            // cleanup: hủy khi đổi showtime
+            return () => subscription.unsubscribe();
+        }
+    }, [stompClient, selectedShowtime]);
+
 
     // ---------------- Fetch API ----------------
     useEffect(() => {
@@ -128,6 +185,45 @@ const SellTicketPage = () => {
 
     const totalPrice = totalTicket + totalFoodCombo;
 
+    const handleBooking = async () => {
+        const bookingData = {
+            staffId: 123, // lấy từ context đăng nhập staff
+            showtimeId: selectedShowtime,
+            seats: selectedSeats.map((id) => {
+                const seat = seatLayouts.find((s) => s.id === id);
+                return {
+                    seatId: seat.id,
+                    price: ticketPrice(seat),
+                };
+            }),
+            foods: Object.entries(cartFood)
+                .filter(([key, qty]) => key.startsWith("food") && qty > 0)
+                .map(([key, qty]) => {
+                    const id = key.split("-")[1];
+                    const item = foods.find((f) => String(f.id) === id);
+                    return {
+                        foodId: item.id,
+                        quantity: qty,
+                        price: item.price,
+                    };
+                }),
+            combos: Object.entries(cartFood)
+                .filter(([key, qty]) => key.startsWith("combo") && qty > 0)
+                .map(([key, qty]) => {
+                    const id = key.split("-")[1];
+                    const item = combos.find((c) => String(c.id) === id);
+                    return {
+                        comboId: item.id,
+                        quantity: qty,
+                        price: item.price,
+                    };
+                }),
+            customerName,
+            customerPhone,
+        };
+        const res = await staffHandleBookingAPI(bookingData);
+    }
+
     return (
         <div style={{ padding: 20 }}>
             {/* Filter theo tên phim */}
@@ -221,20 +317,18 @@ const SellTicketPage = () => {
                         toggleSeat={toggleSeat}
                     />
 
-                    {selectedShowtime && (
-                        <Card title="Food / Combo">
-                            <FoodComboTab
-                                foods={foods}
-                                combos={combos}
-                                foodSearch={foodSearch}
-                                comboSearch={comboSearch}
-                                setFoodSearch={setFoodSearch}
-                                setComboSearch={setComboSearch}
-                                cartFood={cartFood}
-                                changeFoodQty={changeFoodQty}
-                            />
-                        </Card>
-                    )}
+                    <Card title="Food / Combo">
+                        <FoodComboTab
+                            foods={foods}
+                            combos={combos}
+                            foodSearch={foodSearch}
+                            comboSearch={comboSearch}
+                            setFoodSearch={setFoodSearch}
+                            setComboSearch={setComboSearch}
+                            cartFood={cartFood}
+                            changeFoodQty={changeFoodQty}
+                        />
+                    </Card>
                 </Col>
 
                 {/* Right Panel: Cart & Payment */}
@@ -294,52 +388,7 @@ const SellTicketPage = () => {
                             type="primary"
                             block
                             disabled={totalPrice === 0}
-                            onClick={() => {
-                                // Log các giá trị
-                                console.log("Selected Showtime:", selectedShowtime);
-                                console.log("Selected Seats:", selectedSeats);
-                                console.log(
-                                    "Ticket Details:",
-                                    selectedSeats.map((s) => {
-                                        const seat = seatLayouts.find((seat) => seat.id === s);
-                                        return {
-                                            id: seat?.id,
-                                            name: seat?.name,
-                                            seatType: seat?.seatType?.name,
-                                            price: ticketPrice(seat),
-                                        };
-                                    })
-                                );
-
-                                // ✅ Log Food & Combo chi tiết
-                                const foodComboDetails = Object.entries(cartFood)
-                                    .filter(([_, qty]) => qty > 0)
-                                    .map(([key, qty]) => {
-                                        const [type, id] = key.split("-");
-                                        let item;
-                                        if (type === "food") {
-                                            item = foods.find((f) => f.id === Number(id));
-                                        } else if (type === "combo") {
-                                            item = combos.find((c) => c.id === Number(id));
-                                        }
-                                        return {
-                                            type,                     // "food" hoặc "combo"
-                                            id: item?.id,
-                                            name: item?.name,
-                                            quantity: qty,
-                                            unitPrice: item?.price,
-                                            totalPrice: item ? item.price * qty : 0,
-                                        };
-                                    });
-
-                                console.log("Food / Combo Details:", foodComboDetails);
-
-                                console.log("Customer Name:", customerName);
-                                console.log("Customer Phone:", customerPhone);
-                                console.log("Total Price:", totalPrice);
-
-                                // TODO: Gọi API booking-service gửi dữ liệu
-                            }}
+                            onClick={() => { handleBooking() }}
                         >
                             Confirm & Pay
                         </Button>

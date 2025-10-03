@@ -26,12 +26,7 @@ const Sidebar = () => {
         { pattern: /^\/manager\/food-report/, key: "food-report" },
         { pattern: /^\/manager\/staff/, key: "staff" },
         { pattern: /^\/manager\/settings/, key: "settings" },
-        { pattern: /^\/staff$/, key: "sell-ticket" },
-        { pattern: /^\/ticket/, key: "ticket" },
-        { pattern: /^\/sell-ticket/, key: "sell-ticket" },
-        { pattern: /^\/manage-tickets/, key: "manage-tickets" },
-        { pattern: /^\/sell-food/, key: "sell-food" },
-        { pattern: /^\/manage-orders/, key: "manage-orders" },
+        { pattern: /^\/staff/, key: "selling" },
         { pattern: /^\/customer-lookup/, key: "customer-lookup" },
         { pattern: /^\/admin$/, key: "user" },
         { pattern: /^\/admin\/roles/, key: "role" },
@@ -139,34 +134,14 @@ const Sidebar = () => {
     } else if (user.role.name === "STAFF") {
         items = [
             {
-                label: 'Ticket',
-                key: 'ticket',
+                label: 'Selling',
+                key: 'selling',
                 icon: <ShoppingCartOutlined />,
-                children: [
-                    {
-                        type: 'group',
-                        label: 'Ticket Sales',
-                        children: [
-                            { label: 'Sell Ticket', key: 'sell-ticket', onClick: () => nav('/staff') },
-                            { label: 'Manage Tickets', key: 'manage-tickets', onClick: () => nav('/manage-tickets') },
-                        ],
-                    },
-                ],
             },
             {
-                label: 'Food & Combo',
-                key: 'food-combo',
+                label: 'Manage Orders',
+                key: 'manage-orders',
                 icon: <ShopOutlined />,
-                children: [
-                    {
-                        type: 'group',
-                        label: 'Sales',
-                        children: [
-                            { label: 'Sell Food/Combo', key: 'sell-food', onClick: () => nav('/sell-food') },
-                            { label: 'Manage Orders', key: 'manage-orders', onClick: () => nav('/manage-orders') },
-                        ],
-                    },
-                ],
             },
             {
                 label: 'Customer Lookup',
