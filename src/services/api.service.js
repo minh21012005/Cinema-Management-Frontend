@@ -485,7 +485,7 @@ const fetchSeatLayoutAPI = (id) => {
 }
 
 const staffHandleBookingAPI = (payload) => {
-    const URL_BACKEND = `/booking-service/api/v1/bookings`;
+    const URL_BACKEND = `/booking-service/api/v1/orders`;
     return axios.post(URL_BACKEND, payload);
 }
 

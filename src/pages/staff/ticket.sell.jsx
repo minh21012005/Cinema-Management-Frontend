@@ -8,6 +8,7 @@ import {
     Button,
     Divider,
     Pagination,
+    notification,
 } from "antd";
 import { fetchAllCombosActiveAPI, fetchAllFoodsActiveAPI, fetchSeatLayoutAPI, fetchShowtimeInDayForStaffAPI, staffHandleBookingAPI } from "@/services/api.service";
 import StaffSellImage from "@/pages/staff/staff.sell.image";
@@ -39,7 +40,8 @@ const SellTicketPage = () => {
 
     const [stompClient, setStompClient] = useState(null);
     const token = window.localStorage.getItem("access_token");
-    const socketUrl = `http://localhost:8086/ws?accessToken=${token}`; // endpoint WebSocket
+    const baseWebSocketUrl = import.meta.env.VITE_BACKEND_WEBSOCKET_URL
+    const socketUrl = `${baseWebSocketUrl}/ws?accessToken=${token}`; // endpoint WebSocket
 
     // --------------- Init WebSocket ----------------
     useEffect(() => {
@@ -222,6 +224,15 @@ const SellTicketPage = () => {
             customerPhone,
         };
         const res = await staffHandleBookingAPI(bookingData);
+        if (res.data) {
+
+        } else {
+            notification.error({
+                message: "Failed",
+                description: JSON.stringify(res.message)
+            })
+        }
+        setSelectedSeats([]);
     }
 
     return (
