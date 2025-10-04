@@ -7,7 +7,7 @@ const ManagerLayout = () => {
     return (
         <>
             <HeaderLayout />
-            <div style={{ display: "flex", height: "100vh" }}>
+            <div style={{ display: "flex", height: "90vh" }}>
                 <div style={{ width: "250px", borderRight: "1px solid #ddd" }}>
                     <Sidebar />
                 </div>

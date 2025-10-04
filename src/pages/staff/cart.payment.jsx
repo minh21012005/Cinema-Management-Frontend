@@ -1,6 +1,21 @@
-import { Card, Divider, Input, Button, Typography } from "antd";
+import { useState } from "react";
+import {
+    Card,
+    Divider,
+    Input,
+    Button,
+    Typography,
+    Space,
+    Modal,
+} from "antd";
+import {
+    DollarOutlined,
+    CreditCardOutlined,
+    CheckCircleTwoTone,
+    CloseCircleTwoTone,
+} from "@ant-design/icons";
 
-const { Text } = Typography;
+const { Text, Title } = Typography;
 
 const CartPayment = ({
     selectedSeats,
@@ -15,65 +30,155 @@ const CartPayment = ({
     setCustomerPhone,
     ticketPrice,
     handleBooking,
-}) => (
-    <Card title="Cart & Payment">
-        <Text strong>Tickets:</Text>
-        {selectedSeats.length === 0 && <div>No tickets selected</div>}
-        {selectedSeats.map((s) => {
-            const seat = seatLayouts.find((seat) => seat.id === s);
-            return (
-                <div key={s}>
-                    {seat?.name} ({seat?.seatType?.name}) - {ticketPrice(seat)}k
+}) => {
+    const [cashModalVisible, setCashModalVisible] = useState(false);
+
+    return (
+        <>
+            <Card title="Cart & Payment" style={{ borderRadius: 12 }}>
+                <Text strong>Tickets:</Text>
+                {selectedSeats.length === 0 && <div>No tickets selected</div>}
+                {selectedSeats.map((s) => {
+                    const seat = seatLayouts.find((seat) => seat.id === s);
+                    return (
+                        <div key={s}>
+                            {seat?.name} ({seat?.seatType?.name}) - {ticketPrice(seat)}k
+                        </div>
+                    );
+                })}
+
+                <Divider />
+
+                <Text strong>Food / Combo:</Text>
+                {Object.entries(cartFood)
+                    .filter(([_, qty]) => qty > 0)
+                    .map(([key, qty]) => {
+                        const [type, id] = key.split("-");
+                        const item =
+                            type === "food"
+                                ? foods.find((f) => f.id === Number(id))
+                                : combos.find((c) => c.id === Number(id));
+                        return (
+                            <div key={key}>
+                                {item?.name} x {qty} = {item?.price * qty}k
+                            </div>
+                        );
+                    })}
+
+                <Divider />
+
+                <Text strong style={{ fontSize: 16 }}>
+                    Total: <span style={{ color: "#fa541c" }}>{totalPrice}k</span>
+                </Text>
+
+                <Divider />
+
+                <Input
+                    placeholder="Customer Name"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    style={{ marginBottom: 8, borderRadius: 6 }}
+                />
+                <Input
+                    placeholder="Customer Phone"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    style={{ marginBottom: 16, borderRadius: 6 }}
+                />
+
+                {/* Hai nút thanh toán */}
+                <Space direction="vertical" style={{ width: "100%" }}>
+                    <Button
+                        type="primary"
+                        block
+                        icon={<DollarOutlined />}
+                        style={{
+                            backgroundColor: "#52c41a",
+                            borderColor: "#52c41a",
+                            borderRadius: 8,
+                            height: 45,
+                            fontWeight: 600,
+                        }}
+                        disabled={totalPrice === 0}
+                        onClick={() => setCashModalVisible(true)}
+                    >
+                        Thanh toán tiền mặt
+                    </Button>
+
+                    <Button
+                        type="primary"
+                        block
+                        icon={<CreditCardOutlined />}
+                        style={{
+                            backgroundColor: "#1677ff",
+                            borderColor: "#1677ff",
+                            borderRadius: 8,
+                            height: 45,
+                            fontWeight: 600,
+                        }}
+                        disabled={totalPrice === 0}
+                        onClick={() => handleBooking("VNPAY")}
+                    >
+                        Thanh toán qua VNPay
+                    </Button>
+                </Space>
+            </Card>
+
+            {/* Modal xác nhận thanh toán tiền mặt */}
+            <Modal
+                title={null}
+                open={cashModalVisible}
+                onCancel={() => setCashModalVisible(false)}
+                footer={null}
+                centered
+            >
+                <div style={{ textAlign: "center", padding: "20px" }}>
+                    <DollarOutlined style={{ fontSize: 48, color: "#52c41a" }} />
+                    <Title level={4} style={{ marginTop: 16 }}>
+                        Xác nhận thanh toán tiền mặt
+                    </Title>
+                    <Text style={{ fontSize: 16 }}>
+                        Khách hàng đã thanh toán số tiền:{" "}
+                        <span style={{ color: "#fa541c", fontWeight: "bold" }}>
+                            {totalPrice}k
+                        </span>
+                    </Text>
+
+                    <Space style={{ marginTop: 24 }}>
+                        <Button
+                            type="primary"
+                            icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
+                            style={{
+                                borderRadius: 8,
+                                height: 40,
+                                fontWeight: 600,
+                                padding: "0 24px",
+                            }}
+                            onClick={() => {
+                                handleBooking("CASH");
+                                setCashModalVisible(false);
+                            }}
+                        >
+                            Xác nhận
+                        </Button>
+                        <Button
+                            danger
+                            icon={<CloseCircleTwoTone twoToneColor="#ff4d4f" />}
+                            style={{
+                                borderRadius: 8,
+                                height: 40,
+                                fontWeight: 600,
+                                padding: "0 24px",
+                            }}
+                            onClick={() => setCashModalVisible(false)}
+                        >
+                            Hủy
+                        </Button>
+                    </Space>
                 </div>
-            );
-        })}
-
-        <Divider />
-
-        <Text strong>Food / Combo:</Text>
-        {Object.entries(cartFood)
-            .filter(([_, qty]) => qty > 0)
-            .map(([key, qty]) => {
-                const [type, id] = key.split("-");
-                const item =
-                    type === "food"
-                        ? foods.find((f) => f.id === Number(id))
-                        : combos.find((c) => c.id === Number(id));
-                return (
-                    <div key={key}>
-                        {item?.name} x {qty} = {item?.price * qty}k
-                    </div>
-                );
-            })}
-
-        <Divider />
-
-        <Text strong>Total: {totalPrice}k</Text>
-
-        <Divider />
-
-        <Input
-            placeholder="Customer Name"
-            value={customerName}
-            onChange={(e) => setCustomerName(e.target.value)}
-            style={{ marginBottom: 8 }}
-        />
-        <Input
-            placeholder="Customer Phone"
-            value={customerPhone}
-            onChange={(e) => setCustomerPhone(e.target.value)}
-            style={{ marginBottom: 8 }}
-        />
-
-        <Button
-            type="primary"
-            block
-            disabled={totalPrice === 0}
-            onClick={handleBooking}
-        >
-            Confirm & Pay
-        </Button>
-    </Card>
-);
+            </Modal>
+        </>
+    );
+};
 
 export default CartPayment;

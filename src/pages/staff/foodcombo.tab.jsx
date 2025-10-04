@@ -23,7 +23,7 @@ const FoodComboTab = ({
                     onChange={(e) => setFoodSearch(e.target.value)}
                     style={{ marginBottom: 10 }}
                 />
-                <Row gutter={[16, 16]} style={{ maxHeight: 250, overflowY: "auto" }}>
+                <Row gutter={[16, 16]} style={{ maxHeight: 420, overflowY: "auto" }}>
                     {foods
                         .filter((f) => f.name.toLowerCase().includes(foodSearch.toLowerCase()))
                         .map((f) => (
@@ -46,7 +46,7 @@ const FoodComboTab = ({
                     onChange={(e) => setComboSearch(e.target.value)}
                     style={{ marginBottom: 10 }}
                 />
-                <Row gutter={[16, 16]} style={{ maxHeight: 250, overflowY: "auto" }}>
+                <Row gutter={[16, 16]} style={{ maxHeight: 420, overflowY: "auto" }}>
                     {combos
                         .filter((c) => c.name.toLowerCase().includes(comboSearch.toLowerCase()))
                         .map((c) => (
