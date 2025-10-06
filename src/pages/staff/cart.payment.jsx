@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     Card,
     Divider,
@@ -7,6 +7,8 @@ import {
     Typography,
     Space,
     Modal,
+    notification,
+    Image,
 } from "antd";
 import {
     DollarOutlined,
@@ -14,10 +16,15 @@ import {
     CheckCircleTwoTone,
     CloseCircleTwoTone,
 } from "@ant-design/icons";
+import { fetchQrCode } from "@/services/api.service";
 
 const { Text, Title } = Typography;
 
 const CartPayment = ({
+    setCartFood,
+    setTotal,
+    setSelectedSeats,
+    stompClient,
     selectedSeats,
     seatLayouts,
     foods,
@@ -32,6 +39,50 @@ const CartPayment = ({
     handleBooking,
 }) => {
     const [cashModalVisible, setCashModalVisible] = useState(false);
+    const [qrModalVisible, setQrModalVisible] = useState(false);
+    const [qrData, setQrData] = useState(null); // lưu dữ liệu QR từ backend
+    const [orderId, setOrderId] = useState(null);
+
+    useEffect(() => {
+        if (!stompClient || !stompClient.connected || !orderId) return;
+
+        const sub = stompClient.subscribe(`/topic/order-status/${orderId}`, (msg) => {
+            const orderData = JSON.parse(msg.body);
+            if (orderData.paid) {
+                notification.success({
+                    message: "Thanh toán thành công",
+                    description: `Đơn hàng #${orderData.id} đã được thanh toán!`,
+                });
+                setQrModalVisible(false); // nếu đang mở modal QR, đóng đi
+                setQrData(null);
+                setOrderId(null);
+                setSelectedSeats([]);
+                setCartFood({});
+                setTotal(0);
+                setCustomerName(null);
+                setCustomerPhone(null);
+            }
+        });
+        return () => sub.unsubscribe();
+
+    }, [stompClient, orderId]);
+
+
+    // Gọi BE và mở modal QR
+    const handleSepayPayment = async () => {
+        const dataOrder = await handleBooking('SEPAY');
+        setOrderId(dataOrder.data.id);
+        const res = await fetchQrCode(totalPrice, dataOrder.data.id);
+        if (res.data) {
+            setQrData(res.data);
+            setQrModalVisible(true);
+        } else {
+            notification.error({
+                message: "Failed",
+                description: "Không tải được QR Code"
+            })
+        }
+    };
 
     return (
         <>
@@ -117,9 +168,9 @@ const CartPayment = ({
                             fontWeight: 600,
                         }}
                         disabled={totalPrice === 0}
-                        onClick={() => handleBooking("VNPAY")}
+                        onClick={() => handleSepayPayment()}
                     >
-                        Thanh toán qua VNPay
+                        Thanh toán chuyển khoản
                     </Button>
                 </Space>
             </Card>
@@ -176,6 +227,32 @@ const CartPayment = ({
                         </Button>
                     </Space>
                 </div>
+            </Modal>
+
+            {/* Modal hiển thị QR thanh toán SEPAY */}
+            <Modal
+                title="Quét mã QR để thanh toán"
+                open={qrModalVisible}
+                onCancel={() => setQrModalVisible(false)}
+                footer={null}
+                centered
+            >
+                {qrData ? (
+                    <div style={{ textAlign: "center", padding: 16 }}>
+                        <Image
+                            src={qrData}
+                            alt="QR thanh toán SEPAY"
+                            width={240}
+                            preview={false}
+                        />
+                        <p>
+                            <b>Số tiền:</b>{" "}
+                            <span style={{ color: "#fa541c" }}>{totalPrice}₫</span>
+                        </p>
+                    </div>
+                ) : (
+                    <p>Đang tải QR...</p>
+                )}
             </Modal>
         </>
     );

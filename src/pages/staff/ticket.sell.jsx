@@ -54,17 +54,18 @@ const SellTicketPage = () => {
     }, []);
 
     useEffect(() => {
-        if (stompClient && selectedShowtime) {
-            const sub = stompClient.subscribe(`/topic/seats/${selectedShowtime}`, (msg) => {
-                const bookedSeats = JSON.parse(msg.body);
-                setSeatLayouts((prev) =>
-                    prev.map((seat) =>
-                        bookedSeats.includes(seat.id) ? { ...seat, booked: true } : seat
-                    )
-                );
-            });
-            return () => sub.unsubscribe();
-        }
+        if (!stompClient || !stompClient.connected || !selectedShowtime) return;
+
+        const sub = stompClient.subscribe(`/topic/seats/${selectedShowtime}`, (msg) => {
+            const bookedSeats = JSON.parse(msg.body);
+            setSeatLayouts((prev) =>
+                prev.map((seat) =>
+                    bookedSeats.includes(seat.id) ? { ...seat, booked: true } : seat
+                )
+            );
+        });
+        return () => sub.unsubscribe();
+
     }, [stompClient, selectedShowtime]);
 
     // ---------------- Fetch API ----------------
@@ -126,9 +127,9 @@ const SellTicketPage = () => {
 
     const totalPrice = totalTicket + totalFoodCombo;
 
-    const handleBooking = async () => {
-        const bookingData = {
-            staffId: 123,
+    // 👉 Hàm dựng booking data (có thể tái sử dụng ở nhiều nơi)
+    const buildBookingData = (method) => {
+        return {
             showtimeId: selectedShowtime,
             seats: selectedSeats.map((id) => {
                 const seat = seatLayouts.find((s) => s.id === id);
@@ -150,13 +151,30 @@ const SellTicketPage = () => {
                 }),
             customerName,
             customerPhone,
+            paymentMethod: method
         };
+    };
 
+    const handleBooking = async (method) => {
+        const bookingData = buildBookingData(method);
         const res = await staffHandleBookingAPI(bookingData);
-        if (!res?.data) {
-            notification.error({ message: "Failed", description: res.message });
+        if (method === 'CASH') {
+            if (!res?.data) {
+                notification.error({ message: "Failed", description: JSON.stringify(res.message) });
+            } else {
+                notification.success({
+                    message: "Success",
+                    description: "Thành công!"
+                })
+            }
+            setSelectedSeats([]);
+            setCartFood({});
+            setTotal(0);
+            setCustomerName(null);
+            setCustomerPhone(null);
         }
-        setSelectedSeats([]);
+
+        return res;
     };
 
     return (
@@ -204,6 +222,10 @@ const SellTicketPage = () => {
                 {/* Right Panel */}
                 <Col span={8}>
                     <CartPayment
+                        setCartFood={setCartFood}
+                        setTotal={setTotal}
+                        setSelectedSeats={setSelectedSeats}
+                        stompClient={stompClient}
                         selectedSeats={selectedSeats}
                         seatLayouts={seatLayouts}
                         foods={foods}

@@ -489,6 +489,15 @@ const staffHandleBookingAPI = (payload) => {
     return axios.post(URL_BACKEND, payload);
 }
 
+const fetchQrCode = (amount, orderId) => {
+    return axios.get("/booking-service/api/v1/sepay/generate-qr", {
+        params: {
+            amount: amount,
+            orderId: orderId
+        }
+    });
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -499,5 +508,6 @@ export {
     commitFileAPI, changeMovieStatusAPI, updateMovieAPI, deleteFileAPI, fetchAllFoodAPI, createFoodAPI, fetchFoodTypeActiveAPI,
     updateFoodAPI, fetchAllCombosAPI, createComboAPI, fetchAllFoodsActiveAPI, updateComboAPI, fetchRolesWithPaginationAPI,
     fetchPermissionsActiveAPI, createRoleAPI, updateRoleAPI, fetchPermissionsWithPaginationAPI, createPermissionAPI,
-    updatePermissionAPI, fetchShowtimeInDayForStaffAPI, fetchSeatLayoutAPI, fetchAllCombosActiveAPI, staffHandleBookingAPI
+    updatePermissionAPI, fetchShowtimeInDayForStaffAPI, fetchSeatLayoutAPI, fetchAllCombosActiveAPI, staffHandleBookingAPI,
+    fetchQrCode
 }
