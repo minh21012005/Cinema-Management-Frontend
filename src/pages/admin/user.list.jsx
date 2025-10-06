@@ -1,6 +1,6 @@
 import UserTable from "../../components/user/user.table";
 import { useEffect, useState } from "react";
-import { createUserApi, fetchAllRoleAPI, fetchAllUserAPI } from "@/services/api.service";
+import { createUserApi, fetchActiveCinemas, fetchAllRoleAPI, fetchAllUserAPI } from "@/services/api.service";
 import { Button, Input, Modal, Form, Row, Col, Select, DatePicker, notification, Space } from "antd";
 import dayjs from "dayjs";
 const { Search } = Input;
@@ -15,11 +15,13 @@ const UserPage = () => {
     const [emailSearch, setEmailSearch] = useState(null);
     const [roleList, setRoleList] = useState([]);
     const [roleSelected, setRoleSelected] = useState(null);
+    const [cinemaData, setCinemaData] = useState([])
+    const [selectedRoleCode, setSelectedRoleCode] = useState(null);
 
     const [form] = Form.useForm();
 
     useEffect(() => { loadUser(); }, [current, pageSize, emailSearch, roleSelected]);
-    useEffect(() => { loadRole(); }, []);
+    useEffect(() => { loadRole(); loadCinema(); }, []);
 
     const loadUser = async () => {
         const res = await fetchAllUserAPI(current, pageSize, emailSearch, roleSelected);
@@ -30,6 +32,13 @@ const UserPage = () => {
             setTotal(res.data.meta.total);
         }
     };
+
+    const loadCinema = async () => {
+        const res = await fetchActiveCinemas();
+        if (res?.data) {
+            setCinemaData(res.data);
+        }
+    }
 
     const loadRole = async () => {
         const res = await fetchAllRoleAPI();
@@ -54,7 +63,8 @@ const UserPage = () => {
                 value.address,
                 dateFormatted,
                 value.gender,
-                value.roleId
+                value.roleId,
+                value.cinemaId
             );
             if (res.data) {
                 notification.success({
@@ -76,6 +86,7 @@ const UserPage = () => {
 
     const handleCancel = () => {
         form.resetFields(); // reset dữ liệu form
+        setSelectedRoleCode(null);
         setIsModalOpen(false); // đóng modal
     };
 
@@ -250,14 +261,36 @@ const UserPage = () => {
                         name="roleId"
                         rules={[{ required: true, message: "Vui lòng chọn role!" }]}
                     >
-                        <Select placeholder="Chọn role" style={{ width: "100%" }}>
+                        <Select
+                            placeholder="Chọn role"
+                            style={{ width: "100%" }}
+                            onChange={(value) => {
+                                const role = roleList.find(r => r.id === value);
+                                setSelectedRoleCode(role?.code || null);
+                            }}
+                        >
                             {roleList.map((role) => (
                                 <Select.Option key={role.id} value={role.id}>
-                                    {role.code}
+                                    {role.name}
                                 </Select.Option>
                             ))}
                         </Select>
                     </Form.Item>
+                    {selectedRoleCode === "STAFF" && (
+                        <Form.Item
+                            label="Cinema"
+                            name="cinemaId"
+                            rules={[{ required: true, message: "Vui lòng chọn rạp cho nhân viên!" }]}
+                        >
+                            <Select placeholder="Chọn rạp" style={{ width: "100%" }}>
+                                {cinemaData.map((cinema) => (
+                                    <Select.Option key={cinema.id} value={cinema.id}>
+                                        {cinema.name} - {cinema.city}
+                                    </Select.Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
+                    )}
                 </Form>
             </Modal>
         </>

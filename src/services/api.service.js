@@ -60,7 +60,7 @@ const fetchUser = (userId) => {
     return axios.get(`/user-service/api/v1/users/${userId}`);
 }
 
-const createUserApi = (name, email, password, phone, address, dateOfBirth, gender, roleId) => {
+const createUserApi = (name, email, password, phone, address, dateOfBirth, gender, roleId, cinemaId) => {
     const URL_BACKEND = "/user-service/api/v1/users";
     const data = {
         name: name,
@@ -70,7 +70,8 @@ const createUserApi = (name, email, password, phone, address, dateOfBirth, gende
         address: address,
         dateOfBirth: dateOfBirth,
         gender: gender,
-        roleId: roleId
+        roleId: roleId,
+        cinemaId: cinemaId
     }
     return axios.post(URL_BACKEND, data);
 }
@@ -84,6 +85,10 @@ const fetchCinemaAPI = (current, pageSize, name) => {
         }
     });
 };
+
+const fetchActiveCinemas = () => {
+    return axios.get("/cinema-service/api/v1/cinemas/active")
+}
 
 const fetchAllRoleAPI = () => {
     return axios.get("/auth-service/api/v1/roles");
@@ -509,5 +514,5 @@ export {
     updateFoodAPI, fetchAllCombosAPI, createComboAPI, fetchAllFoodsActiveAPI, updateComboAPI, fetchRolesWithPaginationAPI,
     fetchPermissionsActiveAPI, createRoleAPI, updateRoleAPI, fetchPermissionsWithPaginationAPI, createPermissionAPI,
     updatePermissionAPI, fetchShowtimeInDayForStaffAPI, fetchSeatLayoutAPI, fetchAllCombosActiveAPI, staffHandleBookingAPI,
-    fetchQrCode
+    fetchQrCode, fetchActiveCinemas
 }
