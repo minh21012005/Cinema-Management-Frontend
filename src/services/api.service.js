@@ -30,6 +30,16 @@ const registerUserApi = (name, email, password, phone, address, dateOfBirth, gen
     return axios.post(URL_BACKEND, data);
 }
 
+const registerRequestApi = (data) => {
+    const URL_BACKEND = "/auth-service/api/v1/auth/register-request";
+    return axios.post(URL_BACKEND, data);
+};
+
+const verifyOtpApi = (data) => {
+    const URL_BACKEND = "/auth-service/api/v1/auth/register-verify";
+    return axios.post(URL_BACKEND, data);
+};
+
 const getAccountApi = () => {
     const URL_BACKEND = "/auth-service/api/v1/auth/account";
     return axios.get(URL_BACKEND);
@@ -514,5 +524,5 @@ export {
     updateFoodAPI, fetchAllCombosAPI, createComboAPI, fetchAllFoodsActiveAPI, updateComboAPI, fetchRolesWithPaginationAPI,
     fetchPermissionsActiveAPI, createRoleAPI, updateRoleAPI, fetchPermissionsWithPaginationAPI, createPermissionAPI,
     updatePermissionAPI, fetchShowtimeInDayForStaffAPI, fetchSeatLayoutAPI, fetchAllCombosActiveAPI, staffHandleBookingAPI,
-    fetchQrCode, fetchActiveCinemas
+    fetchQrCode, fetchActiveCinemas, registerRequestApi, verifyOtpApi
 }

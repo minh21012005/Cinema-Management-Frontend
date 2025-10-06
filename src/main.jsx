@@ -26,6 +26,7 @@ import UserPage from './pages/admin/user.list.jsx';
 import PermissionListPage from './pages/admin/permission.list.jsx';
 import SellTicketPage from './pages/staff/ticket.sell.jsx';
 import StaffLayout from './pages/staff/index.jsx';
+import VerifyOtpPage from './pages/verify.otp.jsx';
 
 const router = createBrowserRouter([
   {
@@ -121,6 +122,10 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <RegisterPage />,
+  },
+  {
+    path: "/verify-otp",
+    element: <VerifyOtpPage />,
   },
   {
     path: "/404",
