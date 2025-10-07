@@ -525,6 +525,25 @@ const fetchComingSoonMoviesAPI = (limit) => {
     });
 };
 
+const createBannerAPI = (payload) => {
+    const URL_BACKEND = "/content-service/api/v1/banners";
+    return axios.post(URL_BACKEND, payload);
+}
+
+const fetchAllBannerAPI = (current, pageSize, titleSearch) => {
+    return axios.get("/content-service/api/v1/banners/all", {
+        params: {
+            page: current,
+            size: pageSize,
+            title: titleSearch || null, // nếu không có tên thì truyền null
+        }
+    });
+}
+
+const fetchAllBannersActiveAPI = () => {
+    return axios.get("/content-service/api/v1/banners/active");
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -536,5 +555,6 @@ export {
     updateFoodAPI, fetchAllCombosAPI, createComboAPI, fetchAllFoodsActiveAPI, updateComboAPI, fetchRolesWithPaginationAPI,
     fetchPermissionsActiveAPI, createRoleAPI, updateRoleAPI, fetchPermissionsWithPaginationAPI, createPermissionAPI,
     updatePermissionAPI, fetchShowtimeInDayForStaffAPI, fetchSeatLayoutAPI, fetchAllCombosActiveAPI, staffHandleBookingAPI,
-    fetchQrCode, fetchActiveCinemas, registerRequestApi, verifyOtpApi, fetchShowingMoviesAPI, fetchComingSoonMoviesAPI
+    fetchQrCode, fetchActiveCinemas, registerRequestApi, verifyOtpApi, fetchShowingMoviesAPI, fetchComingSoonMoviesAPI,
+    createBannerAPI, fetchAllBannerAPI, fetchAllBannersActiveAPI
 }

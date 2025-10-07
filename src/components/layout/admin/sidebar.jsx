@@ -22,6 +22,7 @@ const Sidebar = () => {
         { pattern: /^\/manager\/rating/, key: "rating" },
         { pattern: /^\/manager\/foods/, key: "food" },
         { pattern: /^\/manager\/combo/, key: "combo" },
+        { pattern: /^\/manager\/banners/, key: "banner" },
         { pattern: /^\/manager\/ticket-report/, key: "ticket-report" },
         { pattern: /^\/manager\/food-report/, key: "food-report" },
         { pattern: /^\/manager\/staff/, key: "staff" },
@@ -94,6 +95,21 @@ const Sidebar = () => {
                         ],
                     },
                 ],
+            },
+            {
+                label: 'Content',
+                key: 'content',
+                icon: <VideoCameraOutlined />, // Có thể thay icon khác nếu muốn
+                children: [
+                    {
+                        type: 'group',
+                        label: 'Content Management',
+                        children: [
+                            { label: 'Banner', key: 'banner', onClick: () => nav('/manager/banners') },
+                            // Sau này có thể thêm các item con khác như: Promotion, Event, News...
+                        ]
+                    }
+                ]
             },
             {
                 label: 'Reports',

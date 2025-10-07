@@ -27,6 +27,7 @@ import PermissionListPage from './pages/admin/permission.list.jsx';
 import SellTicketPage from './pages/staff/ticket.sell.jsx';
 import StaffLayout from './pages/staff/index.jsx';
 import VerifyOtpPage from './pages/verify.otp.jsx';
+import BannerListPage from './pages/manager/banner.list.jsx';
 
 const router = createBrowserRouter([
   {
@@ -97,6 +98,10 @@ const router = createBrowserRouter([
       {
         path: "combos",
         element: <ComboListPage />,
+      },
+      {
+        path: "banners",
+        element: <BannerListPage />,
       },
     ],
   },

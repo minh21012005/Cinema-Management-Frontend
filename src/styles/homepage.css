@@ -51,26 +51,6 @@
     opacity: 0.9;
 }
 
-.banner-book-btn {
-    margin-top: 10px;
-    background-color: #ff6600 !important;
-    border-color: #ff6600 !important;
-    color: #fff !important;
-    font-weight: 400;
-    border-radius: 6px;
-    padding: 6px 24px;
-    text-transform: uppercase;
-    transition: all 0.3s ease;
-}
-
-.banner-book-btn:hover {
-    background-color: #ff944d !important;
-    border-color: #ff944d !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 148, 77, 0.4);
-}
-
-
 /* Navigation buttons */
 .banner-nav-btn {
     position: absolute;

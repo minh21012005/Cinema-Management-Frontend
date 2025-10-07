@@ -1,42 +1,29 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Carousel, Row, Col, Card, Button, Tag, Divider, Tabs } from "antd";
-import { StarFilled, LeftOutlined, RightOutlined } from "@ant-design/icons";
+import React, { useEffect, useState } from "react";
+import { Row, Col, Button, Divider, Tabs } from "antd";
 import "@/styles/homepage.css";
-import banner1 from "@/assets/banner/banner1.jpg";
-import banner2 from "@/assets/banner/banner2.jpg";
-import banner3 from "@/assets/banner/banner3.jpg";
 import Header from "@/components/layout/client/header";
-import { fetchComingSoonMoviesAPI, fetchShowingMoviesAPI } from "@/services/api.service";
+import { fetchAllBannersActiveAPI, fetchComingSoonMoviesAPI, fetchShowingMoviesAPI } from "@/services/api.service";
 import MovieCard from "@/components/movie/movie.card";
+import BannerSection from "@/components/banner/banner.section";
 
 const HomePage = () => {
 
-    const carouselRef = useRef(null);
     const [nowShowing, setNowShowing] = useState([]);
     const [comingSoon, setComingSoon] = useState([]);
-
-    const bannerImages = [
-        {
-            img: banner1,
-            title: "Inside Out 2",
-            subtitle: "Một hành trình cảm xúc đầy màu sắc – Đang chiếu tại tất cả các rạp!"
-        },
-        {
-            img: banner2,
-            title: "Bad Boys 4",
-            subtitle: "Will Smith trở lại cùng những pha hành động mãn nhãn!"
-        },
-        {
-            img: banner3,
-            title: "Kingdom of the Planet of the Apes",
-            subtitle: "Sự trỗi dậy của một đế chế mới – Đừng bỏ lỡ!"
-        }
-    ];
+    const [bannerImages, setBannerImages] = useState([])
 
     useEffect(() => {
         fetchComingSoonMovies();
         fetchShowingMovies();
+        fetchBanners();
     }, []);
+
+    const fetchBanners = async () => {
+        const res = await fetchAllBannersActiveAPI();
+        if (res?.data) {
+            setBannerImages(res.data);
+        }
+    }
 
     const fetchShowingMovies = async () => {
         const res = await fetchShowingMoviesAPI(8);
@@ -60,43 +47,7 @@ const HomePage = () => {
             <div className="homepage-container">
                 {/* 🎬 Banner */}
                 <div className="banner-container">
-                    <Carousel
-                        infinite
-                        autoplay
-                        ref={carouselRef}
-                        dots={{ className: "custom-dots" }}
-                        autoplaySpeed={4000}
-                        speed={800}
-                    >
-                        {bannerImages.map((banner, index) => (
-                            <div key={index} className="banner-slide">
-                                <img src={banner.img} alt={`banner-${index}`} className="banner-image" />
-                                <div className="banner-overlay">
-                                    <div className="banner-text">
-                                        <h2>{banner.title}</h2>
-                                        <p>{banner.subtitle}</p>
-                                        <Button type="primary" size="large" className="banner-book-btn">
-                                            Đặt vé ngay
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </Carousel>
-
-                    {/* Nút điều hướng */}
-                    <Button
-                        shape="circle"
-                        icon={<LeftOutlined />}
-                        className="banner-nav-btn left"
-                        onClick={() => carouselRef.current.prev()}
-                    />
-                    <Button
-                        shape="circle"
-                        icon={<RightOutlined />}
-                        className="banner-nav-btn right"
-                        onClick={() => carouselRef.current.next()}
-                    />
+                    <BannerSection banners={bannerImages} />
                 </div>
 
                 {/* 🎞️ Tabs for movies */}
