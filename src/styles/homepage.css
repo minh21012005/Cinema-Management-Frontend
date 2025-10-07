@@ -1,0 +1,329 @@
+/* ===== HEADER ===== */
+.site-header {
+    position: sticky;
+    margin-top: -50px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 60px;
+}
+
+.header-logo {
+    max-width: 60px;
+}
+
+.header-nav {
+    display: flex;
+    gap: 25px;
+}
+
+.header-nav a {
+    color: #333;
+    font-size: 16px;
+    text-decoration: none;
+    transition: color 0.3s;
+    font-weight: 400;
+}
+
+.header-nav a:hover {
+    color: #ff944d;
+}
+
+.header-actions a {
+    display: flex;
+    font-size: 16px;
+    gap: 12px;
+    color: #333;
+}
+
+.header-actions a:hover {
+    color: #ff944d;
+}
+
+/* Đảm bảo header dính trên banner */
+
+.homepage-container {
+    padding: 0 50px;
+    position: relative;
+}
+
+/* Banner */
+.banner-container {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.banner-slide {
+    position: relative;
+}
+
+.banner-image {
+    width: 100%;
+    height: 60vh;
+    object-fit: cover;
+    filter: brightness(90%);
+    transition: transform 2s ease;
+}
+
+.banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0));
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: 40px 60px;
+    /* Giảm từ 60 xuống 40px */
+}
+
+.banner-text {
+    color: white;
+    max-width: 500px;
+}
+
+.banner-text h2 {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.banner-text p {
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+.banner-book-btn {
+    margin-top: 10px;
+    background-color: #ff6600 !important;
+    border-color: #ff6600 !important;
+    color: #fff !important;
+    font-weight: 400;
+    border-radius: 6px;
+    padding: 6px 24px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.banner-book-btn:hover {
+    background-color: #ff944d !important;
+    border-color: #ff944d !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 148, 77, 0.4);
+}
+
+
+/* Navigation buttons */
+.banner-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.7);
+    border: none;
+    transition: all 0.3s;
+    opacity: 0;
+}
+
+.banner-container:hover .banner-nav-btn {
+    opacity: 1;
+}
+
+.banner-nav-btn.left {
+    left: 25px;
+}
+
+.banner-nav-btn.right {
+    right: 25px;
+}
+
+.banner-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+/* Dots */
+.custom-dots li button {
+    background: rgba(255, 255, 255, 0.5);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.custom-dots li.slick-active button {
+    background: #ff4d4f;
+}
+
+/* Movie sections */
+.section-title {
+    font-size: 24px !important;
+    font-weight: 500 !important;
+    margin-top: 40px !important;
+}
+
+.movie-poster {
+    border-radius: 10px;
+}
+
+.movie-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* --- Movie Card Container --- */
+.movie-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* --- Movie Poster --- */
+.movie-img {
+    width: 100%;
+    height: 380px;
+    object-fit: cover;
+    border-radius: 10px;
+    transition: filter 0.3s ease;
+}
+
+.movie-card:hover .movie-img {
+    filter: brightness(70%);
+}
+
+/* --- Hover Overlay --- */
+.movie-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 60px);
+    /* trừ chiều cao phần info */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+    /* để không cản hover phần info */
+}
+
+.movie-card:hover .movie-hover {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* --- Buttons --- */
+/* --- Movie Buttons (override Ant Design only inside movie-card) --- */
+.movie-card .movie-btn.ant-btn {
+    width: 130px;
+    height: 40px;
+    font-weight: 450;
+    border-radius: 5px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+/* Nút trên: màu cam đậm */
+.movie-card .movie-btn.ant-btn-primary {
+    background-color: #ff6600;
+    border-color: #ff6600;
+    color: white;
+}
+
+.movie-card .movie-btn.ant-btn-primary:hover,
+.movie-card .movie-btn.ant-btn-primary:focus {
+    background-color: #ff944d;
+    border-color: #ff944d;
+    color: white;
+}
+
+/* Nút dưới: trong suốt, có viền trắng */
+.movie-card .movie-btn.ant-btn-default {
+    background-color: transparent;
+    border: 1.5px solid white;
+    color: white;
+}
+
+.movie-card .movie-btn.ant-btn-default:hover,
+.movie-card .movie-btn.ant-btn-default:focus {
+    background-color: #ff944d;
+    border-color: #ff944d;
+    color: white;
+}
+
+
+.movie-btn:first-child {
+    background: #ff6600;
+    color: white;
+}
+
+.movie-btn:first-child:hover {
+    background: #ff944d;
+    /* cam nhạt hơn */
+}
+
+/* Nút dưới: trong suốt, hover cam nhạt */
+.movie-btn:last-child {
+    background: transparent;
+    color: white;
+    border: 1.5px solid white;
+}
+
+.movie-btn:last-child:hover {
+    background: #ff944d;
+    border-color: #ff944d;
+    color: white;
+}
+
+/* --- Movie Info --- */
+.movie-info {
+    text-align: center;
+    margin-top: 10px;
+    z-index: 5;
+    position: relative;
+}
+
+.movie-info div {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    color: #222;
+}
+
+.movie-info p,
+.movie-info span {
+    color: #555;
+}
+
+/* Footer */
+.footer-section {
+    text-align: center;
+    padding: 60px 0;
+}
+
+.footer-btn {
+    margin-top: 10px;
+    background-color: #ff6600 !important;
+    border-color: #ff6600 !important;
+    color: #fff !important;
+    font-weight: 300;
+    border-radius: 6px;
+    padding: 6px 24px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.footer-btn:hover {
+    background-color: #ff944d !important;
+    border-color: #ff944d !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 148, 77, 0.4);
+}
