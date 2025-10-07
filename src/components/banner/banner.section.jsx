@@ -9,8 +9,11 @@ const BannerSection = ({ banners }) => {
 
     useEffect(() => {
         const fetchUrls = async () => {
+            // Sắp xếp theo displayOrder tăng dần
+            const sortedBanners = [...banners].sort((a, b) => a.displayOrder - b.displayOrder);
+
             const urls = await Promise.all(
-                banners.map(async (b) => {
+                sortedBanners.map(async (b) => {
                     const res = await getMediaUrlAPI(b.imageKey);
                     return { ...b, imgUrl: res.data };
                 })

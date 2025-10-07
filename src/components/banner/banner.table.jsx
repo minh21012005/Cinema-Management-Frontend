@@ -2,6 +2,7 @@ import { Space, Table, Tag } from "antd";
 import { useState } from "react";
 import BannerImage from "./banner.image";
 import { EditOutlined } from "@ant-design/icons";
+import BannerUpdateModal from "./banner.update";
 
 const BannerTable = (props) => {
     const { dataBanner, current, pageSize, total, setCurrent, setPageSize,
@@ -80,7 +81,7 @@ const BannerTable = (props) => {
                 }}
                 onChange={onChange}
             />
-            {/* <BannerUpdateModal
+            <BannerUpdateModal
                 isModalUpdateOpen={isModalUpdateOpen}
                 setIsModalUpdateOpen={setIsModalUpdateOpen}
                 bannerSelected={bannerSelected}
@@ -93,7 +94,7 @@ const BannerTable = (props) => {
                 previewUrl={previewUrl}
                 setPreviewUrl={setPreviewUrl}
                 fetchBannerList={fetchBannerList}
-            /> */}
+            />
         </>
     );
 };

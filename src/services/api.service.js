@@ -544,6 +544,11 @@ const fetchAllBannersActiveAPI = () => {
     return axios.get("/content-service/api/v1/banners/active");
 }
 
+const updateBannerAPI = (id, data) => {
+    const URL_BACKEND = `/content-service/api/v1/banners/${id}`;
+    return axios.put(URL_BACKEND, data);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -556,5 +561,5 @@ export {
     fetchPermissionsActiveAPI, createRoleAPI, updateRoleAPI, fetchPermissionsWithPaginationAPI, createPermissionAPI,
     updatePermissionAPI, fetchShowtimeInDayForStaffAPI, fetchSeatLayoutAPI, fetchAllCombosActiveAPI, staffHandleBookingAPI,
     fetchQrCode, fetchActiveCinemas, registerRequestApi, verifyOtpApi, fetchShowingMoviesAPI, fetchComingSoonMoviesAPI,
-    createBannerAPI, fetchAllBannerAPI, fetchAllBannersActiveAPI
+    createBannerAPI, fetchAllBannerAPI, fetchAllBannersActiveAPI, updateBannerAPI
 }

@@ -67,8 +67,8 @@ instance.interceptors.response.use(function (response) {
                 return instance(originalRequest);
             } else {
                 window.localStorage.removeItem("access_token");
-                if (window.location.pathname !== "/login") {
-                    window.location.href = "/login";
+                if (window.location.pathname !== "/") {
+                    window.location.href = "/";
                 }
             }
         } catch (refreshError) {
