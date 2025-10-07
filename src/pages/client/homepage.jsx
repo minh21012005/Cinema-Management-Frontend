@@ -1,15 +1,19 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Carousel, Row, Col, Card, Button, Tag, Divider, Tabs } from "antd";
 import { StarFilled, LeftOutlined, RightOutlined } from "@ant-design/icons";
 import "@/styles/homepage.css";
 import banner1 from "@/assets/banner/banner1.jpg";
 import banner2 from "@/assets/banner/banner2.jpg";
 import banner3 from "@/assets/banner/banner3.jpg";
-
-const { Meta } = Card;
+import Header from "@/components/layout/client/header";
+import { fetchComingSoonMoviesAPI, fetchShowingMoviesAPI } from "@/services/api.service";
+import MovieCard from "@/components/movie/movie.card";
 
 const HomePage = () => {
+
     const carouselRef = useRef(null);
+    const [nowShowing, setNowShowing] = useState([]);
+    const [comingSoon, setComingSoon] = useState([]);
 
     const bannerImages = [
         {
@@ -29,34 +33,28 @@ const HomePage = () => {
         }
     ];
 
-    const nowShowing = [
-        { id: 1, title: "Avengers: Endgame", poster: "https://img.cgv.co.kr/Movie/Thumbnail/Poster/000083/83277/83277_320.jpg", rating: 9.2 },
-        { id: 2, title: "Spider-Man: No Way Home", poster: "https://resizing.flixster.com/8PNiwC2bpe9OecfYZSOVkvYC5vk=/ems.cHJkLWVtcy1hc3NldHMvbW92aWVzL2U5NGM0Y2Q1LTAyYTItNGFjNC1hNWZhLWMzYjJjOTdjMTFhOS5qcGc=", rating: 8.7 },
-        { id: 3, title: "The Batman", poster: "https://img.cgv.co.kr/Movie/Thumbnail/Poster/000085/85815/85815_320.jpg", rating: 8.3 },
-        { id: 4, title: "Doctor Strange 2", poster: "https://img.cgv.co.kr/Movie/Thumbnail/Poster/000085/85844/85844_320.jpg", rating: 8.5 }
-    ];
+    useEffect(() => {
+        fetchComingSoonMovies();
+        fetchShowingMovies();
+    }, []);
 
-    const comingSoon = [
-        { id: 1, title: "Avatar 3", poster: "https://img.cgv.co.kr/Movie/Thumbnail/Poster/000085/85852/85852_320.jpg", releaseDate: "2025-12-20" },
-        { id: 2, title: "Fantastic Beasts 4", poster: "https://img.cgv.co.kr/Movie/Thumbnail/Poster/000083/83305/83305_320.jpg", releaseDate: "2026-01-10" }
-    ];
+    const fetchShowingMovies = async () => {
+        const res = await fetchShowingMoviesAPI(8);
+        if (res?.data) {
+            setNowShowing(res.data);
+        }
+    }
+
+    const fetchComingSoonMovies = async () => {
+        const res = await fetchComingSoonMoviesAPI(8);
+        if (res?.data) {
+            setComingSoon(res.data);
+        }
+    }
 
     return (
         <>
-            {/* ✅ HEADER */}
-            <header className="site-header">
-                <img className="header-logo" src="/logo.svg" alt="logo" />
-                <nav className="header-nav">
-                    <a href="#">Trang chủ</a>
-                    <a href="#">Phim</a>
-                    <a href="#">Lịch chiếu</a>
-                    <a href="#">Ưu đãi</a>
-                    <a href="#">Liên hệ</a>
-                </nav>
-                <div className="header-actions">
-                    <a href="#" className="login-link">Đăng nhập</a>
-                </div>
-            </header>
+            <Header />
 
             {/* ✅ MAIN CONTENT */}
             <div className="homepage-container">
@@ -66,7 +64,6 @@ const HomePage = () => {
                         infinite
                         autoplay
                         ref={carouselRef}
-                        effect="scrollx"
                         dots={{ className: "custom-dots" }}
                         autoplaySpeed={4000}
                         speed={800}
@@ -113,46 +110,30 @@ const HomePage = () => {
                             key: "1",
                             label: "Đang Chiếu",
                             children: (
-                                <Row gutter={[20, 20]}>
-                                    {nowShowing.map((movie) => (
-                                        <Col xs={24} sm={12} md={8} lg={6} key={movie.id}>
-                                            <div className="movie-card">
-                                                <img src={movie.poster} alt={movie.title} className="movie-img" />
-                                                <div className="movie-hover">
-                                                    <Button type="primary" className="movie-btn">Mua vé</Button>
-                                                    <Button type="default" className="movie-btn">Chi tiết</Button>
-                                                </div>
-                                                <div className="movie-info">
-                                                    <div>{movie.title}</div>
-                                                    <Tag color="gold"><StarFilled /> {movie.rating}</Tag>
-                                                </div>
-                                            </div>
-                                        </Col>
-                                    ))}
-                                </Row>
-                            )
+                                <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+                                    <Row gutter={[20, 20]} justify="start">
+                                        {nowShowing.map((movie) => (
+                                            <Col xs={24} sm={12} md={12} lg={6} key={movie.id}>
+                                                <MovieCard movie={movie} />
+                                            </Col>
+                                        ))}
+                                    </Row>
+                                </div>
+                            ),
                         },
                         {
                             key: "2",
                             label: "Sắp Chiếu",
                             children: (
-                                <Row gutter={[20, 20]}>
-                                    {comingSoon.map((movie) => (
-                                        <Col xs={24} sm={12} md={8} lg={6} key={movie.id}>
-                                            <div className="movie-card">
-                                                <img src={movie.poster} alt={movie.title} className="movie-img" />
-                                                <div className="movie-hover">
-                                                    <Button type="primary" className="movie-btn">Nhắc tôi</Button>
-                                                    <Button type="default" className="movie-btn">Chi tiết</Button>
-                                                </div>
-                                                <div className="movie-info">
-                                                    <h4>{movie.title}</h4>
-                                                    <p>Khởi chiếu: {movie.releaseDate}</p>
-                                                </div>
-                                            </div>
-                                        </Col>
-                                    ))}
-                                </Row>
+                                <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+                                    <Row gutter={[20, 20]} justify="start">
+                                        {comingSoon.map((movie) => (
+                                            <Col xs={24} sm={12} md={12} lg={6} key={movie.id}>
+                                                <MovieCard movie={movie} />
+                                            </Col>
+                                        ))}
+                                    </Row>
+                                </div>
                             )
                         }
                     ]}

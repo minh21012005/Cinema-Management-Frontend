@@ -9,7 +9,7 @@ import { AuthContext } from "@/components/context/auth.context";
 const HeaderLayout = () => {
     const navigate = useNavigate();
 
-    const { user } = useContext(AuthContext);
+    const { user, setUser } = useContext(AuthContext);
 
     const handleLogout = async () => {
         try {
@@ -17,9 +17,10 @@ const HeaderLayout = () => {
         } catch (err) {
             console.error(err);
         } finally {
-            message.success("Đăng xuất thành công");
-            localStorage.removeItem("access_token");
+            setUser(null);
             navigate("/");
+            localStorage.removeItem("access_token");
+            message.success("Đăng xuất thành công");
         }
     };
 

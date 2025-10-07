@@ -513,6 +513,18 @@ const fetchQrCode = (amount, orderId) => {
     });
 }
 
+const fetchShowingMoviesAPI = (limit) => {
+    return axios.get("/movie-service/api/v1/movies/showing", {
+        params: { limit },
+    });
+};
+
+const fetchComingSoonMoviesAPI = (limit) => {
+    return axios.get("/movie-service/api/v1/movies/coming-soon", {
+        params: { limit },
+    });
+};
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -524,5 +536,5 @@ export {
     updateFoodAPI, fetchAllCombosAPI, createComboAPI, fetchAllFoodsActiveAPI, updateComboAPI, fetchRolesWithPaginationAPI,
     fetchPermissionsActiveAPI, createRoleAPI, updateRoleAPI, fetchPermissionsWithPaginationAPI, createPermissionAPI,
     updatePermissionAPI, fetchShowtimeInDayForStaffAPI, fetchSeatLayoutAPI, fetchAllCombosActiveAPI, staffHandleBookingAPI,
-    fetchQrCode, fetchActiveCinemas, registerRequestApi, verifyOtpApi
+    fetchQrCode, fetchActiveCinemas, registerRequestApi, verifyOtpApi, fetchShowingMoviesAPI, fetchComingSoonMoviesAPI
 }
