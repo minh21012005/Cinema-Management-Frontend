@@ -419,6 +419,31 @@
     /* kéo chữ lên gần poster */
 }
 
+.title-row {
+    margin-bottom: 16px;
+    /* khoảng cách dưới tiêu đề */
+}
+
+.meta-line {
+    margin-bottom: 12px;
+    /* khoảng cách giữa meta và rating */
+}
+
+.rating-row {
+    margin-bottom: 12px;
+    /* khoảng cách giữa rating và info */
+}
+
+.info-block {
+    margin-bottom: 12px;
+    /* khoảng cách dưới cùng nếu cần */
+}
+
+/* Nếu muốn các item trong info-block cũng giãn */
+.info-item {
+    margin-bottom: 8px;
+}
+
 /* Giữ bố cục ổn định trên mobile */
 @media (max-width: 991px) {
     .poster-large {

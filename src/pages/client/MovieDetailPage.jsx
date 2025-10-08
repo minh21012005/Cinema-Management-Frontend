@@ -1,55 +1,56 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Row, Col, Button, Tabs, Rate, Tag, Divider, Select, Modal } from "antd";
-import ReactPlayer from "react-player";
 import "@/styles/movie-detail.css";
 import Header from "@/components/layout/client/header";
 import TrailerModal from "./trailer.modal";
+import { useLocation } from "react-router-dom";
+import { fetchShowingMoviesAPI, getMediaUrlAPI } from "@/services/api.service";
 
 const { Option } = Select;
 
 const MovieDetailPage = () => {
-    // fake data
-    const movie = {
-        id: 1,
-        title: "Chú Thuật Hồi Chiến: Hoài Ngọc / Ngọc Chiết",
-        poster:
-            "https://cdn.galaxycine.vn/media/2025/9/30/jujutsu-kaisen-500_1759216418459.jpg",
-        background:
-            "https://www.galaxycine.vn/media/2025/9/24/hidden-inventory--premature-death_1727147303221.jpg",
-        genres: ["Hoạt Hình", "Hành động", "Phiêu lưu"],
-        duration: "110 Phút",
-        releaseDate: "08/10/2025",
-        country: "Nhật Bản",
-        studio: "TOHO Animation, MAPPA",
-        director: "Goshozono Shouta",
-        cast: ["Sakurai Takahiro", "Nakamura Yuichi"],
-        rating: 8.8,
-        starValue: 4.4, // for 5-star visual
-        trailerUrl: "https://www.youtube.com/watch?v=Ep0XezEzJXg",
-        nowShowing: [
-            {
-                id: 11,
-                title: "Cục Vàng Của Ngoại",
-                poster:
-                    "https://www.galaxycine.vn/media/2025/9/24/cuc-vang-cua-ngoai.jpg",
-                rating: 9.4,
-            },
-            {
-                id: 12,
-                title: "Tee Yod: Quỷ Ăn Tạng 3",
-                poster:
-                    "https://www.galaxycine.vn/media/2025/9/24/tee-yod.jpg",
-                rating: 9.1,
-            },
-            {
-                id: 13,
-                title: "Một Phim Khác",
-                poster:
-                    "https://www.galaxycine.vn/media/2025/9/24/another-movie.jpg",
-                rating: 8.2,
-            },
-        ],
+
+    const location = useLocation();
+
+    const { movie } = location.state || {};
+    const [poster, setPoster] = useState(null);
+    const [nowShowing, setNowShowing] = useState([]);
+    const [nowShowingPosters, setNowShowingPosters] = useState({});
+    const [visibleCount, setVisibleCount] = useState(3);
+
+    const handleSeeMore = () => {
+        setVisibleCount(nowShowing.length); // hiện tất cả
     };
+
+    useEffect(() => {
+        console.log(movie);
+        fetchPoster();
+        fetchShowingMovies();
+    }, []);
+
+    const fetchPoster = async () => {
+        const res = await getMediaUrlAPI(movie.posterKey);
+        if (res?.data) {
+            setPoster(res.data);
+        }
+    }
+
+    const fetchShowingMovies = async () => {
+        const res = await fetchShowingMoviesAPI(10);
+        if (res?.data) {
+            const filtered = res.data.filter(film => film.id !== movie.id);
+            setNowShowing(filtered);
+
+            const posters = {};
+            await Promise.all(
+                filtered.map(async (film) => {
+                    const posterRes = await getMediaUrlAPI(film.posterKey);
+                    if (posterRes?.data) posters[film.id] = posterRes.data;
+                })
+            );
+            setNowShowingPosters(posters);
+        }
+    }
 
     // fake schedule
     const schedule = [
@@ -75,11 +76,13 @@ const MovieDetailPage = () => {
 
     // Tách ID từ link YouTube
     const getYouTubeThumbnail = (url) => {
-        const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-        const match = url.match(regExp);
-        return match && match[7].length === 11
-            ? `https://img.youtube.com/vi/${match[7]}/maxresdefault.jpg`
-            : null;
+        if (url) {
+            const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+            const match = url.match(regExp);
+            return match && match[7].length === 11
+                ? `https://img.youtube.com/vi/${match[7]}/maxresdefault.jpg`
+                : null;
+        }
     };
 
     const [activeTab] = useState("1");
@@ -94,7 +97,7 @@ const MovieDetailPage = () => {
             <div className="movie-hero">
                 <div className="hero-inner" onClick={() => setPlaying(true)}>
                     <img
-                        src={getYouTubeThumbnail(movie.trailerUrl) || movie.background}
+                        src={getYouTubeThumbnail(movie.trailerUrl)}
                         alt="Trailer thumbnail"
                         className="hero-thumbnail"
                     />
@@ -109,7 +112,7 @@ const MovieDetailPage = () => {
                 <TrailerModal
                     isOpen={playing}
                     onClose={() => setPlaying(false)}
-                    trailerUrl={movie.trailerUrl}
+                    trailerUrl={movie?.trailerUrl}
                 />
             </div>
 
@@ -121,7 +124,7 @@ const MovieDetailPage = () => {
                         <div className="top-info">
                             <Row gutter={[24, 24]} align="middle">
                                 <Col xs={9} sm={8} md={8}>
-                                    <img className="poster-large" src={movie.poster} alt={movie.title} />
+                                    <img className="poster-large" src={poster} />
                                 </Col>
                                 <Col xs={15} sm={16} md={16}>
                                     <div className="title-row">
@@ -133,7 +136,7 @@ const MovieDetailPage = () => {
                                             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" class="inline-block align-baseline mr-1">
                                                 <path d="M7 0C3.13306 0 0 3.13306 0 7C0 10.8669 3.13306 14 7 14C10.8669 14 14 10.8669 14 7C14 3.13306 10.8669 0 7 0ZM7 12.6452C3.88105 12.6452 1.35484 10.119 1.35484 7C1.35484 3.88105 3.88105 1.35484 7 1.35484C10.119 1.35484 12.6452 3.88105 12.6452 7C12.6452 10.119 10.119 12.6452 7 12.6452ZM8.74435 9.69839L6.34798 7.95685C6.26048 7.89193 6.20968 7.79032 6.20968 7.68306V3.04839C6.20968 2.8621 6.3621 2.70968 6.54839 2.70968H7.45161C7.6379 2.70968 7.79032 2.8621 7.79032 3.04839V7.04798L9.67581 8.41976C9.82823 8.52984 9.85927 8.74153 9.74919 8.89395L9.21855 9.625C9.10847 9.7746 8.89677 9.80847 8.74435 9.69839Z" fill="#F58020"></path>
                                             </svg>
-                                            {movie.duration}</span>
+                                            {movie.durationInMinutes} phút</span>
                                         <span className="dot" />
                                         <span className="meta-item">
                                             <svg width="12" height="14" viewBox="0 0 12 14" fill="none" class="inline-block align-baseline mr-1">
@@ -154,19 +157,16 @@ const MovieDetailPage = () => {
                                     <div className="info-block">
                                         <div className="info-item">
                                             <span className="label">Thể loại:</span>
-                                            <span className="value">{movie.genres.join(", ")}</span>
+                                            <span className="value">{movie.categoryNames?.join(", ")}</span>
                                         </div>
                                         <div className="info-item">
                                             <span className="label">Đạo diễn:</span>
-                                            <span className="value">{movie.director}</span>
+                                            <span className="value">{movie.director ? movie.director : "Đang cập nhật"}</span>
                                         </div>
+
                                         <div className="info-item">
                                             <span className="label">Diễn viên:</span>
-                                            <span className="value">{movie.cast.join(", ")}</span>
-                                        </div>
-                                        <div className="info-item">
-                                            <span className="label">Quốc gia:</span>
-                                            <span className="value">{movie.country}</span>
+                                            <span className="value">{movie.cast ? movie.cast : "Đang cập nhật"}</span>
                                         </div>
                                     </div>
                                 </Col>
@@ -178,7 +178,7 @@ const MovieDetailPage = () => {
                         <div className="content-detail">
                             <h3 className="section-heading">Nội Dung Phim</h3>
                             <p className="description">
-                                Khi Gojo Satoru và Geto Suguru còn là học sinh trường Jujutsu, họ được giao nhiệm vụ bảo vệ một cô gái đặc biệt — người sẽ trở thành vật chứa của Tengen. Nhưng những biến cố bất ngờ đã thay đổi tất cả. Đây là phần phim đặc biệt...
+                                {movie.description}
                             </p>
 
                             {/* Lịch chiếu */}
@@ -233,9 +233,9 @@ const MovieDetailPage = () => {
                         <div className="sidebar">
                             <h3 className="sidebar-title">PHIM ĐANG CHIẾU</h3>
                             <div className="sidebar-list">
-                                {movie.nowShowing.map((m) => (
+                                {nowShowing.slice(0, visibleCount).map((m) => (
                                     <div className="sidebar-card" key={m.id}>
-                                        <img src={m.poster} alt={m.title} />
+                                        <img src={nowShowingPosters[m.id]} alt={m.title} />
                                         <div className="sidebar-card-body">
                                             <div className="sidebar-card-title">{m.title}</div>
                                             <div className="sidebar-card-meta">
@@ -246,10 +246,13 @@ const MovieDetailPage = () => {
                                     </div>
                                 ))}
                             </div>
-
-                            <div style={{ marginTop: 18 }}>
-                                <Button className="see-more-btn" block> Xem thêm </Button>
-                            </div>
+                            {visibleCount < nowShowing.length && (
+                                <div style={{ marginTop: 18 }}>
+                                    <Button className="see-more-btn" block onClick={handleSeeMore}>
+                                        Xem thêm
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     </Col>
                 </Row>

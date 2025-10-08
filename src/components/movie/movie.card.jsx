@@ -3,15 +3,22 @@ import { PlayCircleFilled, StarFilled } from "@ant-design/icons";
 import { getMediaUrlAPI } from "@/services/api.service";
 import { useEffect, useState } from "react";
 import "@/styles/homepage.css"; // ✅ Giữ nguyên CSS cũ
+import { useNavigate } from "react-router-dom";
 
 const MovieCard = ({ movie, onWatchTrailer }) => {
     const [posterUrl, setPosterUrl] = useState(null);
+
+    const navigate = useNavigate()
 
     useEffect(() => {
         if (movie.posterKey) {
             getMediaUrlAPI(movie.posterKey).then((res) => setPosterUrl(res.data));
         }
     }, [movie.posterKey]);
+
+    const handleBooking = () => {
+        navigate("/booking", { state: { movie } }); // chuyền movie qua state
+    };
 
     return (
         <div className="movie-card">
@@ -24,7 +31,7 @@ const MovieCard = ({ movie, onWatchTrailer }) => {
 
             {/* Hiệu ứng hover */}
             <div className="movie-hover">
-                <Button type="primary" className="movie-btn">
+                <Button type="primary" className="movie-btn" onClick={handleBooking}>
                     <img src="https://www.galaxycine.vn/_next/static/media/Vector-1.319a0d2b.svg"></img>
                     Mua vé
                 </Button>
