@@ -28,11 +28,17 @@ import SellTicketPage from './pages/staff/ticket.sell.jsx';
 import StaffLayout from './pages/staff/index.jsx';
 import VerifyOtpPage from './pages/verify.otp.jsx';
 import BannerListPage from './pages/manager/banner.list.jsx';
+import MovieDetailPage from './pages/client/MovieDetailPage.jsx';
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/booking",
+    element: <MovieDetailPage />,
     errorElement: <ErrorPage />,
   },
   {

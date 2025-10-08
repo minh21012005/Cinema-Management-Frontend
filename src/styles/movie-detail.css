@@ -1,0 +1,441 @@
+/* container */
+.movie-detail-page {
+    font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+    color: #222;
+    background: #fff;
+    margin-top: 8vh;
+}
+
+/* HERO */
+.movie-hero {
+    background: #000;
+    position: relative;
+}
+
+.hero-inner {
+    position: relative;
+    width: 60%;
+    height: 70vh;
+    max-width: none;
+    overflow: hidden;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.hero-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.play-icon-large {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+    border-radius: 50%;
+    padding: 18px;
+    transition: all 0.3s ease;
+}
+
+/* chỉnh lại svg bên trong cho hợp màu */
+.play-icon-large svg {
+    width: 46px;
+    height: 46px;
+}
+
+.play-icon-large circle {
+    fill: rgba(255, 255, 255, 0.85);
+}
+
+.play-icon-large polygon {
+    fill: #ff7a2d;
+    /* màu cam thương hiệu */
+}
+
+/* page container */
+.page-container {
+    max-width: 1200px;
+    margin: 24px auto;
+    padding: 0 16px;
+}
+
+/* top info */
+.top-info {
+    margin-top: 24px;
+    /* thay vì -80px */
+    position: relative;
+    z-index: 10;
+}
+
+.poster-large {
+    width: 100%;
+    border-radius: 6px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.movie-title {
+    font-size: 28px;
+    margin: 0;
+    font-weight: 600;
+    color: #111;
+}
+
+.rating-badge {
+    background: #ff944d;
+    color: #fff;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-weight: 600;
+}
+
+.meta-line {
+    margin-top: 10px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    /* ✅ tạo khoảng cách giữa icon và chữ */
+    color: #666;
+}
+
+.dot {
+    width: 1px;
+    height: 18px;
+    background: #e6e6e6;
+    display: inline-block;
+    margin: 0 8px;
+}
+
+.rating-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.rating-number {
+    font-size: 18px;
+    font-weight: 400;
+}
+
+.pill-row {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.pill {
+    background: #f8f8f8;
+    border-radius: 18px;
+    padding: 6px 12px;
+    border: 1px solid #efefef;
+    color: #333;
+}
+
+/* buttons */
+.action-buttons {
+    margin-top: 18px;
+    display: flex;
+    gap: 12px;
+}
+
+.buy-ticket-btn {
+    background: linear-gradient(180deg, #ff7a2d, #ff6b20);
+    border: none;
+    color: white;
+    height: 44px;
+    padding: 0 18px;
+}
+
+.watch-trailer-btn {
+    border: 1px solid #ddd;
+    background: transparent;
+    color: #333;
+    height: 44px;
+}
+
+/* content */
+.content-detail {
+    margin-top: 18px;
+}
+
+.section-heading {
+    color: #0d3b73;
+    border-left: 4px solid #0d3b73;
+    padding-left: 10px;
+    margin: 20px 0 12px;
+}
+
+.description {
+    color: #444;
+    line-height: 1.7;
+}
+
+/* schedule filter */
+.schedule-filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+
+.date-list {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.date-pill {
+    border: none;
+    background: #fff;
+    padding: 10px 14px;
+    border-radius: 8px;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+    cursor: pointer;
+}
+
+.date-pill.active {
+    background: #123a75;
+    color: #fff;
+    border-radius: 8px;
+}
+
+.date-small {
+    font-size: 12px;
+    display: block;
+    margin-top: 4px;
+    color: inherit;
+}
+
+.filters {
+    display: flex;
+    gap: 10px;
+}
+
+/* schedule list */
+.schedule-list {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.cinema-block {
+    padding: 18px 12px;
+    border-radius: 6px;
+    border: 1px solid #f0f0f0;
+}
+
+.cinema-name {
+    margin: 0 0 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #222;
+}
+
+.room-block {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    padding: 12px 0;
+    border-top: 1px dashed #f4f4f4;
+}
+
+.room-type {
+    width: 180px;
+    color: #666;
+    font-weight: 600;
+}
+
+.times {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.time-pill {
+    border: 1px solid #eee;
+    background: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* sidebar */
+.sidebar {
+    background: transparent;
+}
+
+.sidebar-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-left: 4px solid #0d3b73;
+    padding-left: 12px;
+    font-weight: 700;
+    color: #0d3b73;
+}
+
+.sidebar-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 12px;
+}
+
+.sidebar-card {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: #fff;
+    border-radius: 6px;
+    padding: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.sidebar-card img {
+    width: 110px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+.sidebar-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sidebar-card-title {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.sidebar-card-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.star {
+    color: #ff7a2d;
+    font-weight: 700;
+}
+
+.rating-badge.small {
+    background: #ff944d;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* see more */
+.see-more-btn {
+    margin-top: 12px;
+    border: 1px solid #ffd0b6;
+    color: #ff7a2d;
+    background: #fff;
+}
+
+.top-info {
+    position: relative;
+    z-index: 20;
+    margin-top: 0;
+    /* giữ chữ ở vị trí bình thường */
+}
+
+/* Chỉ đẩy poster tràn lên phần trailer */
+.poster-large {
+    width: 100%;
+    max-width: 380px;
+    border: 2px solid #fff;
+    border-radius: 3px;
+    /* vẫn bo mềm mại */
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+    /* đổ bóng đậm hơn nhẹ */
+    transform: translateY(-70px);
+    /* ✅ tràn lên trailer nhiều hơn 1 chút */
+    position: relative;
+    z-index: 30;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ⭐ Style ngôi sao trong phần rating */
+.rating-row svg {
+    width: 22px;
+    /* giảm kích thước */
+    height: 22px;
+    color: #ff7a2d;
+    /* đổi màu cam */
+    flex-shrink: 0;
+}
+
+.info-block {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.info-item {
+    font-size: 15px;
+    color: #333;
+}
+
+.info-item .label {
+    font-weight: 600;
+    color: #0d3b73;
+    margin-right: 6px;
+}
+
+.info-item .value {
+    color: #444;
+}
+
+.top-info .ant-col:nth-child(2) {
+    margin-top: -120px;
+    /* kéo chữ lên gần poster */
+}
+
+/* Giữ bố cục ổn định trên mobile */
+@media (max-width: 991px) {
+    .poster-large {
+        max-width: 200px;
+        border-width: 4px;
+        transform: translateY(-60px);
+    }
+}
+
+/* responsive */
+@media (max-width: 991px) {
+
+    .top-info {
+        margin-top: -40px;
+    }
+
+    .poster-large {
+        max-width: 180px;
+    }
+}

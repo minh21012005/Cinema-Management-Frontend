@@ -5,7 +5,6 @@ import Header from "@/components/layout/client/header";
 import { fetchAllBannersActiveAPI, fetchComingSoonMoviesAPI, fetchShowingMoviesAPI } from "@/services/api.service";
 import MovieCard from "@/components/movie/movie.card";
 import BannerSection from "@/components/banner/banner.section";
-import ReactPlayer from "react-player";
 import TrailerModal from "./trailer.modal";
 
 const HomePage = () => {
