@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Row, Col, Button, Divider, Tabs } from "antd";
+import { Row, Col, Button, Divider, Tabs, Modal } from "antd";
 import "@/styles/homepage.css";
 import Header from "@/components/layout/client/header";
 import { fetchAllBannersActiveAPI, fetchComingSoonMoviesAPI, fetchShowingMoviesAPI } from "@/services/api.service";
 import MovieCard from "@/components/movie/movie.card";
 import BannerSection from "@/components/banner/banner.section";
+import ReactPlayer from "react-player";
+import TrailerModal from "./trailer.modal";
 
 const HomePage = () => {
 
     const [nowShowing, setNowShowing] = useState([]);
     const [comingSoon, setComingSoon] = useState([]);
-    const [bannerImages, setBannerImages] = useState([])
+    const [bannerImages, setBannerImages] = useState([]);
+    const [isTrailerOpen, setIsTrailerOpen] = useState(false);
+    const [currentTrailerUrl, setCurrentTrailerUrl] = useState("");
 
     useEffect(() => {
         fetchComingSoonMovies();
@@ -39,6 +43,12 @@ const HomePage = () => {
         }
     }
 
+    const handleWatchTrailer = (url) => {
+        if (!url) return;
+        setCurrentTrailerUrl(url);
+        setIsTrailerOpen(true);
+    };
+
     return (
         <>
             <Header />
@@ -65,7 +75,7 @@ const HomePage = () => {
                                     <Row gutter={[20, 20]} justify="start">
                                         {nowShowing.map((movie) => (
                                             <Col xs={24} sm={12} md={12} lg={6} key={movie.id}>
-                                                <MovieCard movie={movie} />
+                                                <MovieCard movie={movie} onWatchTrailer={handleWatchTrailer} />
                                             </Col>
                                         ))}
                                     </Row>
@@ -80,7 +90,7 @@ const HomePage = () => {
                                     <Row gutter={[20, 20]} justify="start">
                                         {comingSoon.map((movie) => (
                                             <Col xs={24} sm={12} md={12} lg={6} key={movie.id}>
-                                                <MovieCard movie={movie} />
+                                                <MovieCard movie={movie} onWatchTrailer={handleWatchTrailer} />
                                             </Col>
                                         ))}
                                     </Row>
@@ -88,6 +98,13 @@ const HomePage = () => {
                             )
                         }
                     ]}
+                />
+
+                {/* ✅ Modal Trailer */}
+                <TrailerModal
+                    isOpen={isTrailerOpen}
+                    onClose={() => setIsTrailerOpen(false)}
+                    trailerUrl={currentTrailerUrl}
                 />
 
                 {/* Footer */}

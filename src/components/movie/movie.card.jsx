@@ -1,10 +1,10 @@
 import { Button, Tag } from "antd";
-import { StarFilled } from "@ant-design/icons";
+import { PlayCircleFilled, StarFilled } from "@ant-design/icons";
 import { getMediaUrlAPI } from "@/services/api.service";
 import { useEffect, useState } from "react";
 import "@/styles/homepage.css"; // ✅ Giữ nguyên CSS cũ
 
-const MovieCard = ({ movie }) => {
+const MovieCard = ({ movie, onWatchTrailer }) => {
     const [posterUrl, setPosterUrl] = useState(null);
 
     useEffect(() => {
@@ -25,10 +25,12 @@ const MovieCard = ({ movie }) => {
             {/* Hiệu ứng hover */}
             <div className="movie-hover">
                 <Button type="primary" className="movie-btn">
+                    <img src="https://www.galaxycine.vn/_next/static/media/Vector-1.319a0d2b.svg"></img>
                     Mua vé
                 </Button>
-                <Button type="default" className="movie-btn">
-                    Chi tiết
+                <Button type="default" className="movie-btn" onClick={() => onWatchTrailer(movie.trailerUrl)}>
+                    <PlayCircleFilled style={{ fontSize: 16, marginLeft: "-5px" }} />
+                    Trailer
                 </Button>
             </div>
 

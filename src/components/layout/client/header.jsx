@@ -46,7 +46,7 @@ const Header = () => {
         <header className="site-header">
             <img className="header-logo" src="/logo.svg" alt="logo" />
             <nav className="header-nav">
-                <a href="#">Trang chủ</a>
+                <a href="/">Trang chủ</a>
                 <a href="#">Phim</a>
                 <a href="#">Lịch chiếu</a>
                 <a href="#">Ưu đãi</a>
