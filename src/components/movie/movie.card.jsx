@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 const MovieCard = ({ movie, onWatchTrailer }) => {
     const [posterUrl, setPosterUrl] = useState(null);
 
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (movie.posterKey) {
@@ -17,7 +17,8 @@ const MovieCard = ({ movie, onWatchTrailer }) => {
     }, [movie.posterKey]);
 
     const handleBooking = () => {
-        navigate("/booking", { state: { movie } }); // chuyền movie qua state
+        console.log(movie)
+        navigate(`/booking/${movie.id}`);
     };
 
     return (
@@ -30,12 +31,20 @@ const MovieCard = ({ movie, onWatchTrailer }) => {
             />
 
             {/* Hiệu ứng hover */}
-            <div className="movie-hover">
-                <Button type="primary" className="movie-btn" onClick={handleBooking}>
+            <div className="movie-hover" onClick={handleBooking}>
+                <Button type="primary" className="movie-btn"
+                    onClick={(e) => {
+                        e.stopPropagation(); // ngăn click "bong bóng" lên div cha
+                        handleBooking();
+                    }}>
                     <img src="https://www.galaxycine.vn/_next/static/media/Vector-1.319a0d2b.svg"></img>
                     Mua vé
                 </Button>
-                <Button type="default" className="movie-btn" onClick={() => onWatchTrailer(movie.trailerUrl)}>
+                <Button type="default" className="movie-btn"
+                    onClick={(e) => {
+                        e.stopPropagation(); // ngăn click "bong bóng" lên div cha
+                        onWatchTrailer(movie.trailerUrl);
+                    }}>
                     <PlayCircleFilled style={{ fontSize: 16, marginLeft: "-5px" }} />
                     Trailer
                 </Button>
@@ -43,7 +52,7 @@ const MovieCard = ({ movie, onWatchTrailer }) => {
 
             {/* Thông tin phim */}
             <div className="movie-info">
-                <div>{movie.title}</div>
+                <div onClick={handleBooking}>{movie.title}</div>
                 {movie.rating && (
                     <Tag color="gold">
                         <StarFilled /> {movie.rating}

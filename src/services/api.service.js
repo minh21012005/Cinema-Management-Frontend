@@ -549,6 +549,10 @@ const updateBannerAPI = (id, data) => {
     return axios.put(URL_BACKEND, data);
 }
 
+const fetchMovieByIdAPI = (id) => {
+    return axios.get(`/movie-service/api/v1/movies/fetch/${id}`);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -561,5 +565,5 @@ export {
     fetchPermissionsActiveAPI, createRoleAPI, updateRoleAPI, fetchPermissionsWithPaginationAPI, createPermissionAPI,
     updatePermissionAPI, fetchShowtimeInDayForStaffAPI, fetchSeatLayoutAPI, fetchAllCombosActiveAPI, staffHandleBookingAPI,
     fetchQrCode, fetchActiveCinemas, registerRequestApi, verifyOtpApi, fetchShowingMoviesAPI, fetchComingSoonMoviesAPI,
-    createBannerAPI, fetchAllBannerAPI, fetchAllBannersActiveAPI, updateBannerAPI
+    createBannerAPI, fetchAllBannerAPI, fetchAllBannersActiveAPI, updateBannerAPI, fetchMovieByIdAPI
 }

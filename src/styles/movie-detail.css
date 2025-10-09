@@ -6,6 +6,13 @@
     margin-top: 8vh;
 }
 
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
 /* HERO */
 .movie-hero {
     background: #000;
@@ -103,10 +110,9 @@
 .meta-line {
     margin-top: 10px;
     color: #666;
-    display: flex;
     align-items: center;
-    gap: 8px;
     font-size: 14px;
+    margin-bottom: 12px;
 }
 
 .meta-item {
@@ -307,18 +313,21 @@
 
 .sidebar-card {
     display: flex;
-    gap: 12px;
-    align-items: center;
+    flex-direction: column;
+    width: 200px;
+    align-items: start;
     background: #fff;
     border-radius: 6px;
     padding: 8px;
+    gap: 15px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .sidebar-card img {
-    width: 110px;
+    width: 200px;
     border-radius: 6px;
     object-fit: cover;
+    cursor: pointer;
 }
 
 .sidebar-card-body {
@@ -328,9 +337,10 @@
 }
 
 .sidebar-card-title {
-    font-weight: 600;
+    font-weight: 500;
     color: #333;
     font-size: 14px;
+    cursor: pointer;
 }
 
 .sidebar-card-meta {
@@ -375,7 +385,7 @@
     /* vẫn bo mềm mại */
     box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
     /* đổ bóng đậm hơn nhẹ */
-    transform: translateY(-70px);
+    transform: translateY(-85px);
     /* ✅ tràn lên trailer nhiều hơn 1 chút */
     position: relative;
     z-index: 30;
@@ -414,18 +424,12 @@
     color: #444;
 }
 
-.top-info .ant-col:nth-child(2) {
-    margin-top: -120px;
-    /* kéo chữ lên gần poster */
-}
-
 .title-row {
     margin-bottom: 16px;
     /* khoảng cách dưới tiêu đề */
 }
 
 .meta-line {
-    margin-bottom: 12px;
     /* khoảng cách giữa meta và rating */
 }
 

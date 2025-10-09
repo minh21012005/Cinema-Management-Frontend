@@ -219,15 +219,14 @@
 
 /* --- Movie Info --- */
 .movie-info {
-    text-align: center;
     margin-top: 10px;
     z-index: 5;
     position: relative;
 }
 
 .movie-info div {
-    font-weight: 600;
-    font-size: 1.1rem;
+    font-weight: 500;
+    font-size: 1rem;
     margin-bottom: 5px;
     color: #222;
 }

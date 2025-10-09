@@ -37,7 +37,7 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
   },
   {
-    path: "/booking",
+    path: "/booking/:id",
     element: <MovieDetailPage />,
     errorElement: <ErrorPage />,
   },
