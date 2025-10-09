@@ -127,10 +127,15 @@ const MovieInfo = ({
                                     <div className="times">
                                         {r.times.map((t) => (
                                             <button
+                                                key={t.time}
                                                 onClick={() =>
-                                                    requireLogin(() => navigate(`/booking/${movie.id}`))
+                                                    requireLogin(() => {
+                                                        console.log("Showtime info:", t.showtime);
+                                                    })
                                                 }
-                                                key={t} className="time-pill">{t}
+                                                className="time-pill"
+                                            >
+                                                {t.time}
                                             </button>
                                         ))}
                                     </div>

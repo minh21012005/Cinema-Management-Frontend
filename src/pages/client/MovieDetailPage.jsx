@@ -142,12 +142,19 @@ const MovieDetailPage = () => {
         showtimes.forEach((s) => {
             const cinemaName = s.cinemaName || "Unknown Cinema";
             const roomName = s.roomName || "Unknown Room";
-            const time = new Date(s.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+            const time = new Date(s.startTime).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit"
+            });
 
             if (!cinemasMap[cinemaName]) cinemasMap[cinemaName] = {};
             if (!cinemasMap[cinemaName][roomName]) cinemasMap[cinemaName][roomName] = [];
 
-            cinemasMap[cinemaName][roomName].push(time);
+            // Thay vì chỉ lưu time, lưu cả object chứa time + showtime gốc
+            cinemasMap[cinemaName][roomName].push({
+                time,
+                showtime: s,
+            });
         });
 
         // Chuyển map sang mảng để render
