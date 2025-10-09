@@ -1,6 +1,6 @@
 import UserTable from "../../components/user/user.table";
 import { useEffect, useState } from "react";
-import { createUserApi, fetchActiveCinemas, fetchAllRoleAPI, fetchAllUserAPI } from "@/services/api.service";
+import { createUserApi, fetchActiveCinemasAPI, fetchAllRoleAPI, fetchAllUserAPI } from "@/services/api.service";
 import { Button, Input, Modal, Form, Row, Col, Select, DatePicker, notification, Space } from "antd";
 import dayjs from "dayjs";
 const { Search } = Input;
@@ -34,7 +34,7 @@ const UserPage = () => {
     };
 
     const loadCinema = async () => {
-        const res = await fetchActiveCinemas();
+        const res = await fetchActiveCinemasAPI();
         if (res?.data) {
             setCinemaData(res.data);
         }

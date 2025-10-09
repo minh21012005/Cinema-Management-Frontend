@@ -209,11 +209,12 @@
 
 .date-list {
     display: flex;
-    gap: 10px;
+    gap: 15px;
     align-items: center;
 }
 
 .date-pill {
+    font-size: 14px;
     border: none;
     background: #fff;
     padding: 10px 14px;
@@ -256,7 +257,7 @@
 
 .cinema-name {
     margin: 0 0 8px;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 600;
     color: #222;
 }
@@ -271,8 +272,8 @@
 
 .room-type {
     width: 180px;
-    color: #666;
-    font-weight: 600;
+    font-weight: 500;
+    color: #4e4e4e;
 }
 
 .times {

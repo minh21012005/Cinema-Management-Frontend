@@ -96,7 +96,7 @@ const fetchCinemaAPI = (current, pageSize, name) => {
     });
 };
 
-const fetchActiveCinemas = () => {
+const fetchActiveCinemasAPI = () => {
     return axios.get("/cinema-service/api/v1/cinemas/active")
 }
 
@@ -553,6 +553,10 @@ const fetchMovieByIdAPI = (id) => {
     return axios.get(`/movie-service/api/v1/movies/fetch/${id}`);
 }
 
+const fetchShowtimeByMovieAPI = (id, params) => {
+    return axios.get(`/cinema-service/api/v1/showtime/movie/${id}`, { params });
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -564,6 +568,6 @@ export {
     updateFoodAPI, fetchAllCombosAPI, createComboAPI, fetchAllFoodsActiveAPI, updateComboAPI, fetchRolesWithPaginationAPI,
     fetchPermissionsActiveAPI, createRoleAPI, updateRoleAPI, fetchPermissionsWithPaginationAPI, createPermissionAPI,
     updatePermissionAPI, fetchShowtimeInDayForStaffAPI, fetchSeatLayoutAPI, fetchAllCombosActiveAPI, staffHandleBookingAPI,
-    fetchQrCode, fetchActiveCinemas, registerRequestApi, verifyOtpApi, fetchShowingMoviesAPI, fetchComingSoonMoviesAPI,
-    createBannerAPI, fetchAllBannerAPI, fetchAllBannersActiveAPI, updateBannerAPI, fetchMovieByIdAPI
+    fetchQrCode, fetchActiveCinemasAPI, registerRequestApi, verifyOtpApi, fetchShowingMoviesAPI, fetchComingSoonMoviesAPI,
+    createBannerAPI, fetchAllBannerAPI, fetchAllBannersActiveAPI, updateBannerAPI, fetchMovieByIdAPI, fetchShowtimeByMovieAPI,
 }

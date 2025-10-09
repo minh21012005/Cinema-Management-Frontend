@@ -4,7 +4,8 @@ import "@/styles/movie-detail.css";
 import Header from "@/components/layout/client/header";
 import TrailerModal from "./trailer.modal";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchMovieByIdAPI, fetchShowingMoviesAPI, getMediaUrlAPI } from "@/services/api.service";
+import { fetchActiveCinemasAPI, fetchMovieByIdAPI, fetchShowingMoviesAPI, fetchShowtimeByMovieAPI, getMediaUrlAPI } from "@/services/api.service";
+import SidebarMovieCard from "./SidebarMovieCard";
 
 const { Option } = Select;
 
@@ -13,22 +14,64 @@ const MovieDetailPage = () => {
     const navigate = useNavigate();
     const { id } = useParams();
 
+    const [playing, setPlaying] = useState(false);
     const [loading, setLoading] = useState(true);
     const [movie, setMovie] = useState({});
     const [poster, setPoster] = useState(null);
     const [nowShowing, setNowShowing] = useState([]);
     const [nowShowingPosters, setNowShowingPosters] = useState({});
     const [visibleCount, setVisibleCount] = useState(3);
+    const [showtimes, setShowtimes] = useState([]);
+    const [cinemas, setCinemas] = useState([]);
+    const [selectedCinema, setSelectedCinema] = useState("all");
+    const [selectedDate, setSelectedDate] = useState(() => {
+        const today = new Date();
+        return today.toISOString().split("T")[0]; // yyyy-MM-dd
+    });
+    const [dateList, setDateList] = useState([]);
+
+    useEffect(() => {
+        const dates = [];
+        const today = new Date();
+        const todayStr = today.toISOString().split("T")[0]; // yyyy-MM-dd
+
+        // Map số thứ (0 = Chủ nhật) sang tên đầy đủ tiếng Việt
+        const weekdayMap = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(today);
+            d.setDate(today.getDate() + i);
+
+            const value = d.toISOString().split("T")[0]; // yyyy-MM-dd
+            const dayNumber = d.getDate().toString().padStart(2, "0");
+            const monthNumber = (d.getMonth() + 1).toString().padStart(2, "0");
+
+            // Nếu là hôm nay thì label là "Hôm Nay"
+            const weekday = value === todayStr ? "Hôm Nay" : weekdayMap[d.getDay()];
+            const label = `${weekday}\n${dayNumber}/${monthNumber}`;
+
+            dates.push({ label, value });
+        }
+        setDateList(dates);
+        fetchCinemas();
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true); // bắt đầu loading
             await fetchMovie();
             await fetchShowingMovies();
+            fetchShowtime(selectedDate);
             setLoading(false); // kết thúc loading
         };
         fetchData();
     }, [id]);
+
+    useEffect(() => {
+        if (selectedDate && selectedCinema) {
+            fetchShowtime(selectedDate, selectedCinema);
+        }
+    }, [selectedDate, selectedCinema]);
 
     useEffect(() => {
         if (movie.posterKey) {
@@ -44,7 +87,7 @@ const MovieDetailPage = () => {
     }
 
     const handleSeeMore = () => {
-        setVisibleCount(nowShowing.length); // hiện tất cả
+        setVisibleCount(nowShowing.length);
     };
 
     const fetchPoster = async () => {
@@ -75,27 +118,48 @@ const MovieDetailPage = () => {
         }
     }
 
-    // fake schedule
-    const schedule = [
-        {
-            cinema: "Galaxy Nguyễn Du",
-            rooms: [
-                { type: "2D Phụ Đề", times: ["10:00", "13:00", "16:30", "19:45"] },
-            ],
-        },
-        {
-            cinema: "Galaxy Sala",
-            rooms: [
-                { type: "2D Phụ Đề", times: ["11:00", "14:30", "18:00"] },
-            ],
-        },
-        {
-            cinema: "Galaxy Tân Bình",
-            rooms: [
-                { type: "2D Phụ Đề", times: ["09:45", "12:45", "15:30", "18:45"] },
-            ],
-        },
-    ];
+    const fetchShowtime = async (date, cinemaId = selectedCinema) => {
+        const params = {};
+        if (date) params.date = date;
+        if (cinemaId && cinemaId !== "all") params.cinemaId = cinemaId;
+
+        const res = await fetchShowtimeByMovieAPI(id, params);
+        if (res?.data) {
+            setShowtimes(res.data);
+        }
+    };
+
+    const fetchCinemas = async () => {
+        const res = await fetchActiveCinemasAPI();
+        if (res?.data) {
+            setCinemas(res.data);
+        }
+    }
+
+    const getScheduleByCinema = () => {
+        // Nhóm showtime theo cinema
+        const cinemasMap = {};
+
+        showtimes.forEach((s) => {
+            const cinemaName = s.cinemaName || "Unknown Cinema";
+            const roomName = s.roomName || "Unknown Room";
+            const time = new Date(s.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+            if (!cinemasMap[cinemaName]) cinemasMap[cinemaName] = {};
+            if (!cinemasMap[cinemaName][roomName]) cinemasMap[cinemaName][roomName] = [];
+
+            cinemasMap[cinemaName][roomName].push(time);
+        });
+
+        // Chuyển map sang mảng để render
+        return Object.entries(cinemasMap).map(([cinema, rooms]) => ({
+            cinema,
+            rooms: Object.entries(rooms).map(([roomName, times]) => ({
+                type: roomName,
+                times: times.sort(), // sắp xếp giờ tăng dần
+            }))
+        }));
+    };
 
     // Tách ID từ link YouTube
     const getYouTubeThumbnail = (url) => {
@@ -107,11 +171,6 @@ const MovieDetailPage = () => {
                 : null;
         }
     };
-
-    const [activeTab] = useState("1");
-    const [selectedDate] = useState("08/10");
-    const [selectedArea] = useState("Toàn quốc");
-    const [playing, setPlaying] = useState(false);
 
     return (
         <>
@@ -203,7 +262,7 @@ const MovieDetailPage = () => {
                                 </div>
 
                                 {/* Description */}
-                                <Divider />
+                                <Divider style={{ marginTop: "-1vh" }} />
                                 <div className="content-detail">
                                     <h3 className="section-heading">Nội Dung Phim</h3>
                                     <p className="description">
@@ -217,28 +276,38 @@ const MovieDetailPage = () => {
                                     {/* date / filters */}
                                     <div className="schedule-filters">
                                         <div className="date-list">
-                                            <button className="date-pill active">Hôm Nay<br /><span className="date-small">08/10</span></button>
-                                            <button className="date-pill">Thứ Năm<br /><span className="date-small">09/10</span></button>
-                                            <button className="date-pill">Thứ Sáu<br /><span className="date-small">10/10</span></button>
-                                            <button className="date-pill">Thứ Bảy<br /><span className="date-small">11/10</span></button>
+                                            {dateList.map((d) => {
+                                                const [dayLabel, dayMonth] = d.label.split("\n");
+                                                return (
+                                                    <button
+                                                        key={d.value}
+                                                        className={`date-pill ${d.value === selectedDate ? "active" : ""}`}
+                                                        onClick={() => setSelectedDate(d.value)}
+                                                    >
+                                                        {dayLabel}<br />
+                                                        <span className="date-small">{dayMonth}</span>
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
 
                                         <div className="filters">
-                                            <Select defaultValue={selectedArea} style={{ width: 160, marginRight: 12 }}>
-                                                <Option value="Toàn quốc">Toàn quốc</Option>
-                                                <Option value="HCM">HCM</Option>
-                                                <Option value="HN">Hà Nội</Option>
-                                            </Select>
-                                            <Select defaultValue="Tất cả rạp" style={{ width: 160 }}>
+                                            <Select
+                                                value={selectedCinema}
+                                                style={{ width: 160 }}
+                                                onChange={(value) => setSelectedCinema(value)}
+                                            >
                                                 <Option value="all">Tất cả rạp</Option>
-                                                <Option value="galaxy-nd">Galaxy Nguyễn Du</Option>
+                                                {cinemas.map((c) => (
+                                                    <Option key={c.id} value={c.id}>{c.name}</Option>
+                                                ))}
                                             </Select>
                                         </div>
                                     </div>
 
                                     {/* schedule list */}
                                     <div className="schedule-list">
-                                        {schedule.map((s) => (
+                                        {getScheduleByCinema().map((s) => (
                                             <div className="cinema-block" key={s.cinema}>
                                                 <h4 className="cinema-name">{s.cinema}</h4>
                                                 {s.rooms.map((r, idx) => (
@@ -254,6 +323,7 @@ const MovieDetailPage = () => {
                                             </div>
                                         ))}
                                     </div>
+
                                 </div>
                             </Col>
 
@@ -263,15 +333,12 @@ const MovieDetailPage = () => {
                                     <h3 className="sidebar-title">PHIM ĐANG CHIẾU</h3>
                                     <div className="sidebar-list">
                                         {nowShowing.slice(0, visibleCount).map((m) => (
-                                            <div className="sidebar-card" key={m.id} >
-                                                <img onClick={() => { handleClickSidebar(m) }} src={nowShowingPosters[m.id]} alt={m.title} />
-                                                <div className="sidebar-card-body">
-                                                    <div onClick={() => { handleClickSidebar(m) }} className="sidebar-card-title">{m.title}</div>
-                                                    <div className="sidebar-card-meta">
-                                                        <span className="star">{m.rating}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <SidebarMovieCard
+                                                key={m.id}
+                                                movie={m}
+                                                poster={nowShowingPosters[m.id]}
+                                                onClick={handleClickSidebar}
+                                            />
                                         ))}
                                     </div>
                                     {visibleCount < nowShowing.length && (
