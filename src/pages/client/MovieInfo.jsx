@@ -1,5 +1,8 @@
 import React from "react";
 import { Row, Col, Divider, Select } from "antd";
+import { useNavigate } from "react-router-dom";
+import { useRequireLogin } from "@/utils/requireLogin";
+
 const { Option } = Select;
 
 const MovieInfo = ({
@@ -13,6 +16,10 @@ const MovieInfo = ({
     cinemas,
     getScheduleByCinema,
 }) => {
+
+    const requireLogin = useRequireLogin();
+    const navigate = useNavigate();
+
     return (
         <div className="top-info">
             <Row gutter={[24, 24]} align="top">
@@ -119,7 +126,12 @@ const MovieInfo = ({
                                     <div className="room-type">{r.type}</div>
                                     <div className="times">
                                         {r.times.map((t) => (
-                                            <button key={t} className="time-pill">{t}</button>
+                                            <button
+                                                onClick={() =>
+                                                    requireLogin(() => navigate(`/booking/${movie.id}`))
+                                                }
+                                                key={t} className="time-pill">{t}
+                                            </button>
                                         ))}
                                     </div>
                                 </div>
