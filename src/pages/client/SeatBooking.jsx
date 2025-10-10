@@ -1,80 +1,95 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import "@/styles/seat-booking.css"; // tách CSS riêng
-import { Col, Row } from "antd";
+import { Col, message, Row } from "antd";
+import SockJS from "sockjs-client";
+import * as StompJs from "@stomp/stompjs";
+import { fetchSeatLayoutAPI, getMediaUrlAPI } from "@/services/api.service";
 
-const fakeMovie = {
-    title: "Chú Thuật Hồi Chiến: Hoài Ngọc / Ngọc Chiết",
-    poster:
-        "https://cdn.galaxycine.vn/media/2025/9/30/jujutsu-kaisen-500_1759216418459.jpg",
-    cinema: "Galaxy Nguyễn Du - RẠP 5",
-    rating: "T13",
-};
+const SeatBooking = () => {
 
-const fakeShowtimes = [
-    { id: 1, time: "09:45", date: "10/10/2025", hall: "RAP 5", price: 90000 }
-];
-
-function generateSeats(rows = ["A", "B", "C", "D", "E", "F", "G", "H", "I"], cols = 9) {
-    const result = {};
-    rows.forEach((r, idx) => {
-        const seats = [];
-        for (let c = 1; c <= cols; c++) {
-            const id = `${r}${c}`;
-            const sold = (idx + c) % 11 === 0;
-            const vip = (idx === 0 && c >= 7) || (idx === 1 && c >= 8);
-            seats.push({
-                id,
-                row: r,
-                number: c,
-                status: sold ? "sold" : vip ? "vip" : "available",
-            });
-        }
-        result[r] = seats;
-    });
-    return result;
-}
-
-export default function SeatBooking() {
     const location = useLocation();
     const showtime = location.state?.showtime;
-    useEffect(() => console.log(showtime), []);
-
-    const [showtimes] = useState(fakeShowtimes);
-    const [activeShowtimeId, setActiveShowtimeId] = useState(showtimes[0].id);
-    const [seatsMap] = useState(() => generateSeats());
+    const movie = location.state?.movie;
+    const [poster, setPoster] = useState(null);
+    const token = window.localStorage.getItem("access_token");
+    const baseWebSocketUrl = import.meta.env.VITE_BACKEND_WEBSOCKET_URL;
+    const socketUrl = `${baseWebSocketUrl}/ws?accessToken=${token}`;
     const [selectedSeats, setSelectedSeats] = useState([]);
+    const [seatLayouts, setSeatLayouts] = useState([]);
 
-    const activeShowtime = useMemo(
-        () => showtimes.find((s) => s.id === activeShowtimeId),
-        [showtimes, activeShowtimeId]
-    );
+    // ---------------- WebSocket ----------------
+    useEffect(() => {
+        if (!showtime) return;
+
+        const socket = new SockJS(socketUrl);
+        const client = new StompJs.Client({
+            webSocketFactory: () => socket,
+            reconnectDelay: 5000, // Tự động reconnect nếu rớt
+            debug: (str) => console.log(str),
+            onConnect: () => {
+                console.log("✅ Connected to WebSocket");
+
+                // Subscribe ngay khi connect thành công
+                client.subscribe(`/topic/seats/${showtime.id}`, (msg) => {
+                    const newlyBookedSeats = JSON.parse(msg.body);
+
+                    setSeatLayouts((prev) =>
+                        prev.map((seat) =>
+                            newlyBookedSeats.includes(seat.id)
+                                ? { ...seat, booked: true } // chỉ đánh dấu thêm ghế mới
+                                : seat // giữ nguyên trạng thái cũ
+                        )
+                    );
+
+                    // Nếu ghế khách đang chọn bị staff bán thì bỏ khỏi danh sách chọn
+                    setSelectedSeats((prev) =>
+                        prev.filter((seat) => !newlyBookedSeats.includes(seat.id))
+                    );
+                });
+            },
+            onStompError: (frame) => {
+                console.error("Broker error:", frame.headers["message"]);
+            },
+        });
+
+        client.activate();
+        return () => {
+            if (client.active) client.deactivate();
+        };
+    }, [showtime]);
+
+    useEffect(() => {
+        if (movie.posterKey) {
+            fetchPoster();
+        }
+    }, [movie.posterKey]);
+
+    useEffect(() => {
+        if (showtime) {
+            fetchSeatLayoutAPI(showtime.id).then((res) => {
+                if (res.data) setSeatLayouts(res.data);
+            });
+        }
+    }, [showtime]);
+
+    const fetchPoster = async () => {
+        const res = await getMediaUrlAPI(movie.posterKey);
+        if (res?.data) {
+            console.log(res.data);
+            setPoster(res.data);
+        }
+    }
 
     const toggleSeat = (seat) => {
-        if (seat.status === "sold") return;
+        if (seat.booked) return; // đã đặt rồi thì không được chọn
         const isSelected = selectedSeats.some((s) => s.id === seat.id);
         setSelectedSeats((prev) =>
             isSelected ? prev.filter((s) => s.id !== seat.id) : [...prev, seat]
         );
     };
 
-    const seatState = (seat) => {
-        if (seat.status === "sold") return "sold";
-        if (selectedSeats.some((s) => s.id === seat.id)) return "selected";
-        if (seat.status === "vip") return "vip";
-        return "available";
-    };
-
-    const total = selectedSeats.reduce(
-        (sum) => sum + (activeShowtime ? activeShowtime.price : 0),
-        0
-    );
-
-    const onClickPill = (s) => {
-        console.log("Clicked showtime:", s);
-        setActiveShowtimeId(s.id);
-        setSelectedSeats([]);
-    };
+    const total = selectedSeats.reduce((sum, seat) => sum + (seat.seatType?.basePrice || 0), 0);
 
     return (
         <div className="seat-page">
@@ -91,7 +106,7 @@ export default function SeatBooking() {
 
                 <Row gutter={[24, 0]} className="seat-container">
                     {/* LEFT */}
-                    <Col xs={24} sm={24} md={16} lg={17}>
+                    <Col xs={24} sm={24} md={16} lg={16}>
                         <div className="seat-left">
                             <div className="seat-screen">
                                 <div className="seat-screen__label">Màn hình</div>
@@ -100,29 +115,43 @@ export default function SeatBooking() {
 
                             <div className="seat-map">
                                 <div className="seat-map__rows">
-                                    {Object.keys(seatsMap)
-                                        .slice()
-                                        .map((row) => (
-                                            <div key={row} className="seat-row">
-                                                <div className="seat-row__label">{row}</div>
+                                    {Object.values(
+                                        seatLayouts.reduce((acc, seat) => {
+                                            const row = seat.name[0]; // lấy ký tự đầu làm hàng, ví dụ "E6" → "E"
+                                            if (!acc[row]) acc[row] = [];
+                                            acc[row].push(seat);
+                                            return acc;
+                                        }, {})
+                                    ).map((rowSeats, idx) => {
+                                        const rowName = rowSeats[0]?.name[0];
+                                        return (
+                                            <div key={rowName || idx} className="seat-row">
+                                                <div className="seat-row__label">{rowName}</div>
                                                 <div className="seat-row__seats">
-                                                    {seatsMap[row].map((seat) => (
-                                                        <button
-                                                            key={seat.id}
-                                                            className={`seat-btn seat-btn--${seatState(seat)}`}
-                                                            onClick={() => toggleSeat(seat)}
-                                                        >
-                                                            {seat.number}
-                                                        </button>
-                                                    ))}
+                                                    {rowSeats
+                                                        .sort((a, b) => a.colIndex - b.colIndex)
+                                                        .map((seat) => (
+                                                            <button
+                                                                key={seat.id}
+                                                                className={`seat-btn 
+                                                                    ${seat.seatType?.name === "Đôi" ? "seat-btn--couple" : ""} 
+                                                                    ${seat.seatType?.name === "VIP" ? "seat-btn--vip" : ""} 
+                                                                    ${seat.booked ? "seat-btn--sold" : ""} 
+                                                                    ${selectedSeats.some((s) => s.id === seat.id) ? "seat-btn--selected" : ""} `}
+                                                                onClick={() => toggleSeat(seat)}
+                                                                disabled={seat.booked}
+                                                            >
+                                                                {seat.name.replace(/^[A-Z]/, "")}
+                                                            </button>
+                                                        ))}
                                                 </div>
-                                                <div className="seat-row__label">{row}</div>
+                                                <div className="seat-row__label">{rowName}</div>
                                             </div>
-                                        ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
 
-                            {/* Legend */}
                             {/* Legend */}
                             <div className="seat-legend">
                                 <div className="seat-legend__group">
@@ -136,10 +165,13 @@ export default function SeatBooking() {
 
                                 <div className="seat-legend__group">
                                     <div className="seat-legend__item">
+                                        <span className="seat-box normal" /> Ghế đơn
+                                    </div>
+                                    <div className="seat-legend__item">
                                         <span className="seat-box vip" /> Ghế VIP
                                     </div>
                                     <div className="seat-legend__item">
-                                        <span className="seat-box normal" /> Ghế đơn
+                                        <span className="seat-box couple" /> Ghế đôi
                                     </div>
                                 </div>
                             </div>
@@ -147,16 +179,41 @@ export default function SeatBooking() {
                     </Col>
 
                     {/* RIGHT */}
-                    <Col xs={24} sm={24} md={8} lg={7}>
+                    <Col xs={24} sm={24} md={8} lg={8}>
                         <div className="seat-right">
                             <div className="seat-info">
-                                <img src={fakeMovie.poster} alt="poster" className="seat-poster" />
+                                <img
+                                    src={poster || "/default-poster.jpg"} // fallback nếu chưa có poster
+                                    alt={movie.title || "poster"}
+                                    className="seat-poster"
+                                />
                                 <div className="seat-details">
-                                    <h3>{fakeMovie.title}</h3>
-                                    <p>2D Phụ Đề • {fakeMovie.rating}</p>
-                                    <p><strong>{fakeMovie.cinema}</strong></p>
+                                    <h3>{movie?.title || "Đang cập nhật"}</h3>
+                                    <p style={{ marginTop: "10px" }} className="movie-meta">
+                                        <strong>Thể loại:</strong> {movie?.categoryNames?.join(", ")}
+                                    </p>
                                     <p>
-                                        Suất: <b>{activeShowtime?.time}</b> - {activeShowtime?.date}
+                                        <strong>
+                                            {showtime?.cinemaName} - {showtime?.roomName}
+                                        </strong>
+                                    </p>
+                                    <p>
+                                        Suất:{" "}
+                                        <b>
+                                            {new Date(showtime?.startTime).toLocaleTimeString("vi-VN", {
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                            })}
+                                        </b>{" "}
+                                        -{" "}
+                                        {new Date(showtime?.endTime).toLocaleTimeString("vi-VN", {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                        })}
+                                    </p>
+                                    <p>
+                                        Ngày chiếu:{" "}
+                                        {new Date(showtime?.startTime).toLocaleDateString("vi-VN")}
                                     </p>
                                 </div>
                             </div>
@@ -167,7 +224,7 @@ export default function SeatBooking() {
                                     <span>
                                         {selectedSeats.length === 0
                                             ? "-"
-                                            : selectedSeats.map((s) => s.id).join(", ")}
+                                            : selectedSeats.map((s) => s.name).join(", ")}
                                     </span>
                                 </div>
                                 <div className="seat-summary__total">
@@ -176,18 +233,19 @@ export default function SeatBooking() {
                                 </div>
 
                                 <div className="seat-summary__buttons">
-                                    <button className="btn-back" onClick={() => setSelectedSeats([])}>
+                                    <button className="btn-back" onClick={() => window.history.back()}>
                                         Quay lại
                                     </button>
                                     <button
                                         className="btn-continue"
                                         onClick={() => {
                                             if (selectedSeats.length === 0) {
-                                                alert("Vui lòng chọn ghế trước khi tiếp tục.");
+                                                message.warning("Vui lòng chọn ghế trước khi tiếp tục.");
                                                 return;
                                             }
                                             console.log("Proceed booking:", {
-                                                showtime: activeShowtime,
+                                                showtime,
+                                                movie,
                                                 seats: selectedSeats,
                                                 total,
                                             });
@@ -199,9 +257,12 @@ export default function SeatBooking() {
                             </div>
                         </div>
                     </Col>
+
                 </Row>
             </div>
 
         </div>
     );
 }
+
+export default SeatBooking;
