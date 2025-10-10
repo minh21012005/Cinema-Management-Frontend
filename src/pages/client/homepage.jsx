@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Row, Col, Button, Divider, Tabs, Modal } from "antd";
 import "@/styles/homepage.css";
-import Header from "@/components/layout/client/header";
 import { fetchAllBannersActiveAPI, fetchComingSoonMoviesAPI, fetchShowingMoviesAPI } from "@/services/api.service";
 import MovieCard from "@/components/movie/movie.card";
 import BannerSection from "@/components/banner/banner.section";
@@ -50,8 +49,6 @@ const HomePage = () => {
 
     return (
         <>
-            <Header />
-
             {/* ✅ MAIN CONTENT */}
             <div className="homepage-container">
                 {/* 🎬 Banner */}

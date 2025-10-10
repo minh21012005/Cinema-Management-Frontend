@@ -1,5 +1,4 @@
 import { createRoot } from 'react-dom/client'
-import App from './App.jsx'
 import LoginPage from './pages/login.jsx';
 import {
   createBrowserRouter,
@@ -29,17 +28,33 @@ import StaffLayout from './pages/staff/index.jsx';
 import VerifyOtpPage from './pages/verify.otp.jsx';
 import BannerListPage from './pages/manager/banner.list.jsx';
 import MovieDetailPage from './pages/client/MovieDetailPage.jsx';
+import ClientLayout from './components/layout/client/ClientLayout.jsx';
+import HomePage from './pages/client/homepage.jsx';
+import SeatBooking from './pages/client/SeatBooking.jsx';
+import PrivateRouteClient from './pages/client/private.route.client.jsx';
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <ClientLayout />,
     errorElement: <ErrorPage />,
-  },
-  {
-    path: "/booking/:id",
-    element: <MovieDetailPage />,
-    errorElement: <ErrorPage />,
+    children: [
+      {
+        index: true,
+        element: <HomePage />,
+      },
+      {
+        path: "booking/:id",
+        element: <MovieDetailPage />,
+      },
+      {
+        path: "booking/:id/seats",
+        element:
+          <PrivateRouteClient>
+            <SeatBooking />
+          </PrivateRouteClient>
+      },
+    ],
   },
   {
     path: "/admin",

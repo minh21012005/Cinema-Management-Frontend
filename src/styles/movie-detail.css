@@ -3,7 +3,6 @@
     font-family: Inter, "Helvetica Neue", Arial, sans-serif;
     color: #222;
     background: #fff;
-    margin-top: 8vh;
 }
 
 .loading-container {
@@ -293,6 +292,7 @@
 /* sidebar */
 .sidebar {
     background: transparent;
+    margin-bottom: 50px;
 }
 
 .sidebar-title {

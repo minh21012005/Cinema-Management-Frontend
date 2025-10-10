@@ -130,7 +130,7 @@ const MovieInfo = ({
                                                 key={t.time}
                                                 onClick={() =>
                                                     requireLogin(() => {
-                                                        console.log("Showtime info:", t.showtime);
+                                                        navigate("seats", { state: { showtime: t.showtime } });
                                                     })
                                                 }
                                                 className="time-pill"

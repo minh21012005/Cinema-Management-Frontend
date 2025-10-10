@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Row, Col, Select, Spin } from "antd";
 import "@/styles/movie-detail.css";
-import Header from "@/components/layout/client/header";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchActiveCinemasAPI, fetchMovieByIdAPI, fetchShowingMoviesAPI, fetchShowtimeByMovieAPI, getMediaUrlAPI } from "@/services/api.service";
 import MovieHero from "./MovieHero";
@@ -186,7 +185,6 @@ const MovieDetailPage = () => {
                 </div>
             ) : (
                 <div className="movie-detail-page">
-                    <Header />
                     <MovieHero movie={movie} playing={playing} setPlaying={setPlaying} getYouTubeThumbnail={getYouTubeThumbnail} />
                     <div className="page-container">
                         <Row gutter={[24, 24]}>
