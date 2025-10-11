@@ -260,3 +260,11 @@
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(255, 148, 77, 0.4);
 }
+
+.banner-slide {
+    cursor: pointer !important;
+}
+
+.banner-slide * {
+    cursor: pointer !important;
+}

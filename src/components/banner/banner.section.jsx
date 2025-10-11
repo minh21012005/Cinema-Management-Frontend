@@ -2,10 +2,12 @@ import { getMediaUrlAPI } from "@/services/api.service";
 import { useEffect, useRef, useState } from "react";
 import { Carousel, Button } from "antd";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const BannerSection = ({ banners }) => {
     const carouselRef = useRef(null);
     const [bannerImages, setBannerImages] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchUrls = async () => {
@@ -23,6 +25,15 @@ const BannerSection = ({ banners }) => {
         if (banners.length > 0) fetchUrls();
     }, [banners]);
 
+    const handleBannerClick = (url) => {
+        if (!url) return;
+        if (url.startsWith("/")) {
+            navigate(url);
+        } else {
+            window.open(url, "_blank");
+        }
+    };
+
     if (!bannerImages.length) return null;
 
     return (
@@ -36,7 +47,10 @@ const BannerSection = ({ banners }) => {
                 speed={800}
             >
                 {bannerImages.map((banner, index) => (
-                    <div key={banner.id} className="banner-slide">
+                    <div
+                        onClick={() => handleBannerClick(banner.redirectUrl)}
+                        key={banner.id}
+                        className="banner-slide">
                         <img src={banner.imgUrl} alt={banner.title} className="banner-image" />
                         <div className="banner-overlay">
                             <div className="banner-text">

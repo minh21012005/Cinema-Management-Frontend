@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import "@/styles/seat-booking.css";
-import { Col, message, Row } from "antd";
+import { Col, message, Row, Tabs, Card } from "antd";
 import SockJS from "sockjs-client";
 import * as StompJs from "@stomp/stompjs";
-import { fetchSeatLayoutAPI, getMediaUrlAPI } from "@/services/api.service";
+import { fetchAllCombosActiveAPI, fetchAllFoodsActiveAPI, fetchSeatLayoutAPI, getMediaUrlAPI } from "@/services/api.service";
 import SeatMap from "../../components/client/seat-booking/SeatMap";
 import SeatLegend from "../../components/client/seat-booking/SeatLegend";
 import SeatInfo from "../../components/client/seat-booking/SeatInfo";
 import SeatSummary from "../../components/client/seat-booking/SeatSummary";
+import ClientFoodComboTab from "@/components/client/seat-booking/ClientFoodComboTab";
 
 const SeatBooking = () => {
     const location = useLocation();
@@ -20,6 +21,11 @@ const SeatBooking = () => {
     const socketUrl = `${baseWebSocketUrl}/ws?accessToken=${token}`;
     const [selectedSeats, setSelectedSeats] = useState([]);
     const [seatLayouts, setSeatLayouts] = useState([]);
+    const [foods, setFoods] = useState([]);
+    const [combos, setCombos] = useState([]);
+    const [foodSearch, setFoodSearch] = useState("");
+    const [comboSearch, setComboSearch] = useState("");
+    const [cartFood, setCartFood] = useState({});
 
     // --- WebSocket ---
     useEffect(() => {
@@ -68,6 +74,11 @@ const SeatBooking = () => {
         }
     }, [showtime]);
 
+    useEffect(() => {
+        fetchAllFoodsActiveAPI().then((res) => setFoods(res.data || []));
+        fetchAllCombosActiveAPI().then((res) => setCombos(res.data || []));
+    }, []);
+
     const fetchPoster = async () => {
         const res = await getMediaUrlAPI(movie.posterKey);
         if (res?.data) setPoster(res.data);
@@ -81,27 +92,28 @@ const SeatBooking = () => {
         );
     };
 
-    const total = selectedSeats.reduce(
+    // Tổng tiền ghế
+    const seatTotal = selectedSeats.reduce(
         (sum, seat) => sum + (seat.seatType?.basePrice || 0),
         0
     );
 
+    // Tính tổng tiền đồ ăn + combo
+    const foodComboTotal = Object.entries(cartFood).reduce((sum, [key, qty]) => {
+        if (!qty) return sum;
+        const [type, id] = key.split("-");
+        const list = type === "food" ? foods : combos;
+        const item = list.find((i) => i.id === Number(id));
+        return sum + (item?.price || 0) * qty;
+    }, 0);
+
+    // Tổng cộng
+    const total = seatTotal + foodComboTotal;
+
     return (
         <div className="seat-page">
-            {/* Breadcrumb */}
             <div className="seat-breadcrumb">
-                {["Chọn phim/rạp/suất", "Chọn ghế", "Chọn thức ăn", "Thanh toán", "Xác nhận"].map(
-                    (step, index, arr) => (
-                        <div
-                            key={step}
-                            className={`breadcrumb-step ${index === 1 ? "active" : index < 1 ? "completed" : ""
-                                }`}
-                        >
-                            <div className="step-label">{step}</div>
-                            {index < arr.length - 1 && <div className="step-arrow">→</div>}
-                        </div>
-                    )
-                )}
+                Mua vé xem phim
             </div>
 
             {/* Layout */}
@@ -120,6 +132,18 @@ const SeatBooking = () => {
                                 toggleSeat={toggleSeat}
                             />
                             <SeatLegend />
+                            <ClientFoodComboTab
+                                foods={foods}
+                                combos={combos}
+                                foodSearch={foodSearch}
+                                comboSearch={comboSearch}
+                                setFoodSearch={setFoodSearch}
+                                setComboSearch={setComboSearch}
+                                cartFood={cartFood}
+                                changeFoodQty={(type, id, qty) =>
+                                    setCartFood((prev) => ({ ...prev, [`${type}-${id}`]: qty }))
+                                }
+                            />
                         </div>
                     </Col>
 
@@ -133,12 +157,15 @@ const SeatBooking = () => {
                                 showtime={showtime}
                                 movie={movie}
                                 message={message}
+                                cartFood={cartFood}
+                                foods={foods}
+                                combos={combos}
                             />
                         </div>
                     </Col>
                 </Row>
             </div>
-        </div>
+        </div >
     );
 };
 

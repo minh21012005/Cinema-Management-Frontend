@@ -9,32 +9,10 @@
 .seat-breadcrumb {
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 12px;
     margin-bottom: 24px;
-    flex-wrap: wrap;
-    font-size: 14px;
-}
-
-.breadcrumb-step {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: #aaa;
-}
-
-.breadcrumb-step.completed .step-label {
+    font-size: 18px;
     color: #ff944d;
     font-weight: 600;
-}
-
-.breadcrumb-step.active .step-label {
-    color: #222;
-    font-weight: 700;
-}
-
-.step-arrow {
-    color: #bbb;
 }
 
 .seat-container-wrapper {
@@ -324,4 +302,37 @@ button.seat-btn--couple.seat-btn--selected {
 .seat-btn--sold.seat-btn--selected {
     background: #f0f0f0 !important;
     color: #aaa !important;
+}
+
+.seat-summary__food {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.seat-summary__food>span {
+    margin-bottom: 4px;
+}
+
+.food-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.food-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.food-name {
+    font-size: 14px;
+    color: #333;
+}
+
+.food-price {
+    font-size: 14px;
+    color: #000;
 }
