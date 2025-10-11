@@ -3,9 +3,9 @@ import { Row, Col, Select, Spin } from "antd";
 import "@/styles/movie-detail.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchActiveCinemasAPI, fetchMovieByIdAPI, fetchShowingMoviesAPI, fetchShowtimeByMovieAPI, getMediaUrlAPI } from "@/services/api.service";
-import MovieHero from "./MovieHero";
-import SidebarNowShowing from "./SidebarNowShowing";
-import MovieInfo from "./MovieInfo";
+import SidebarNowShowing from "@/components/client/movie-detail/SidebarNowShowing";
+import MovieInfo from "@/components/client/movie-detail/MovieInfo";
+import MovieHero from "@/components/client/movie-detail/MovieHero";
 
 const MovieDetailPage = () => {
 

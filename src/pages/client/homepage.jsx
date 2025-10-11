@@ -4,7 +4,7 @@ import "@/styles/homepage.css";
 import { fetchAllBannersActiveAPI, fetchComingSoonMoviesAPI, fetchShowingMoviesAPI } from "@/services/api.service";
 import MovieCard from "@/components/movie/movie.card";
 import BannerSection from "@/components/banner/banner.section";
-import TrailerModal from "./trailer.modal";
+import TrailerModal from "../../components/client/movie-detail/trailer.modal";
 
 const HomePage = () => {
 

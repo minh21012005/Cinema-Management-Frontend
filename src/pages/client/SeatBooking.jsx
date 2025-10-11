@@ -5,10 +5,10 @@ import { Col, message, Row } from "antd";
 import SockJS from "sockjs-client";
 import * as StompJs from "@stomp/stompjs";
 import { fetchSeatLayoutAPI, getMediaUrlAPI } from "@/services/api.service";
-import SeatMap from "./SeatMap";
-import SeatLegend from "./SeatLegend";
-import SeatInfo from "./SeatInfo";
-import SeatSummary from "./SeatSummary";
+import SeatMap from "../../components/client/seat-booking/SeatMap";
+import SeatLegend from "../../components/client/seat-booking/SeatLegend";
+import SeatInfo from "../../components/client/seat-booking/SeatInfo";
+import SeatSummary from "../../components/client/seat-booking/SeatSummary";
 
 const SeatBooking = () => {
     const location = useLocation();
