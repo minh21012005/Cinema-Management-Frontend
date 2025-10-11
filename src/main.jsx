@@ -30,7 +30,7 @@ import BannerListPage from './pages/manager/banner.list.jsx';
 import MovieDetailPage from './pages/client/MovieDetailPage.jsx';
 import ClientLayout from './components/layout/client/ClientLayout.jsx';
 import HomePage from './pages/client/homepage.jsx';
-import SeatBooking from './pages/client/SeatBooking.jsx';
+import SeatBooking from './pages/client/booking.jsx';
 import PrivateRouteClient from './pages/client/private.route.client.jsx';
 
 const router = createBrowserRouter([

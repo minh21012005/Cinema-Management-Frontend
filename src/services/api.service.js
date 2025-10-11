@@ -557,6 +557,11 @@ const fetchShowtimeByMovieAPI = (id, params) => {
     return axios.get(`/cinema-service/api/v1/showtime/movie/${id}`, { params });
 }
 
+const bookingAPI = (payload) => {
+    const URL_BACKEND = `/booking-service/api/v1/orders/booking`;
+    return axios.post(URL_BACKEND, payload);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -570,4 +575,5 @@ export {
     updatePermissionAPI, fetchShowtimeInDayForStaffAPI, fetchSeatLayoutAPI, fetchAllCombosActiveAPI, staffHandleBookingAPI,
     fetchQrCode, fetchActiveCinemasAPI, registerRequestApi, verifyOtpApi, fetchShowingMoviesAPI, fetchComingSoonMoviesAPI,
     createBannerAPI, fetchAllBannerAPI, fetchAllBannersActiveAPI, updateBannerAPI, fetchMovieByIdAPI, fetchShowtimeByMovieAPI,
+    bookingAPI
 }

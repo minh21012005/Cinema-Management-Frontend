@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import "@/styles/seat-booking.css";
-import { Col, message, Row, Tabs, Card } from "antd";
+import "@/styles/booking.css";
+import { Col, message, Row } from "antd";
 import SockJS from "sockjs-client";
 import * as StompJs from "@stomp/stompjs";
 import { fetchAllCombosActiveAPI, fetchAllFoodsActiveAPI, fetchSeatLayoutAPI, getMediaUrlAPI } from "@/services/api.service";
-import SeatMap from "../../components/client/seat-booking/SeatMap";
-import SeatLegend from "../../components/client/seat-booking/SeatLegend";
-import SeatInfo from "../../components/client/seat-booking/SeatInfo";
-import SeatSummary from "../../components/client/seat-booking/SeatSummary";
 import ClientFoodComboTab from "@/components/client/seat-booking/ClientFoodComboTab";
+import SeatMap from "@/components/client/seat-booking/SeatMap";
+import SeatLegend from "@/components/client/seat-booking/SeatLegend";
+import SeatInfo from "@/components/client/seat-booking/SeatInfo";
+import SeatSummary from "@/components/client/seat-booking/SeatSummary";
 
 const SeatBooking = () => {
     const location = useLocation();
@@ -45,9 +45,6 @@ const SeatBooking = () => {
                                 ? { ...seat, booked: true }
                                 : seat
                         )
-                    );
-                    setSelectedSeats((prev) =>
-                        prev.filter((seat) => !newlyBookedSeats.includes(seat.id))
                     );
                 });
             },
@@ -153,6 +150,7 @@ const SeatBooking = () => {
                             <SeatInfo movie={movie} showtime={showtime} poster={poster} />
                             <SeatSummary
                                 selectedSeats={selectedSeats}
+                                setSelectedSeats={setSelectedSeats}
                                 total={total}
                                 showtime={showtime}
                                 movie={movie}
