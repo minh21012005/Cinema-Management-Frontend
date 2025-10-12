@@ -16,7 +16,7 @@ import {
     CheckCircleTwoTone,
     CloseCircleTwoTone,
 } from "@ant-design/icons";
-import { fetchQrCode } from "@/services/api.service";
+import { cancelBookingAPI, fetchQrCode } from "@/services/api.service";
 
 const { Text, Title } = Typography;
 
@@ -83,6 +83,11 @@ const CartPayment = ({
             })
         }
     };
+
+    const handleCancel = async () => {
+        await cancelBookingAPI(orderId);
+        setQrModalVisible(false);
+    }
 
     return (
         <>
@@ -233,7 +238,7 @@ const CartPayment = ({
             <Modal
                 title="Quét mã QR để thanh toán"
                 open={qrModalVisible}
-                onCancel={() => setQrModalVisible(false)}
+                onCancel={() => handleCancel()}
                 footer={null}
                 centered
             >

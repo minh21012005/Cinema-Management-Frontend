@@ -1,5 +1,5 @@
-import { bookingAPI, fetchQrCode } from "@/services/api.service";
-import { Modal, Image } from "antd";
+import { bookingAPI, cancelBookingAPI, fetchQrCode } from "@/services/api.service";
+import { Modal, Image, notification } from "antd";
 import { useState } from "react";
 
 const SeatSummary = ({ selectedSeats, setSelectedSeats, total, showtime, movie, message, cartFood, foods, combos }) => {
@@ -49,6 +49,14 @@ const SeatSummary = ({ selectedSeats, setSelectedSeats, total, showtime, movie, 
     const handleBooking = async (method) => {
         const bookingData = buildBookingData(method);
         const res = await bookingAPI(bookingData);
+        if (!res.data) {
+            notification.error({
+                message: "Lỗi!",
+                description: JSON.stringify(res.message)
+            })
+            setSelectedSeats([]);
+            return;
+        }
         return res;
     };
 
@@ -68,8 +76,8 @@ const SeatSummary = ({ selectedSeats, setSelectedSeats, total, showtime, movie, 
         }
     };
 
-    const handleCancel = () => {
-        setSelectedSeats([]);
+    const handleCancel = async () => {
+        await cancelBookingAPI(orderId);
         setQrModalVisible(false);
     }
 

@@ -57,15 +57,28 @@ const SellTicketPage = () => {
         if (!stompClient || !stompClient.connected || !selectedShowtime) return;
 
         const sub = stompClient.subscribe(`/topic/seats/${selectedShowtime}`, (msg) => {
-            const bookedSeats = JSON.parse(msg.body);
-            setSeatLayouts((prev) =>
-                prev.map((seat) =>
-                    bookedSeats.includes(seat.id) ? { ...seat, booked: true } : seat
-                )
-            );
-        });
-        return () => sub.unsubscribe();
+            const payload = JSON.parse(msg.body);
 
+            if (payload.type === "BOOKED") {
+                setSeatLayouts((prev) =>
+                    prev.map((seat) =>
+                        payload.seatIds.includes(seat.id)
+                            ? { ...seat, booked: true }
+                            : seat
+                    )
+                );
+            } else if (payload.type === "RELEASED") {
+                setSeatLayouts((prev) =>
+                    prev.map((seat) =>
+                        payload.seatIds.includes(seat.id)
+                            ? { ...seat, booked: false }
+                            : seat
+                    )
+                );
+            }
+        });
+
+        return () => sub.unsubscribe();
     }, [stompClient, selectedShowtime]);
 
     // ---------------- Fetch API ----------------

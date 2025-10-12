@@ -38,14 +38,25 @@ const SeatBooking = () => {
             onConnect: () => {
                 console.log("✅ Connected to WebSocket");
                 client.subscribe(`/topic/seats/${showtime.id}`, (msg) => {
-                    const newlyBookedSeats = JSON.parse(msg.body);
-                    setSeatLayouts((prev) =>
-                        prev.map((seat) =>
-                            newlyBookedSeats.includes(seat.id)
-                                ? { ...seat, booked: true }
-                                : seat
-                        )
-                    );
+                    const payload = JSON.parse(msg.body);
+
+                    if (payload.type === "BOOKED") {
+                        setSeatLayouts((prev) =>
+                            prev.map((seat) =>
+                                payload.seatIds.includes(seat.id)
+                                    ? { ...seat, booked: true }
+                                    : seat
+                            )
+                        );
+                    } else if (payload.type === "RELEASED") {
+                        setSeatLayouts((prev) =>
+                            prev.map((seat) =>
+                                payload.seatIds.includes(seat.id)
+                                    ? { ...seat, booked: false }
+                                    : seat
+                            )
+                        );
+                    }
                 });
             },
             onStompError: (frame) => {
