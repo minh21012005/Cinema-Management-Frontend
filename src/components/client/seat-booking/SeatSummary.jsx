@@ -1,11 +1,32 @@
 import { bookingAPI, cancelBookingAPI, fetchQrCode } from "@/services/api.service";
 import { Modal, Image, notification } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const SeatSummary = ({ selectedSeats, setSelectedSeats, total, showtime, movie, message, cartFood, foods, combos }) => {
+const SeatSummary = ({ selectedSeats, setSelectedSeats, total, showtime, movie, message, cartFood, setCartFood, foods, combos, stompClient }) => {
     const [qrModalVisible, setQrModalVisible] = useState(false);
     const [qrData, setQrData] = useState(null); // lưu dữ liệu QR từ backend
     const [orderId, setOrderId] = useState(null);
+
+    useEffect(() => {
+        if (!stompClient || !stompClient.connected || !orderId) return;
+
+        const sub = stompClient.subscribe(`/topic/order-status/${orderId}`, (msg) => {
+            const orderData = JSON.parse(msg.body);
+            if (orderData.paid) {
+                notification.success({
+                    message: "Thanh toán thành công",
+                    description: `Đặt vé thành công, vé của quý khách sẽ sớm được gửi về email!`,
+                });
+                setQrModalVisible(false); // nếu đang mở modal QR, đóng đi
+                setQrData(null);
+                setOrderId(null);
+                setSelectedSeats([]);
+                setCartFood({});
+            }
+        });
+        return () => sub.unsubscribe();
+
+    }, [stompClient, orderId]);
 
     const selectedItems = Object.entries(cartFood)
         .filter(([_, qty]) => qty > 0)

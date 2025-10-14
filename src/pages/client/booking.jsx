@@ -26,6 +26,7 @@ const SeatBooking = () => {
     const [foodSearch, setFoodSearch] = useState("");
     const [comboSearch, setComboSearch] = useState("");
     const [cartFood, setCartFood] = useState({});
+    const [stompClient, setStompClient] = useState(null);
 
     // --- WebSocket ---
     useEffect(() => {
@@ -65,6 +66,7 @@ const SeatBooking = () => {
         });
 
         client.activate();
+        setStompClient(client); // 🟢 thêm dòng này
         return () => {
             if (client.active) client.deactivate();
         };
@@ -167,8 +169,10 @@ const SeatBooking = () => {
                                 movie={movie}
                                 message={message}
                                 cartFood={cartFood}
+                                setCartFood={setCartFood}
                                 foods={foods}
                                 combos={combos}
+                                stompClient={stompClient}
                             />
                         </div>
                     </Col>
