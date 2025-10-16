@@ -56,7 +56,7 @@ const MovieInfo = ({
                             </path>
                         </svg>
                         <div className="rating-number">
-                            <span>{movie.rating}</span> <span className="muted">(22 votes)</span>
+                            <span>{movie.ratingAvg}</span> <span className="muted">({movie.ratingCount} votes)</span>
                         </div>
                     </div>
 

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Row, Col, Select, Spin } from "antd";
+import { Row, Col, Select, Spin, Divider } from "antd";
 import "@/styles/movie-detail.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchActiveCinemasAPI, fetchMovieByIdAPI, fetchShowingMoviesAPI, fetchShowtimeByMovieAPI, getMediaUrlAPI } from "@/services/api.service";
 import SidebarNowShowing from "@/components/client/movie-detail/SidebarNowShowing";
 import MovieInfo from "@/components/client/movie-detail/MovieInfo";
 import MovieHero from "@/components/client/movie-detail/MovieHero";
+import MovieReviewSection from "@/components/client/movie-detail/MovieReviewSection";
 
 const MovieDetailPage = () => {
 
@@ -200,6 +201,10 @@ const MovieDetailPage = () => {
                                     cinemas={cinemas}
                                     getScheduleByCinema={getScheduleByCinema}
                                 />
+                                <Divider />
+                                <MovieReviewSection
+                                    fetchMovie={fetchMovie}
+                                    movieId={movie.id} />
                             </Col>
                             <Col xs={24} lg={5}>
                                 <SidebarNowShowing

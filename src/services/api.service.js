@@ -566,6 +566,25 @@ const cancelBookingAPI = (id) => {
     return axios.delete(`/booking-service/api/v1/orders/${id}`);
 }
 
+const fetchRatingsByMovieAPI = (current, pageSize, id) => {
+    return axios.get(`/movie-service/api/v1/ratings/movies/${id}`, {
+        params: {
+            page: current,
+            size: pageSize,
+        }
+    });
+}
+
+const createRatingAPI = (movieId, rating, comment) => {
+    const URL_BACKEND = "/movie-service/api/v1/ratings";
+    const payload = {
+        movieId: movieId,
+        stars: rating,
+        comment: comment
+    }
+    return axios.post(URL_BACKEND, payload);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -579,5 +598,5 @@ export {
     updatePermissionAPI, fetchShowtimeInDayForStaffAPI, fetchSeatLayoutAPI, fetchAllCombosActiveAPI, staffHandleBookingAPI,
     fetchQrCode, fetchActiveCinemasAPI, registerRequestApi, verifyOtpApi, fetchShowingMoviesAPI, fetchComingSoonMoviesAPI,
     createBannerAPI, fetchAllBannerAPI, fetchAllBannersActiveAPI, updateBannerAPI, fetchMovieByIdAPI, fetchShowtimeByMovieAPI,
-    bookingAPI, cancelBookingAPI
+    bookingAPI, cancelBookingAPI, fetchRatingsByMovieAPI, createRatingAPI
 }

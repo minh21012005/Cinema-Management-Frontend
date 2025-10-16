@@ -68,7 +68,9 @@ instance.interceptors.response.use(function (response) {
             } else {
                 window.localStorage.removeItem("access_token");
                 const currentPath = window.location.pathname;
-                if (currentPath !== "/login" && currentPath !== "/register") {
+                const allowedPaths = ["/login", "/register", "/booking/"];
+
+                if (!allowedPaths.some(path => currentPath.startsWith(path))) {
                     window.location.href = "/";
                 }
             }

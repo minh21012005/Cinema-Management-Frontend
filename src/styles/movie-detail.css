@@ -188,7 +188,7 @@
     color: #0d3b73;
     border-left: 4px solid #0d3b73;
     padding-left: 10px;
-    margin: 20px 0 12px;
+    margin: 25px 0 12px;
 }
 
 .description {
@@ -447,6 +447,25 @@
 /* Nếu muốn các item trong info-block cũng giãn */
 .info-item {
     margin-bottom: 8px;
+}
+
+.review-list {
+    margin-bottom: 10vh;
+}
+
+.review-form p {
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.review-form .ant-rate {
+    font-size: 22px;
+    color: #ff7a2d;
+}
+
+.review-list h4 {
+    color: #0d3b73;
+    font-weight: 600;
 }
 
 /* Giữ bố cục ổn định trên mobile */
