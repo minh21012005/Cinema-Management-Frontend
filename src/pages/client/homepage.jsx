@@ -5,7 +5,6 @@ import { fetchAllBannersActiveAPI, fetchComingSoonMoviesAPI, fetchShowingMoviesA
 import MovieCard from "@/components/movie/movie.card";
 import BannerSection from "@/components/banner/banner.section";
 import TrailerModal from "../../components/client/movie-detail/trailer.modal";
-import ChatBotComponent from "../chatbot/ChatBot";
 
 const HomePage = () => {
 
@@ -111,8 +110,6 @@ const HomePage = () => {
                     <p>Nhận ưu đãi, giảm giá, và vé sớm dành riêng cho bạn!</p>
                     <Button type="primary" size="large" className="footer-btn">Đăng ký ngay</Button>
                 </div>
-
-                <ChatBotComponent />
             </div>
         </>
     );

@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Input, Button, Spin, FloatButton, message as antdMessage } from "antd";
-import { SendOutlined, RobotOutlined, CloseOutlined, MessageOutlined } from "@ant-design/icons";
+import { SendOutlined, RobotOutlined, MessageOutlined, CloseOutlined } from "@ant-design/icons";
+import { motion, AnimatePresence } from "framer-motion";
+import "@/styles/chatbot.css";
 
 const { TextArea } = Input;
 
@@ -10,6 +12,7 @@ const ChatBotComponent = () => {
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const messagesEndRef = useRef(null);
+    const messagesContainerRef = useRef(null);
 
     useEffect(() => {
         const fakeMessages = [
@@ -27,7 +30,7 @@ const ChatBotComponent = () => {
 
     useEffect(() => {
         if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
     }, [messages]);
 
@@ -62,16 +65,13 @@ const ChatBotComponent = () => {
         }
     };
 
-    // Ngăn scroll trang ngoài khi scroll chat
     const handleWheel = (e) => {
         const target = e.currentTarget;
         const atTop = target.scrollTop === 0 && e.deltaY < 0;
         const atBottom =
             target.scrollHeight - target.scrollTop === target.clientHeight &&
             e.deltaY > 0;
-        if (atTop || atBottom) {
-            e.preventDefault();
-        }
+        if (atTop || atBottom) e.preventDefault();
     };
 
     return (
@@ -87,103 +87,166 @@ const ChatBotComponent = () => {
                 />
             )}
 
-            {open && (
-                <div
-                    style={{
-                        position: "fixed",
-                        bottom: 20,
-                        right: 24,
-                        width: 380,
-                        height: 520,
-                        zIndex: 9999,
-                        boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
-                        borderRadius: 12,
-                        overflow: "hidden",
-                        background: "#fff",
-                        display: "flex",
-                        flexDirection: "column",
-                    }}
-                >
-                    {/* Header */}
-                    <div
+            <AnimatePresence>
+                {open && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.7, y: 50 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.7, y: 50 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
                         style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            padding: "12px",
-                            borderBottom: "1px solid #f0f0f0",
+                            position: "fixed",
+                            bottom: 20,
+                            right: 24,
+                            width: 380,
+                            height: 520,
+                            zIndex: 9999,
+                            boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
+                            borderRadius: 12,
+                            overflow: "hidden",
                             background: "#fff",
-                        }}
-                    >
-                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <RobotOutlined /> CNM Cinemas Assistant
-                        </div>
-                        <Button type="text" onClick={() => setOpen(false)}>
-                            ❌
-                        </Button>
-                    </div>
-
-                    {/* Messages */}
-                    <div
-                        style={{
-                            flex: 1,
-                            overflowY: "auto",
-                            padding: "12px",
                             display: "flex",
                             flexDirection: "column",
                         }}
-                        onWheel={handleWheel}
                     >
-                        {messages.map((msg, index) => (
-                            <div
-                                key={index}
-                                style={{
-                                    display: "flex",
-                                    justifyContent: msg.sender === "USER" ? "flex-end" : "flex-start",
-                                    marginBottom: 8,
-                                }}
-                            >
+                        {/* Header */}
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                padding: "12px",
+                                borderBottom: "1px solid #f0f0f0",
+                                background: "#fff",
+                            }}
+                        >
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                <RobotOutlined /> CNM Cinemas Assistant
+                            </div>
+                            <Button type="text" onClick={() => setOpen(false)}>
+                                <CloseOutlined />
+                            </Button>
+                        </div>
+
+                        {/* Messages */}
+                        <div
+                            className="chat-container"
+                            ref={messagesContainerRef}
+                            onWheel={handleWheel}
+                            style={{
+                                flex: 1,
+                                overflowY: "auto",
+                                padding: "12px",
+                                display: "flex",
+                                flexDirection: "column",
+                            }}
+                        >
+                            {messages.map((msg, index) => (
                                 <div
+                                    key={index}
                                     style={{
-                                        background: msg.sender === "USER" ? "#1677ff" : "#f1f1f1",
-                                        color: msg.sender === "USER" ? "#fff" : "#000",
-                                        padding: "8px 12px",
-                                        borderRadius: 16,
-                                        maxWidth: "75%",
-                                        whiteSpace: "pre-wrap",
-                                        lineHeight: 1.4,
+                                        display: "flex",
+                                        justifyContent: msg.sender === "USER" ? "flex-end" : "flex-start",
+                                        marginBottom: 8,
+                                        alignItems: "flex-end",
                                     }}
                                 >
-                                    {msg.content}
-                                </div>
-                            </div>
-                        ))}
-                        {loading && <Spin size="small" />}
-                        <div ref={messagesEndRef} />
-                    </div>
+                                    {/* Avatar chỉ hiển thị cho BOT */}
+                                    {msg.sender === "BOT" && (
+                                        <div
+                                            style={{
+                                                width: 32,
+                                                height: 32,
+                                                borderRadius: "50%",
+                                                backgroundColor: "#1677ff",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                color: "#fff",
+                                                fontSize: 18,
+                                                marginRight: 8,
+                                                flexShrink: 0,
+                                            }}
+                                        >
+                                            🤖
+                                        </div>
+                                    )}
 
-                    {/* Input */}
-                    <div
-                        style={{
-                            borderTop: "1px solid #f0f0f0",
-                            padding: "10px 12px",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 8,
-                        }}
-                    >
-                        <TextArea
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            onKeyDown={handleKeyPress}
-                            placeholder="Nhập tin nhắn..."
-                            autoSize={{ minRows: 1, maxRows: 3 }}
-                            style={{ flex: 1, resize: "none", borderRadius: 8 }}
-                        />
-                        <Button type="primary" icon={<SendOutlined />} onClick={handleSend} disabled={loading} />
-                    </div>
-                </div>
-            )}
+                                    <div
+                                        style={{
+                                            background: msg.sender === "USER" ? "#1677ff" : "#f1f1f1",
+                                            color: msg.sender === "USER" ? "#fff" : "#000",
+                                            padding: "8px 12px",
+                                            borderRadius: 16,
+                                            maxWidth: "75%",
+                                            whiteSpace: "pre-wrap",
+                                            lineHeight: 1.4,
+                                            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                                            transformOrigin: msg.sender === "USER" ? "100% 0%" : "0% 0%",
+                                        }}
+                                    >
+                                        {msg.content}
+                                    </div>
+                                </div>
+                            ))}
+
+                            {loading && (
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        marginBottom: 8,
+                                    }}
+                                >
+                                    {/* Avatar BOT */}
+                                    <div
+                                        style={{
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: "50%",
+                                            backgroundColor: "#1677ff",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            color: "#fff",
+                                            fontSize: 18,
+                                            marginRight: 8,
+                                            flexShrink: 0,
+                                        }}
+                                    >
+                                        🤖
+                                    </div>
+                                    {/* Spin sát avatar */}
+                                    <Spin size="small" />
+                                </div>
+                            )}
+                            <div style={{ height: 20 }} />
+                            <div ref={messagesEndRef} />
+                        </div>
+
+                        {/* Input */}
+                        <div
+                            style={{
+                                borderTop: "1px solid #f0f0f0",
+                                padding: "10px 12px",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                            }}
+                        >
+                            <TextArea
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                onKeyDown={handleKeyPress}
+                                placeholder="Nhập tin nhắn..."
+                                autoSize={{ minRows: 1, maxRows: 3 }}
+                                style={{ flex: 1, resize: "none", borderRadius: 8 }}
+                            />
+                            <Button type="primary" icon={<SendOutlined />} onClick={handleSend} disabled={loading} />
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </>
     );
 };
