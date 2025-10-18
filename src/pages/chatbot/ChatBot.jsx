@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext, useLayoutEffect } from "react";
 import { Input, Button, Spin, FloatButton, message as antdMessage } from "antd";
 import { SendOutlined, RobotOutlined, MessageOutlined, CloseOutlined } from "@ant-design/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import "@/styles/chatbot.css";
+import { chatBotAPI, fetchChatBotHistory, fetchChatBotHistoryForUser } from "@/services/api.service";
 
 const { TextArea } = Input;
 
@@ -11,21 +12,17 @@ const ChatBotComponent = () => {
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
+    const [sessionId, setSessionId] = useState(null); // 🌟 Quản lý session
     const messagesEndRef = useRef(null);
     const messagesContainerRef = useRef(null);
+    const [userId, setUserId] = useState(null);
 
     useEffect(() => {
-        const fakeMessages = [
-            { sender: "BOT", content: "Xin chào! Tôi là CNM Assistant 🤖" },
-            ...Array.from({ length: 15 }).map((_, i) => ({
-                sender: i % 2 === 0 ? "USER" : "BOT",
-                content:
-                    i % 2 === 0
-                        ? `Tin nhắn thử nghiệm số ${i + 1} từ người dùng để kiểm tra khả năng cuộn.`
-                        : `Đây là phản hồi mẫu từ chatbot cho tin nhắn thứ ${i + 1}.`,
-            })),
-        ];
-        setMessages(fakeMessages);
+        const storedUserId = localStorage.getItem("userId");
+        if (storedUserId) setUserId(storedUserId);
+
+        const welcomeMsg = { sender: "BOT", content: "Xin chào! Tôi là CNM Assistant 🤖" };
+        setMessages([welcomeMsg]);
     }, []);
 
     useEffect(() => {
@@ -34,25 +31,76 @@ const ChatBotComponent = () => {
         }
     }, [messages]);
 
+    useLayoutEffect(() => {
+        if (open && messagesContainerRef.current) {
+            const container = messagesContainerRef.current;
+
+            // Chờ frame đầu tiên để đảm bảo layout tin nhắn đã render xong
+            requestAnimationFrame(() => {
+                container.scrollTop = container.scrollHeight;
+            });
+        }
+    }, [open, messages]);
+
+    useEffect(() => {
+        const savedSession = localStorage.getItem("chatSessionId");
+        setSessionId(savedSession);
+
+        const loadHistory = async () => {
+            try {
+                let res;
+                if (userId) {
+                    res = await fetchChatBotHistoryForUser(userId);
+                } else if (savedSession) {
+                    res = await fetchChatBotHistory(savedSession);
+                }
+
+                // Cập nhật messages: nếu có dữ liệu từ backend thì dùng, nếu không thì tin nhắn mặc định
+                setMessages(
+                    res?.data?.length
+                        ? res.data
+                        : [{ sender: "BOT", content: "Xin chào! Tôi là CNM Assistant 🤖" }]
+                );
+            } catch (err) {
+                console.error("Load chat history failed:", err);
+                setMessages([{ sender: "BOT", content: "Xin chào! Tôi là CNM Assistant 🤖" }]);
+            }
+        };
+
+        loadHistory();
+    }, [userId]);
+
     const handleSend = async () => {
         if (!input.trim()) return;
+
         const userMessage = { sender: "USER", content: input };
-        setMessages((prev) => [...prev, userMessage]);
+        setMessages(prev => [...prev, userMessage]);
         setInput("");
         setLoading(true);
 
         try {
-            await new Promise((r) => setTimeout(r, 800));
+            // Tạo payload gửi lên backend
+            const payload = { content: input };
+            if (sessionId) payload.sessionId = sessionId; // gửi sessionId nếu có
+
+            // Gọi API với payload
+            const res = await chatBotAPI(payload);
+
             const botReply = {
-                sender: "BOT",
-                content:
-                    input.includes("phim")
-                        ? "Hiện đang có 4 phim hot: Dune 2, Venom 3, Joker 2 và Kungfu Panda 4 🍿"
-                        : "Cảm ơn bạn! Mình đang ghi nhận thông tin nhé 🤖",
+                sender: res.data.sender,
+                content: res.data.content,
             };
-            setMessages((prev) => [...prev, botReply]);
+
+            setMessages(prev => [...prev, botReply]);
+
+            // Lưu sessionId lần đầu để các tin nhắn tiếp theo dùng chung
+            if (!sessionId && res.data.sessionId) {
+                setSessionId(res.data.sessionId);
+                localStorage.setItem("chatSessionId", res.data.sessionId);
+            }
+
         } catch (err) {
-            antdMessage.error("Không thể gửi tin nhắn, vui lòng thử lại!");
+            antdMessage.error(res?.message || "Không thể gửi tin nhắn, vui lòng thử lại!");
         } finally {
             setLoading(false);
         }
@@ -151,7 +199,6 @@ const ChatBotComponent = () => {
                                         alignItems: "flex-end",
                                     }}
                                 >
-                                    {/* Avatar chỉ hiển thị cho BOT */}
                                     {msg.sender === "BOT" && (
                                         <div
                                             style={{
@@ -198,7 +245,6 @@ const ChatBotComponent = () => {
                                         marginBottom: 8,
                                     }}
                                 >
-                                    {/* Avatar BOT */}
                                     <div
                                         style={{
                                             width: 32,
@@ -216,7 +262,6 @@ const ChatBotComponent = () => {
                                     >
                                         🤖
                                     </div>
-                                    {/* Spin sát avatar */}
                                     <Spin size="small" />
                                 </div>
                             )}

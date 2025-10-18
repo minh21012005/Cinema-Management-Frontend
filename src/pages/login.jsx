@@ -17,7 +17,9 @@ const LoginPage = () => {
         const res = await loginApi(values.email, values.password);
         if (res.data) {
             message.success("Đăng nhập thành công");
+            localStorage.removeItem("chatSessionId");
             localStorage.setItem("access_token", res.data.access_token);
+            localStorage.setItem("userId", res.data.user.id);
             setUser(res.data.user);
             if (res.data.user.role.name === 'ADMIN') {
                 navigate("/admin");

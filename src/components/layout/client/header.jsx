@@ -6,10 +6,8 @@ import { AuthContext } from "@/components/context/auth.context";
 import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { Dropdown, message } from "antd";
 import { logoutApi } from "@/services/api.service";
-import { useNavigate } from "react-router-dom";
 
 const Header = () => {
-    const navigate = useNavigate();
 
     const { user, setUser } = useContext(AuthContext);
 
@@ -20,8 +18,10 @@ const Header = () => {
             console.error(err);
         } finally {
             setUser(null);
-            navigate("/");
             localStorage.removeItem("access_token");
+            localStorage.removeItem("chatSessionId");
+            localStorage.removeItem("userId");
+            window.location.href = "/";
             message.success("Đăng xuất thành công");
         }
     };
