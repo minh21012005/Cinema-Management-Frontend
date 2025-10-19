@@ -3,7 +3,7 @@ import { Input, Button, Spin, FloatButton, message as antdMessage } from "antd";
 import { SendOutlined, RobotOutlined, MessageOutlined, CloseOutlined } from "@ant-design/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import "@/styles/chatbot.css";
-import { chatBotAPI, fetchChatBotHistory, fetchChatBotHistoryForUser } from "@/services/api.service";
+import { chatBotAPI, fetchChatBotHistory, fetchChatBotHistoryForUser, resetChatBotSession } from "@/services/api.service";
 
 const { TextArea } = Input;
 
@@ -59,7 +59,7 @@ const ChatBotComponent = () => {
                 setMessages(
                     res?.data?.length
                         ? res.data
-                        : [{ sender: "BOT", content: "Xin chào! Tôi là CNM Assistant 🤖" }]
+                        : [{ sender: "BOT", content: "Xin chào! Tôi là CNM Assistant, bạn cần tôi hỗ trợ gì? 🤖" }]
                 );
             } catch (err) {
                 console.error("Load chat history failed:", err);
@@ -122,6 +122,21 @@ const ChatBotComponent = () => {
         if (atTop || atBottom) e.preventDefault();
     };
 
+    const handleResetSession = async () => {
+        try {
+            await resetChatBotSession();
+            localStorage.removeItem("chatSessionId"); // Xoá session hiện tại
+            setSessionId(null);
+            setMessages([
+                { sender: "BOT", content: "Bắt đầu cuộc trò chuyện mới 🤖" },
+            ]);
+            antdMessage.success("Đã bắt đầu cuộc trò chuyện mới!");
+        } catch (err) {
+            console.error("Reset session failed:", err);
+            antdMessage.error("Không thể reset cuộc trò chuyện!");
+        }
+    };
+
     return (
         <>
             {!open && (
@@ -171,9 +186,14 @@ const ChatBotComponent = () => {
                             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                 <RobotOutlined /> CNM Cinemas Assistant
                             </div>
-                            <Button type="text" onClick={() => setOpen(false)}>
-                                <CloseOutlined />
-                            </Button>
+                            <div style={{ display: "flex", gap: 6 }}>
+                                <Button type="text" onClick={handleResetSession}>
+                                    New Chat
+                                </Button>
+                                <Button type="text" onClick={() => setOpen(false)}>
+                                    <CloseOutlined />
+                                </Button>
+                            </div>
                         </div>
 
                         {/* Messages */}

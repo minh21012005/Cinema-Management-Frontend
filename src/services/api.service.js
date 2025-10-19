@@ -591,12 +591,17 @@ const chatBotAPI = (payload) => {
 };
 
 const fetchChatBotHistory = (sessionId) => {
-    return axios.get(`/communication-service/api/v1/chat-bot/history/${sessionId}`);
+    return axios.get(`/communication-service/api/v1/chat-messages/history/${sessionId}`);
 }
 
 const fetchChatBotHistoryForUser = (userId) => {
-    return axios.get(`/communication-service/api/v1/chat-bot/history/users/${userId}`);
+    return axios.get(`/communication-service/api/v1/chat-messages/history/users/${userId}`);
 }
+
+const resetChatBotSession = () => {
+    const URL_BACKEND = "/communication-service/api/v1/chat-sessions/reset";
+    return axios.post(URL_BACKEND);
+};
 
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
@@ -611,5 +616,6 @@ export {
     updatePermissionAPI, fetchShowtimeInDayForStaffAPI, fetchSeatLayoutAPI, fetchAllCombosActiveAPI, staffHandleBookingAPI,
     fetchQrCode, fetchActiveCinemasAPI, registerRequestApi, verifyOtpApi, fetchShowingMoviesAPI, fetchComingSoonMoviesAPI,
     createBannerAPI, fetchAllBannerAPI, fetchAllBannersActiveAPI, updateBannerAPI, fetchMovieByIdAPI, fetchShowtimeByMovieAPI,
-    bookingAPI, cancelBookingAPI, fetchRatingsByMovieAPI, createRatingAPI, chatBotAPI, fetchChatBotHistory, fetchChatBotHistoryForUser
+    bookingAPI, cancelBookingAPI, fetchRatingsByMovieAPI, createRatingAPI, chatBotAPI, fetchChatBotHistory, fetchChatBotHistoryForUser,
+    resetChatBotSession
 }
