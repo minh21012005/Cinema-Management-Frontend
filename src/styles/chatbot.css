@@ -4,8 +4,8 @@
     position: fixed;
     bottom: 20px;
     right: 24px;
-    width: 400px;
-    height: 550px;
+    width: 390px;
+    height: 520px;
     background: #fff;
     border-radius: 16px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
@@ -100,6 +100,25 @@
     border-top: 1px solid #eee;
     background: white;
     gap: 8px;
+}
+
+.ant-float-btn.support-float-btn .ant-float-btn-body {
+    background-color: #ffffff !important;
+    border-color: #d9d9d9 !important;
+    color: #333 !important;
+    /* Màu icon */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+}
+
+.ant-float-btn.support-float-btn .ant-float-btn-body svg {
+    fill: currentColor !important;
+    /* ép icon ăn theo màu chữ */
+}
+
+.ant-float-btn.support-float-btn:hover .ant-float-btn-body {
+    background-color: #f5f5f5 !important;
+    border-color: #bfbfbf !important;
+    color: #000 !important;
 }
 
 @keyframes fadeIn {
