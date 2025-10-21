@@ -57,12 +57,23 @@
     justify-content: flex-start;
 }
 
+/* Căn thẳng các tin nhắn của agent */
+.chatbot-message.bot .chat-bubble {
+    margin-left: 42px;
+    /* chừa chỗ avatar */
+}
+
+/* Nếu có avatar thì bỏ khoảng trống để thẳng hàng */
+.chatbot-message.bot .bot-avatar+.chat-bubble {
+    margin-left: 0;
+}
+
 .chatbot-message.user {
     justify-content: flex-end;
 }
 
 .chat-bubble {
-    padding: 10px 14px;
+    padding: 8px 14px;
     border-radius: 20px;
     max-width: 75%;
     word-break: break-word;

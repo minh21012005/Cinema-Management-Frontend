@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { Input, Button, Spin, FloatButton, message as antdMessage } from "antd";
-import { SendOutlined, CustomerServiceOutlined, CloseOutlined, ReloadOutlined, MessageOutlined } from "@ant-design/icons";
+import { SendOutlined, CustomerServiceOutlined, CloseOutlined, ReloadOutlined } from "@ant-design/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import "@/styles/chatbot.css";
 import { createSupportMessageAPI, fetchSupportHistoryAPI } from "@/services/api.service";
+import SockJS from "sockjs-client";
+import Stomp from "stompjs";
 
 const { TextArea } = Input;
 
@@ -12,12 +14,73 @@ const CustomerSupportChat = () => {
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
-    const messagesEndRef = useRef(null);
-    const messagesContainerRef = useRef(null);
+    const [sessionId, setSessionId] = useState(null);
+    const [connected, setConnected] = useState(false);
 
-    // ⏳ Lấy userId và khởi tạo lời chào
+    const messagesContainerRef = useRef(null);
+    const stompClientRef = useRef(null);
+
+    const token = window.localStorage.getItem("access_token");
+    const baseWebSocketUrl = import.meta.env.VITE_BACKEND_WEBSOCKET_CHAT_URL;
+    const socketUrl = `${baseWebSocketUrl}/ws?accessToken=${token}`;
+
+    // 1️⃣ Kết nối WebSocket một lần
     useEffect(() => {
-        setMessages([{ sender: "AGENT", content: "Xin chào 👋 Bộ phận CSKH có thể giúp gì cho bạn hôm nay?" }]);
+        const socket = new SockJS(socketUrl);
+        const client = Stomp.over(socket);
+        client.debug = null; // tắt log thừa
+        stompClientRef.current = client;
+
+        client.connect(
+            {},
+            () => {
+                console.log("✅ Connected to WebSocket");
+                setConnected(true);
+            },
+            (error) => {
+                console.error("❌ WebSocket error:", error);
+                setConnected(false);
+            }
+        );
+
+        return () => {
+            if (client.connected) {
+                client.disconnect(() => console.log("🔌 Disconnected"));
+            }
+        };
+    }, []);
+
+    // 2️⃣ Khi đã connected và có sessionId thì subscribe
+    useEffect(() => {
+        if (!connected || !sessionId) return;
+        const client = stompClientRef.current;
+        if (!client || !client.connected) return;
+
+        console.log("🧩 Subscribing to:", `/topic/agent/support-messages/${sessionId}`);
+        const sub = client.subscribe(`/topic/agent/support-messages/${sessionId}`, (msg) => {
+            const newMsg = JSON.parse(msg.body);
+            setMessages((prev) => [...prev, newMsg]);
+        });
+
+        return () => sub.unsubscribe();
+    }, [connected, sessionId]);
+
+    // 🗄️ Load lịch sử tin nhắn khi mở
+    useEffect(() => {
+        const loadHistory = async () => {
+            try {
+                const res = await fetchSupportHistoryAPI();
+                if (res?.data?.length) {
+                    setMessages(res.data);
+                    setSessionId(res.data[0].sessionId);
+                } else {
+                    setMessages([{ sender: "AGENT", content: "Xin chào 👋 Bộ phận CSKH có thể giúp gì cho bạn hôm nay?" }]);
+                }
+            } catch {
+                setMessages([{ sender: "AGENT", content: "Xin chào 👋 Bộ phận CSKH có thể giúp gì cho bạn hôm nay?" }]);
+            }
+        };
+        loadHistory();
     }, []);
 
     // 🔄 Cuộn xuống khi có tin mới
@@ -29,23 +92,6 @@ const CustomerSupportChat = () => {
         }
     }, [open, messages]);
 
-    // 🗄️ Load lịch sử tin nhắn khi mở
-    useEffect(() => {
-        const loadHistory = async () => {
-            try {
-                const res = await fetchSupportHistoryAPI();
-                if (res?.data?.length) {
-                    setMessages(res.data);
-                } else {
-                    setMessages([{ sender: "AGENT", content: "Xin chào 👋 Bộ phận CSKH có thể giúp gì cho bạn hôm nay?" }]);
-                }
-            } catch {
-                setMessages([{ sender: "AGENT", content: "Xin chào 👋 Bộ phận CSKH có thể giúp gì cho bạn hôm nay?" }]);
-            }
-        };
-        loadHistory();
-    }, []);
-
     // ✉️ Gửi tin nhắn
     const handleSend = async () => {
         if (!input.trim()) return;
@@ -55,45 +101,26 @@ const CustomerSupportChat = () => {
         setLoading(true);
 
         try {
-            // Gửi tin nhắn
             const payload = { content: input };
             const resSend = await createSupportMessageAPI(payload);
-
             if (!resSend?.data) {
-                antdMessage.error("Không thể gửi tin nhắn, vui lòng thử lại!");
+                antdMessage.error("Không thể gửi tin nhắn!");
                 return;
             }
-
-            // Giả lập phản hồi tạm (nếu backend xử lý async)
-            setTimeout(() => {
-                setMessages(prev => [
-                    ...prev,
-                    { sender: "AGENT", content: "Cảm ơn bạn, CSKH sẽ phản hồi trong ít phút!" },
-                ]);
-                setLoading(false);
-            }, 1000);
+            if (!sessionId && resSend.data.sessionId) {
+                setSessionId(resSend.data.sessionId);
+            }
         } catch {
-            antdMessage.error("Không thể gửi tin nhắn, vui lòng thử lại!");
+            antdMessage.error("Không thể gửi tin nhắn!");
+        } finally {
             setLoading(false);
         }
     };
 
-    // ⌨️ Gửi khi Enter
     const handleKeyPress = (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             handleSend();
-        }
-    };
-
-    // 🔁 Reset session
-    const handleResetSession = async () => {
-        try {
-            await resetSupportSessionAPI();
-            setMessages([{ sender: "AGENT", content: "Bắt đầu cuộc trò chuyện mới với CSKH 🧑‍💼" }]);
-            antdMessage.success("Đã bắt đầu cuộc trò chuyện mới!");
-        } catch {
-            antdMessage.error("Không thể reset cuộc trò chuyện!");
         }
     };
 
@@ -108,7 +135,7 @@ const CustomerSupportChat = () => {
                     className="support-float-btn"
                     style={{
                         right: 24,
-                        bottom: 74, // nằm ngay trên chatbot
+                        bottom: 74,
                         backgroundColor: "#fa8c16",
                         boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
                     }}
@@ -125,44 +152,42 @@ const CustomerSupportChat = () => {
                         exit={{ opacity: 0, scale: 0.9 }}
                         transition={{ duration: 0.3 }}
                     >
-                        {/* Header */}
-                        <div
-                            className="chatbot-header"
-                            style={{ background: "linear-gradient(135deg, #fa8c16, #d46b08)" }}
-                        >
+                        <div className="chatbot-header" style={{ background: "linear-gradient(135deg, #fa8c16, #d46b08)" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                 <CustomerServiceOutlined /> CSKH Rạp CNM
                             </div>
-                            <div className="actions" style={{ display: "flex", gap: 6 }}>
-                                <Button icon={<ReloadOutlined />} type="text" onClick={handleResetSession} />
-                                <Button icon={<CloseOutlined />} type="text" onClick={() => setOpen(false)} />
-                            </div>
+                            <Button icon={<CloseOutlined />} type="text" onClick={() => setOpen(false)} />
                         </div>
 
-                        {/* Body */}
                         <div className="chatbot-body" ref={messagesContainerRef}>
-                            {messages.map((msg, i) => (
-                                <div key={i} className={`chatbot-message ${msg.sender === "USER" ? "user" : "bot"}`}>
-                                    {msg.sender === "AGENT" && (
-                                        <div className="bot-avatar" style={{ backgroundColor: "#fa8c16" }}>
-                                            🧑‍💼
+                            {messages.map((msg, i) => {
+                                const showAvatar =
+                                    msg.sender === "AGENT" &&
+                                    (i === 0 || messages[i - 1].sender !== "AGENT");
+
+                                return (
+                                    <div key={i} className={`chatbot-message ${msg.sender === "USER" ? "user" : "bot"}`}>
+                                        {showAvatar && (
+                                            <div className="bot-avatar" style={{ backgroundColor: "#fa8c16" }}>
+                                                🧑‍💼
+                                            </div>
+                                        )}
+                                        <div
+                                            style={{ fontSize: "15px" }}
+                                            className={`chat-bubble ${msg.sender === "USER" ? "user" : "bot"}`}>
+                                            {msg.content}
                                         </div>
-                                    )}
-                                    <div className={`chat-bubble ${msg.sender === "USER" ? "user" : "bot"}`}>
-                                        {msg.content}
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                             {loading && (
                                 <div className="chatbot-message bot">
                                     <div className="bot-avatar" style={{ backgroundColor: "#fa8c16" }}>🧑‍💼</div>
                                     <Spin size="small" />
                                 </div>
                             )}
-                            <div ref={messagesEndRef} />
                         </div>
 
-                        {/* Input */}
                         <div className="chatbot-input">
                             <TextArea
                                 value={input}

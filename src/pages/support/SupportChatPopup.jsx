@@ -12,6 +12,8 @@ import {
     getSupportMessagesAPI,
     sendSupportMessageAPI,
 } from "@/services/api.service";
+import SockJS from "sockjs-client";
+import Stomp from "stompjs";
 
 const { TextArea } = Input;
 
@@ -22,11 +24,39 @@ const SupportChatPopup = ({ session, onClose }) => {
     const messagesEndRef = useRef(null);
     const messagesContainerRef = useRef(null);
 
+    const stompClientRef = useRef(null);
+
+    const token = window.localStorage.getItem("access_token");
+    const baseWebSocketUrl = import.meta.env.VITE_BACKEND_WEBSOCKET_CHAT_URL;
+    const socketUrl = `${baseWebSocketUrl}/ws?accessToken=${token}`;
+
     useEffect(() => {
         if (session?.sessionId) {
             fetchMessages();
+            connectWebSocket();
         }
+
+        return () => disconnectWebSocket();
     }, [session]);
+
+    const connectWebSocket = () => {
+        const socket = new SockJS(socketUrl);
+        const client = Stomp.over(socket);
+        stompClientRef.current = client;
+
+        client.connect({}, () => {
+            client.subscribe(`/topic/user/support-messages/${session.sessionId}`, (msg) => {
+                const newMsg = JSON.parse(msg.body);
+                setMessages((prev) => [...prev, newMsg]);
+            });
+        });
+    };
+
+    const disconnectWebSocket = () => {
+        if (stompClientRef.current) {
+            stompClientRef.current.disconnect();
+        }
+    };
 
     const fetchMessages = async () => {
         try {
@@ -98,28 +128,32 @@ const SupportChatPopup = ({ session, onClose }) => {
 
                 {/* Body */}
                 <div className="chatbot-body" ref={messagesContainerRef}>
-                    {messages.map((msg, i) => (
-                        <div
-                            key={i}
-                            className={`chatbot-message ${msg.sender === "AGENT" ? "user" : "bot"
-                                }`}
-                        >
-                            {msg.sender !== "AGENT" && (
-                                <div
-                                    className="bot-avatar"
-                                    style={{ backgroundColor: "#1677ff" }}
-                                >
-                                    💬
-                                </div>
-                            )}
+                    {messages.map((msg, i) => {
+                        const showAvatar =
+                            msg.sender !== "AGENT" && (i === 0 || messages[i - 1].sender === "AGENT");
+
+                        return (
                             <div
-                                className={`chat-bubble ${msg.sender === "AGENT" ? "user" : "bot"
-                                    }`}
+                                key={i}
+                                className={`chatbot-message ${msg.sender === "AGENT" ? "user" : "bot"}`}
                             >
-                                {msg.content}
+                                {showAvatar && (
+                                    <div
+                                        className="bot-avatar"
+                                        style={{ backgroundColor: "#1677ff" }}
+                                    >
+                                        💬
+                                    </div>
+                                )}
+                                <div
+                                    style={{ fontSize: "15px", maxWidth: "65%" }}
+                                    className={`chat-bubble ${msg.sender === "AGENT" ? "user" : "bot"}`}
+                                >
+                                    {msg.content}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                     {loading && (
                         <div className="chatbot-message bot">
                             <div
