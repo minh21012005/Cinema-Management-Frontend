@@ -29,6 +29,9 @@ const LoginPage = () => {
             else if (res.data.user.role.name === 'STAFF') {
                 navigate("/staff");
             }
+            else if (res.data.user.role.name === 'SUPPORT') {
+                navigate("/support");
+            }
             else {
                 navigate("/");
             }

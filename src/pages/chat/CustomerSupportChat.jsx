@@ -3,6 +3,7 @@ import { Input, Button, Spin, FloatButton, message as antdMessage } from "antd";
 import { SendOutlined, CustomerServiceOutlined, CloseOutlined, ReloadOutlined, MessageOutlined } from "@ant-design/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import "@/styles/chatbot.css";
+import { createSupportMessageAPI, fetchSupportHistoryAPI } from "@/services/api.service";
 
 const { TextArea } = Input;
 
@@ -11,15 +12,11 @@ const CustomerSupportChat = () => {
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
-    const [sessionId, setSessionId] = useState(null);
-    const [userId, setUserId] = useState(null);
     const messagesEndRef = useRef(null);
     const messagesContainerRef = useRef(null);
 
     // ⏳ Lấy userId và khởi tạo lời chào
     useEffect(() => {
-        const storedUserId = localStorage.getItem("userId");
-        if (storedUserId) setUserId(storedUserId);
         setMessages([{ sender: "AGENT", content: "Xin chào 👋 Bộ phận CSKH có thể giúp gì cho bạn hôm nay?" }]);
     }, []);
 
@@ -34,13 +31,9 @@ const CustomerSupportChat = () => {
 
     // 🗄️ Load lịch sử tin nhắn khi mở
     useEffect(() => {
-        const savedSession = localStorage.getItem("supportSessionId");
-        setSessionId(savedSession);
-
         const loadHistory = async () => {
             try {
-                let res;
-                if (savedSession) res = await fetchSupportHistoryAPI(savedSession);
+                const res = await fetchSupportHistoryAPI();
                 if (res?.data?.length) {
                     setMessages(res.data);
                 } else {
@@ -50,7 +43,7 @@ const CustomerSupportChat = () => {
                 setMessages([{ sender: "AGENT", content: "Xin chào 👋 Bộ phận CSKH có thể giúp gì cho bạn hôm nay?" }]);
             }
         };
-        if (savedSession) loadHistory();
+        loadHistory();
     }, []);
 
     // ✉️ Gửi tin nhắn
@@ -62,19 +55,14 @@ const CustomerSupportChat = () => {
         setLoading(true);
 
         try {
-            let currentSession = sessionId;
-
-            // Nếu chưa có session thì tạo mới
-            if (!currentSession) {
-                const sessionRes = await createSupportSessionAPI({ userId });
-                currentSession = sessionRes.data.sessionId;
-                setSessionId(currentSession);
-                localStorage.setItem("supportSessionId", currentSession);
-            }
-
             // Gửi tin nhắn
-            const payload = { content: input, sessionId: currentSession };
-            await createSupportMessageAPI(payload);
+            const payload = { content: input };
+            const resSend = await createSupportMessageAPI(payload);
+
+            if (!resSend?.data) {
+                antdMessage.error("Không thể gửi tin nhắn, vui lòng thử lại!");
+                return;
+            }
 
             // Giả lập phản hồi tạm (nếu backend xử lý async)
             setTimeout(() => {
@@ -101,9 +89,7 @@ const CustomerSupportChat = () => {
     // 🔁 Reset session
     const handleResetSession = async () => {
         try {
-            await resetSupportSessionAPI(sessionId);
-            localStorage.removeItem("supportSessionId");
-            setSessionId(null);
+            await resetSupportSessionAPI();
             setMessages([{ sender: "AGENT", content: "Bắt đầu cuộc trò chuyện mới với CSKH 🧑‍💼" }]);
             antdMessage.success("Đã bắt đầu cuộc trò chuyện mới!");
         } catch {

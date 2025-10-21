@@ -603,6 +603,41 @@ const resetChatBotSession = () => {
     return axios.post(URL_BACKEND);
 };
 
+const fetchSupportHistoryAPI = async () => {
+    const URL = `/communication-service/api/v1/support-chat-messages/session`;
+    return axios.get(URL);
+};
+
+const createSupportMessageAPI = async (payload) => {
+    const URL = `/communication-service/api/v1/support-chat-messages/user`;
+    return axios.post(URL, payload);
+};
+
+const resetSupportSessionAPI = async (sessionId) => {
+    const URL = `/communication-service/api/v1/support-chat-sessions/${sessionId}/close`;
+    return axios.post(URL);
+};
+
+// Lấy danh sách session
+const getSupportSessionsAPI = (params) => {
+    return axios.get("/communication-service/api/v1/support-chat-sessions/status", { params });
+};
+
+// Tiếp nhận session
+const assignSupportSessionAPI = (sessionId) => {
+    return axios.post(`/communication-service/api/v1/support-chat-sessions/${sessionId}/assign`);
+};
+
+// Lấy lịch sử tin nhắn
+const getSupportMessagesAPI = (sessionId) => {
+    return axios.get(`/communication-service/api/v1/support-chat-messages/session/${sessionId}`);
+};
+
+// Gửi tin nhắn từ agent
+const sendSupportMessageAPI = (body) => {
+    return axios.post(`/communication-service/api/v1/support-chat-messages/agent`, body);
+};
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -617,5 +652,6 @@ export {
     fetchQrCode, fetchActiveCinemasAPI, registerRequestApi, verifyOtpApi, fetchShowingMoviesAPI, fetchComingSoonMoviesAPI,
     createBannerAPI, fetchAllBannerAPI, fetchAllBannersActiveAPI, updateBannerAPI, fetchMovieByIdAPI, fetchShowtimeByMovieAPI,
     bookingAPI, cancelBookingAPI, fetchRatingsByMovieAPI, createRatingAPI, chatBotAPI, fetchChatBotHistory, fetchChatBotHistoryForUser,
-    resetChatBotSession
+    resetChatBotSession, fetchSupportHistoryAPI, createSupportMessageAPI, resetSupportSessionAPI, getSupportSessionsAPI,
+    assignSupportSessionAPI, getSupportMessagesAPI, sendSupportMessageAPI
 }

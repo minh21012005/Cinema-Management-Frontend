@@ -1,6 +1,6 @@
 import {
     ApartmentOutlined,
-    BankOutlined, BarChartOutlined, DashboardOutlined, LockOutlined, SearchOutlined, SettingOutlined,
+    BankOutlined, BarChartOutlined, CustomerServiceOutlined, DashboardOutlined, LockOutlined, SearchOutlined, SettingOutlined,
     ShopOutlined, ShoppingCartOutlined, UserOutlined, VideoCameraOutlined
 } from "@ant-design/icons";
 import { Menu } from "antd";
@@ -30,6 +30,7 @@ const Sidebar = () => {
         { pattern: /^\/staff/, key: "selling" },
         { pattern: /^\/customer-lookup/, key: "customer-lookup" },
         { pattern: /^\/admin$/, key: "user" },
+        { pattern: /^\/support$/, key: "support-chat" },
         { pattern: /^\/admin\/roles/, key: "role" },
         { pattern: /^\/admin\/permissions/, key: "permission" },
     ], []);
@@ -164,6 +165,16 @@ const Sidebar = () => {
                 key: 'customer-lookup',
                 icon: <SearchOutlined />,
                 onClick: () => nav('/customer-lookup')
+            },
+        ];
+    }
+    else if (user.role.name === "SUPPORT") {
+        items = [
+            {
+                label: 'Chat Support',
+                key: 'support-chat',
+                icon: <CustomerServiceOutlined />,
+                onClick: () => nav('/support')
             },
         ];
     }

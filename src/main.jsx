@@ -32,6 +32,9 @@ import ClientLayout from './components/layout/client/ClientLayout.jsx';
 import HomePage from './pages/client/homepage.jsx';
 import SeatBooking from './pages/client/booking.jsx';
 import PrivateRouteClient from './pages/client/private.route.client.jsx';
+import PrivateRouteSupport from './pages/support/private.route.support.jsx';
+import SupportLayout from './pages/support/index.jsx';
+import ChatSessionListPage from './pages/support/chat.session.list.jsx';
 
 const router = createBrowserRouter([
   {
@@ -138,6 +141,21 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <SellTicketPage />,
+      },
+    ],
+  },
+  {
+    path: "/support",
+    element: (
+      <PrivateRouteSupport>
+        <SupportLayout />
+      </PrivateRouteSupport>
+    ),
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        index: true,
+        element: <ChatSessionListPage />,
       },
     ],
   },
