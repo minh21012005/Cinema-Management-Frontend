@@ -3,7 +3,7 @@ import { Input, Button, Spin, FloatButton, message as antdMessage, Badge } from 
 import { SendOutlined, CustomerServiceOutlined, CloseOutlined, ReloadOutlined } from "@ant-design/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import "@/styles/chatbot.css";
-import { createSupportMessageAPI, fetchSupportHistoryAPI, userMarkAsRead } from "@/services/api.service";
+import { createSupportMessageAPI, fetchSupportHistoryAPI, userMarkAsReadAPI } from "@/services/api.service";
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 
@@ -171,7 +171,7 @@ const CustomerSupportChat = () => {
                             onClick={async () => {
                                 setOpen(true);
                                 setUnreadCount(0);
-                                await userMarkAsRead();
+                                await userMarkAsReadAPI();
                             }}
                         />
                         {unreadCount > 0 && (
@@ -209,7 +209,7 @@ const CustomerSupportChat = () => {
                         exit={{ opacity: 0, scale: 0.9 }}
                         transition={{ duration: 0.3 }}
                         onClick={async () => {
-                            await userMarkAsRead();
+                            await userMarkAsReadAPI();
                         }}
                     >
                         <div className="chatbot-header" style={{ background: "linear-gradient(135deg, #fa8c16, #d46b08)" }}>

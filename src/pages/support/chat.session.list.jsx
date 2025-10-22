@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { Table, Button, Tag, Space, message, Tabs } from "antd";
+import { Table, Button, Tag, Space, message, Tabs, Badge } from "antd";
 import { MessageOutlined } from "@ant-design/icons";
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 import {
     getSupportSessionsAPI,
     assignSupportSessionAPI,
+    agentMarkAsReadAPI,
 } from "@/services/api.service";
 import SupportChatPopup from "./SupportChatPopup";
 
@@ -18,9 +19,11 @@ const ChatSessionListPage = () => {
     const [loading, setLoading] = useState(false);
     const [activeTab, setActiveTab] = useState("OPEN");
     const [activeSession, setActiveSession] = useState(null);
-    const [stompClient, setStompClient] = useState(null);
 
+    const audioRef = useRef(new Audio("/ting.mp3"));
     const stompClientRef = useRef(null);
+    const subscriptionsRef = useRef({});
+    const lastPlayTimeRef = useRef(0);
 
     useEffect(() => {
         fetchSessions();
@@ -28,17 +31,71 @@ const ChatSessionListPage = () => {
         return () => disconnectWebSocket();
     }, [activeTab]);
 
+    // Sau khi load danh sách, subscribe các session đang "ASSIGNED"
+    useEffect(() => {
+        if (!stompClientRef.current || !stompClientRef.current.connected) return;
+
+        // Hủy các subscription cũ (tránh trùng)
+        Object.values(subscriptionsRef.current).forEach(sub => sub.unsubscribe());
+        subscriptionsRef.current = {};
+
+        sessions
+            .filter(s => s.status === "ASSIGNED")
+            .forEach(session => {
+                const topic = `/topic/user/support-messages/${session.sessionId}`;
+                const sub = stompClientRef.current.subscribe(topic, (msg) => {
+                    const messageData = JSON.parse(msg.body);
+                    const { sessionId, content, sender } = messageData;
+
+                    // Nếu đang mở chat đúng phiên đó thì không tăng badge
+                    const isActive = activeSession?.sessionId === sessionId;
+
+                    const now = Date.now();
+                    const timeSinceLastPlay = now - lastPlayTimeRef.current;
+
+                    setSessions(prev => prev.map(s => {
+                        if (s.sessionId !== sessionId) return s;
+                        return {
+                            ...s,
+                            lastMessage: content,
+                            unreadCountForAgent: isActive ? 0 : (s.unreadCountForAgent || 0) + 1,
+                        };
+                    }));
+
+                    if (!isActive) {
+                        // Không phải phiên đang mở → luôn kêu
+                        audioRef.current.play().catch(() => { });
+                        lastPlayTimeRef.current = now;
+                    } else if (timeSinceLastPlay > 3000) {
+                        // Đúng phiên đang mở → chỉ kêu nếu >3s từ lần cuối
+                        audioRef.current.play().catch(() => { });
+                        lastPlayTimeRef.current = now;
+                    }
+                });
+
+                subscriptionsRef.current[session.sessionId] = sub;
+            });
+    }, [sessions, activeSession]);
+
     const fetchSessions = async () => {
         setLoading(true);
         try {
             const res = await getSupportSessionsAPI({ status: activeTab });
-            setSessions(res.data || []);
+            const data = (res.data || []).map(s => ({
+                ...s,
+                unreadCountForAgent: s.unreadCountForAgent || 0
+            }));
+            setSessions(data);
         } catch {
             message.error("Không thể tải danh sách phiên!");
         } finally {
             setLoading(false);
         }
     };
+
+    const markAsRead = async (sessionId) => {
+        await agentMarkAsReadAPI(sessionId);
+    }
 
     // 🧠 Kết nối WebSocket
     const connectWebSocket = () => {
@@ -49,7 +106,6 @@ const ChatSessionListPage = () => {
         client.connect({}, () => {
             client.subscribe("/topic/support-sessions", (msg) => {
                 const newSession = JSON.parse(msg.body);
-                // ✅ Chỉ thêm nếu đang ở tab OPEN
                 if (activeTab === "OPEN") {
                     setSessions((prev) => {
                         const exists = prev.some(s => s.sessionId === newSession.sessionId);
@@ -61,39 +117,35 @@ const ChatSessionListPage = () => {
 
             client.subscribe("/topic/support-session-updates", (msg) => {
                 const updatedSession = JSON.parse(msg.body);
-
                 setSessions((prev) => {
                     const exists = prev.find(s => s.sessionId === updatedSession.sessionId);
-                    if (!exists) return prev; // không có thì thôi
+                    if (!exists) return prev;
 
-                    // Nếu đang ở tab OPEN thì loại bỏ những phiên đã được assigned
                     if (activeTab === "OPEN" && updatedSession.status !== "OPEN") {
                         return prev.filter(s => s.sessionId !== updatedSession.sessionId);
                     }
 
-                    // Nếu đang ở tab ASSIGNED thì cập nhật hoặc thêm mới
                     if (activeTab === "ASSIGNED" && updatedSession.status === "ASSIGNED") {
                         const filtered = prev.filter(s => s.sessionId !== updatedSession.sessionId);
-                        return [updatedSession, ...filtered];
+                        return [{ ...updatedSession, unreadCountForAgent: 0 }, ...filtered];
                     }
 
-                    // Nếu đang ở tab CLOSED thì tương tự
                     if (activeTab === "CLOSED" && updatedSession.status === "CLOSED") {
                         const filtered = prev.filter(s => s.sessionId !== updatedSession.sessionId);
-                        return [updatedSession, ...filtered];
+                        return [{ ...updatedSession, unreadCountForAgent: 0 }, ...filtered];
                     }
 
                     return prev;
                 });
 
-                // Thông báo nhẹ
-                message.info(`📢 Phiên #${updatedSession.sessionId} đã được ${updatedSession.status === "ASSIGNED" ? "tiếp nhận" : "cập nhật"}!`);
+                message.info(`📢 Phiên #${updatedSession.sessionId} đã được cập nhật!`);
             });
         });
     };
 
     const disconnectWebSocket = () => {
         if (stompClientRef.current) {
+            Object.values(subscriptionsRef.current).forEach(sub => sub.unsubscribe());
             stompClientRef.current.disconnect();
         }
     };
@@ -108,7 +160,14 @@ const ChatSessionListPage = () => {
         }
     };
 
-    const handleOpenChat = (session) => setActiveSession(session);
+    const handleOpenChat = (session) => {
+        setActiveSession(session);
+        // Reset badge khi mở chat
+        markAsRead(session.sessionId);
+        setSessions(prev => prev.map(s =>
+            s.sessionId === session.sessionId ? { ...s, unreadCountForAgent: 0 } : s
+        ));
+    };
     const handleCloseChat = () => setActiveSession(null);
 
     const columns = [
@@ -144,13 +203,20 @@ const ChatSessionListPage = () => {
                         </Button>
                     )}
                     {record.status === "ASSIGNED" && (
-                        <Button
-                            icon={<MessageOutlined />}
+                        <Badge
+                            count={record.unreadCountForAgent}
                             size="small"
-                            onClick={() => handleOpenChat(record)}
+                            offset={[5, -2]}
+                            color="red"
                         >
-                            Mở chat
-                        </Button>
+                            <Button
+                                icon={<MessageOutlined />}
+                                size="small"
+                                onClick={() => handleOpenChat(record)}
+                            >
+                                Mở chat
+                            </Button>
+                        </Badge>
                     )}
                 </Space>
             ),

@@ -638,8 +638,12 @@ const sendSupportMessageAPI = (body) => {
     return axios.post(`/communication-service/api/v1/support-chat-messages/agent`, body);
 };
 
-const userMarkAsRead = () => {
+const userMarkAsReadAPI = () => {
     return axios.post(`/communication-service/api/v1/support-chat-messages/user/read`);
+}
+
+const agentMarkAsReadAPI = (sessionId) => {
+    return axios.post(`/communication-service/api/v1/support-chat-messages/agent/read`, null, { params: { sessionId } });
 }
 
 export {
@@ -657,5 +661,5 @@ export {
     createBannerAPI, fetchAllBannerAPI, fetchAllBannersActiveAPI, updateBannerAPI, fetchMovieByIdAPI, fetchShowtimeByMovieAPI,
     bookingAPI, cancelBookingAPI, fetchRatingsByMovieAPI, createRatingAPI, chatBotAPI, fetchChatBotHistory, fetchChatBotHistoryForUser,
     resetChatBotSession, fetchSupportHistoryAPI, createSupportMessageAPI, resetSupportSessionAPI, getSupportSessionsAPI,
-    assignSupportSessionAPI, getSupportMessagesAPI, sendSupportMessageAPI, userMarkAsRead
+    assignSupportSessionAPI, getSupportMessagesAPI, sendSupportMessageAPI, userMarkAsReadAPI, agentMarkAsReadAPI
 }

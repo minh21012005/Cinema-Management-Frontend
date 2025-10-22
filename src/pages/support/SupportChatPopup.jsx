@@ -9,6 +9,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import "@/styles/chatbot.css";
 import {
+    agentMarkAsReadAPI,
     getSupportMessagesAPI,
     sendSupportMessageAPI,
 } from "@/services/api.service";
@@ -92,6 +93,10 @@ const SupportChatPopup = ({ session, onClose }) => {
         }
     }, [messages]);
 
+    const markAsRead = async (sessionId) => {
+        await agentMarkAsReadAPI(sessionId);
+    }
+
     return (
         <AnimatePresence>
             <motion.div
@@ -101,6 +106,9 @@ const SupportChatPopup = ({ session, onClose }) => {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.25 }}
+                onClick={() => {
+                    markAsRead(session.sessionId);
+                }}
             >
                 {/* Header */}
                 <div
