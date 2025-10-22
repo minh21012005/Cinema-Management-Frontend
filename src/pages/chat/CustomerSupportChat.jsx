@@ -3,7 +3,7 @@ import { Input, Button, Spin, FloatButton, message as antdMessage, Badge } from 
 import { SendOutlined, CustomerServiceOutlined, CloseOutlined, ReloadOutlined } from "@ant-design/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import "@/styles/chatbot.css";
-import { createSupportMessageAPI, fetchSupportHistoryAPI } from "@/services/api.service";
+import { createSupportMessageAPI, fetchSupportHistoryAPI, userMarkAsRead } from "@/services/api.service";
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 
@@ -95,6 +95,11 @@ const CustomerSupportChat = () => {
                 if (res?.data?.length) {
                     setMessages(res.data);
                     setSessionId(res.data[0].sessionId);
+
+                    const unread = res.data.filter(
+                        msg => msg.sender === "AGENT" && msg.readAt === null
+                    ).length;
+                    setUnreadCount(unread);
                 } else {
                     setMessages([{ sender: "AGENT", content: "Xin chào 👋 Bộ phận CSKH có thể giúp gì cho bạn hôm nay?" }]);
                 }
@@ -163,9 +168,10 @@ const CustomerSupportChat = () => {
                                 boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
                                 zIndex: 1,
                             }}
-                            onClick={() => {
+                            onClick={async () => {
                                 setOpen(true);
                                 setUnreadCount(0);
+                                await userMarkAsRead();
                             }}
                         />
                         {unreadCount > 0 && (
@@ -202,6 +208,9 @@ const CustomerSupportChat = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
                         transition={{ duration: 0.3 }}
+                        onClick={async () => {
+                            await userMarkAsRead();
+                        }}
                     >
                         <div className="chatbot-header" style={{ background: "linear-gradient(135deg, #fa8c16, #d46b08)" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
