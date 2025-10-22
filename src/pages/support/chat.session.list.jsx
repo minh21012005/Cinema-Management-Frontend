@@ -58,6 +58,37 @@ const ChatSessionListPage = () => {
                     message.info(`🆕 Có khách hàng mới mở phiên hỗ trợ!`);
                 }
             });
+
+            client.subscribe("/topic/support-session-updates", (msg) => {
+                const updatedSession = JSON.parse(msg.body);
+
+                setSessions((prev) => {
+                    const exists = prev.find(s => s.sessionId === updatedSession.sessionId);
+                    if (!exists) return prev; // không có thì thôi
+
+                    // Nếu đang ở tab OPEN thì loại bỏ những phiên đã được assigned
+                    if (activeTab === "OPEN" && updatedSession.status !== "OPEN") {
+                        return prev.filter(s => s.sessionId !== updatedSession.sessionId);
+                    }
+
+                    // Nếu đang ở tab ASSIGNED thì cập nhật hoặc thêm mới
+                    if (activeTab === "ASSIGNED" && updatedSession.status === "ASSIGNED") {
+                        const filtered = prev.filter(s => s.sessionId !== updatedSession.sessionId);
+                        return [updatedSession, ...filtered];
+                    }
+
+                    // Nếu đang ở tab CLOSED thì tương tự
+                    if (activeTab === "CLOSED" && updatedSession.status === "CLOSED") {
+                        const filtered = prev.filter(s => s.sessionId !== updatedSession.sessionId);
+                        return [updatedSession, ...filtered];
+                    }
+
+                    return prev;
+                });
+
+                // Thông báo nhẹ
+                message.info(`📢 Phiên #${updatedSession.sessionId} đã được ${updatedSession.status === "ASSIGNED" ? "tiếp nhận" : "cập nhật"}!`);
+            });
         });
     };
 
