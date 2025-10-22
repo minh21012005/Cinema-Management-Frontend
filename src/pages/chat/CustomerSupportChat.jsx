@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
-import { Input, Button, Spin, FloatButton, message as antdMessage } from "antd";
+import { Input, Button, Spin, FloatButton, message as antdMessage, Badge } from "antd";
 import { SendOutlined, CustomerServiceOutlined, CloseOutlined, ReloadOutlined } from "@ant-design/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import "@/styles/chatbot.css";
@@ -16,6 +16,14 @@ const CustomerSupportChat = () => {
     const [open, setOpen] = useState(false);
     const [sessionId, setSessionId] = useState(null);
     const [connected, setConnected] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const audioRef = useRef(new Audio("/ting.mp3"));
+
+    const lastPlayRef = useRef(0);
+    const openRef = useRef(open);
+    useEffect(() => {
+        openRef.current = open;
+    }, [open]);
 
     const messagesContainerRef = useRef(null);
     const stompClientRef = useRef(null);
@@ -60,6 +68,20 @@ const CustomerSupportChat = () => {
         const sub = client.subscribe(`/topic/agent/support-messages/${sessionId}`, (msg) => {
             const newMsg = JSON.parse(msg.body);
             setMessages((prev) => [...prev, newMsg]);
+
+            if (newMsg.sender === "AGENT") {
+                const now = Date.now();
+                // Nếu chatbox đóng hoặc đã hơn 2s từ lần phát trước, phát âm thanh
+                if (!openRef.current || now - lastPlayRef.current > 2000) {
+                    audioRef.current.play().catch(() => { });
+                    lastPlayRef.current = now;
+                }
+                // Nếu chatbox đóng thì tăng unreadCount
+                if (!openRef.current) {
+                    setUnreadCount(prev => prev + 1);
+                }
+            }
+
         });
 
         return () => sub.unsubscribe();
@@ -127,20 +149,49 @@ const CustomerSupportChat = () => {
     return (
         <>
             {!open && (
-                <FloatButton
-                    icon={<CustomerServiceOutlined style={{ color: "#333" }} />}
-                    tooltip="Liên hệ CSKH"
-                    type="primary"
-                    shape="circle"
-                    className="support-float-btn"
-                    style={{
-                        right: 24,
-                        bottom: 74,
-                        backgroundColor: "#fa8c16",
-                        boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
-                    }}
-                    onClick={() => setOpen(true)}
-                />
+                <div style={{ position: "fixed", right: 24, bottom: 105, zIndex: 9999 }}>
+                    <div style={{ position: "relative", display: "inline-block" }}>
+                        <FloatButton
+                            icon={<CustomerServiceOutlined style={{ color: "#333" }} />}
+                            tooltip="Liên hệ CSKH"
+                            type="primary"
+                            shape="circle"
+                            className="support-float-btn"
+                            style={{
+                                bottom: 74,
+                                backgroundColor: "#fa8c16",
+                                boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
+                                zIndex: 1,
+                            }}
+                            onClick={() => {
+                                setOpen(true);
+                                setUnreadCount(0);
+                            }}
+                        />
+                        {unreadCount > 0 && (
+                            <div style={{
+                                position: "absolute",
+                                top: -10,
+                                right: -6,
+                                minWidth: 20,
+                                height: 20,
+                                backgroundColor: "#ff4d4f",
+                                color: "white",
+                                fontSize: 12,
+                                fontWeight: 600,
+                                borderRadius: 10,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                padding: "0 5px",
+                                zIndex: 2,
+                                boxShadow: "0 0 0 2px #fff",
+                            }}>
+                                {unreadCount > 99 ? "99+" : unreadCount}
+                            </div>
+                        )}
+                    </div>
+                </div>
             )}
 
             <AnimatePresence>

@@ -13,8 +13,8 @@ const ClientLayout = () => {
             <Header />
             <Content>
                 <Outlet />
-                <CustomerSupportChat />
                 <ChatBotComponent />
+                <CustomerSupportChat />
             </Content>
         </Layout>
     );
