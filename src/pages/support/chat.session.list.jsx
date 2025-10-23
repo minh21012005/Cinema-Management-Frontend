@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { Table, Button, Tag, Space, message, Tabs, Badge } from "antd";
-import { MessageOutlined } from "@ant-design/icons";
+import { Table, Button, Tag, Space, message, Tabs, Badge, Card } from "antd";
+import {
+    MessageOutlined,
+    ClockCircleOutlined,
+    CustomerServiceOutlined,
+    CheckCircleOutlined,
+} from "@ant-design/icons";
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 import {
@@ -32,11 +37,8 @@ const ChatSessionListPage = () => {
         return () => disconnectWebSocket();
     }, [activeTab]);
 
-    // Sau khi load danh sách, subscribe các session đang "ASSIGNED"
     useEffect(() => {
         if (!stompClientRef.current || !stompClientRef.current.connected) return;
-
-        // Hủy các subscription cũ (tránh trùng)
         Object.values(subscriptionsRef.current).forEach(sub => sub.unsubscribe());
         subscriptionsRef.current = {};
 
@@ -46,9 +48,7 @@ const ChatSessionListPage = () => {
                 const topic = `/topic/user/support-messages/${session.sessionId}`;
                 const sub = stompClientRef.current.subscribe(topic, (msg) => {
                     const messageData = JSON.parse(msg.body);
-                    const { sessionId, content, sender } = messageData;
-
-                    // Nếu đang mở chat đúng phiên đó thì không tăng badge
+                    const { sessionId, content } = messageData;
                     const isActive = activeSession?.sessionId === sessionId;
 
                     const now = Date.now();
@@ -73,7 +73,6 @@ const ChatSessionListPage = () => {
                         lastPlayTimeRef.current = now;
                     }
                 });
-
                 subscriptionsRef.current[session.sessionId] = sub;
             });
 
@@ -83,20 +82,14 @@ const ChatSessionListPage = () => {
                 const topic = `/topic/user/close/support-sessions/${session.sessionId}`;
                 const sub = stompClientRef.current.subscribe(topic, (msg) => {
                     const { sessionId, status } = JSON.parse(msg.body);
-
                     if (status === "CLOSED") {
                         message.warning(`👋 Khách hàng đã kết thúc phiên ${sessionId}.`);
-
-                        // Nếu đang mở popup đúng phiên đó → tự đóng
                         if (activeSession?.sessionId === sessionId) {
                             setActiveSession(null);
                         }
-
-                        // Cập nhật lại danh sách
                         fetchSessions();
                     }
                 });
-
                 subscriptionsRef.current[session.sessionId] = sub;
             });
     }, [sessions, activeSession]);
@@ -126,12 +119,11 @@ const ChatSessionListPage = () => {
             await agentCloseChatSessionAPI(sessionId);
             message.success("Phiên đã được kết thúc!");
             fetchSessions();
-        } catch (err) {
+        } catch {
             message.error("Không thể kết thúc phiên!");
         }
     };
 
-    // 🧠 Kết nối WebSocket
     const connectWebSocket = () => {
         const socket = new SockJS(socketUrl);
         const client = Stomp.over(socket);
@@ -171,7 +163,6 @@ const ChatSessionListPage = () => {
 
                     return prev;
                 });
-
                 message.info(`📢 Phiên #${updatedSession.sessionId} đã được cập nhật!`);
             });
         });
@@ -196,18 +187,24 @@ const ChatSessionListPage = () => {
 
     const handleOpenChat = (session) => {
         setActiveSession(session);
-        // Reset badge khi mở chat
         markAsRead(session.sessionId);
         setSessions(prev => prev.map(s =>
             s.sessionId === session.sessionId ? { ...s, unreadCountForAgent: 0 } : s
         ));
     };
+
     const handleCloseChat = () => setActiveSession(null);
 
     const columns = [
         { title: "Mã phiên", dataIndex: "sessionId", key: "sessionId" },
         { title: "Khách hàng", dataIndex: "customerName", key: "customerName" },
-        { title: "Tin nhắn cuối", dataIndex: "lastMessage", key: "lastMessage" },
+        {
+            title: "Tin nhắn cuối",
+            dataIndex: "lastMessage",
+            key: "lastMessage",
+            ellipsis: true,
+            render: (text) => text || <i style={{ color: "#999" }}>Chưa có tin nhắn</i>
+        },
         {
             title: "Trạng thái",
             dataIndex: "status",
@@ -228,31 +225,27 @@ const ChatSessionListPage = () => {
                 <Space>
                     {record.status === "OPEN" && (
                         <Button
-                            icon={<MessageOutlined />}
+                            icon={<CustomerServiceOutlined />}
                             type="primary"
                             size="small"
                             onClick={() => handleAssign(record.sessionId)}
+                            style={{ background: "linear-gradient(90deg, #fa8c16, #d46b08)", border: "none" }}
                         >
                             Tiếp nhận
                         </Button>
                     )}
                     {(record.status === "ASSIGNED" || record.status === "CLOSED") && (
-                        <Space style={{ gap: "20px" }}>
-                            <Badge
-                                count={record.unreadCountForAgent}
-                                size="small"
-                                offset={[5, -2]}
-                                color="red"
-                            >
+                        <Space style={{ gap: 25 }}>
+                            <Badge count={record.unreadCountForAgent} color="red" offset={[2, -2]}>
                                 <Button
                                     icon={<MessageOutlined />}
                                     size="small"
                                     onClick={() => handleOpenChat(record)}
+                                    style={{ backgroundColor: "#1890ff", color: "#fff", border: "none" }}
                                 >
                                     Mở chat
                                 </Button>
                             </Badge>
-
                             {record.status === "ASSIGNED" && (
                                 <Button
                                     danger
@@ -270,25 +263,38 @@ const ChatSessionListPage = () => {
     ];
 
     return (
-        <div style={{ position: "relative" }}>
-            <h2 style={{ marginBottom: 16 }}>💬 Quản lý phiên hỗ trợ</h2>
-            <Tabs
-                activeKey={activeTab}
-                onChange={(key) => setActiveTab(key)}
-                items={[
-                    { key: "OPEN", label: "Đang chờ xử lý" },
-                    { key: "ASSIGNED", label: "Đang hỗ trợ" },
-                    { key: "CLOSED", label: "Đã kết thúc" },
-                ]}
-            />
-            <Table
-                columns={columns}
-                dataSource={sessions}
-                rowKey="sessionId"
-                loading={loading}
-                bordered
-                pagination={false}
-            />
+        <div style={{ margin: "-20px" }}>
+            <Card
+                title={<><CustomerServiceOutlined /> Quản lý phiên hỗ trợ khách hàng</>}
+                style={{
+                    border: "none",
+                    boxShadow: "none",
+                    background: "transparent"
+                }}
+            >
+                <Tabs
+                    activeKey={activeTab}
+                    onChange={setActiveTab}
+                    items={[
+                        { key: "OPEN", label: <><ClockCircleOutlined /> Đang chờ xử lý</> },
+                        { key: "ASSIGNED", label: <><MessageOutlined /> Đang hỗ trợ</> },
+                        { key: "CLOSED", label: <><CheckCircleOutlined /> Đã kết thúc</> },
+                    ]}
+                />
+                <Table
+                    columns={columns}
+                    dataSource={sessions}
+                    rowKey="sessionId"
+                    loading={loading}
+                    bordered
+                    pagination={{ pageSize: 10 }}
+                    style={{
+                        background: "white",
+                        borderRadius: 12,
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                    }}
+                />
+            </Card>
 
             {activeSession && (
                 <SupportChatPopup
