@@ -3,9 +3,10 @@ import { Input, Button, Spin, FloatButton, message as antdMessage, Badge } from 
 import { SendOutlined, CustomerServiceOutlined, CloseOutlined, ReloadOutlined } from "@ant-design/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import "@/styles/chatbot.css";
-import { createSupportMessageAPI, fetchSupportHistoryAPI, userMarkAsReadAPI } from "@/services/api.service";
+import { createSupportMessageAPI, fetchSupportHistoryAPI, userCloseChatSessionAPI, userMarkAsReadAPI } from "@/services/api.service";
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
+import { useRequireLogin } from "@/utils/requireLogin";
 
 const { TextArea } = Input;
 
@@ -18,7 +19,9 @@ const CustomerSupportChat = () => {
     const [connected, setConnected] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
     const audioRef = useRef(new Audio("/ting.mp3"));
+    let userId = useRef(null);
 
+    const requireLogin = useRequireLogin();
     const lastPlayRef = useRef(0);
     const openRef = useRef(open);
     useEffect(() => {
@@ -34,29 +37,32 @@ const CustomerSupportChat = () => {
 
     // 1️⃣ Kết nối WebSocket một lần
     useEffect(() => {
-        const socket = new SockJS(socketUrl);
-        const client = Stomp.over(socket);
-        client.debug = null; // tắt log thừa
-        stompClientRef.current = client;
+        userId = localStorage.getItem("userId");
+        if (userId) {
+            const socket = new SockJS(socketUrl);
+            const client = Stomp.over(socket);
+            client.debug = null; // tắt log thừa
+            stompClientRef.current = client;
 
-        client.connect(
-            {},
-            () => {
-                console.log("✅ Connected to WebSocket");
-                setConnected(true);
-            },
-            (error) => {
-                console.error("❌ WebSocket error:", error);
-                setConnected(false);
-            }
-        );
+            client.connect(
+                {},
+                () => {
+                    console.log("✅ Connected to WebSocket");
+                    setConnected(true);
+                },
+                (error) => {
+                    console.error("❌ WebSocket error:", error);
+                    setConnected(false);
+                }
+            );
 
-        return () => {
-            if (client.connected) {
-                client.disconnect(() => console.log("🔌 Disconnected"));
-            }
-        };
-    }, []);
+            return () => {
+                if (client.connected) {
+                    client.disconnect(() => console.log("🔌 Disconnected"));
+                }
+            };
+        }
+    }, [userId]);
 
     // 2️⃣ Khi đã connected và có sessionId thì subscribe
     useEffect(() => {
@@ -87,6 +93,25 @@ const CustomerSupportChat = () => {
         return () => sub.unsubscribe();
     }, [connected, sessionId]);
 
+    // 🔔 Lắng nghe khi agent đóng phiên chat
+    useEffect(() => {
+        if (!connected || !sessionId) return;
+        const client = stompClientRef.current;
+        if (!client || !client.connected) return;
+
+        const closeSub = client.subscribe(`/topic/agent/close/support-sessions/${sessionId}`, (msg) => {
+            const { status } = JSON.parse(msg.body);
+            if (status === "CLOSED") {
+                antdMessage.warning("Phiên hỗ trợ đã kết thúc bởi nhân viên CSKH!");
+                setSessionId(null);
+                setMessages([{ sender: "AGENT", content: "Xin chào 👋 Bộ phận CSKH có thể giúp gì cho bạn hôm nay?" }]);
+            }
+        });
+
+        return () => closeSub.unsubscribe();
+    }, [connected, sessionId]);
+
+
     // 🗄️ Load lịch sử tin nhắn khi mở
     useEffect(() => {
         const loadHistory = async () => {
@@ -107,7 +132,9 @@ const CustomerSupportChat = () => {
                 setMessages([{ sender: "AGENT", content: "Xin chào 👋 Bộ phận CSKH có thể giúp gì cho bạn hôm nay?" }]);
             }
         };
-        loadHistory();
+        if (userId) {
+            loadHistory();
+        }
     }, []);
 
     // 🔄 Cuộn xuống khi có tin mới
@@ -148,6 +175,17 @@ const CustomerSupportChat = () => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             handleSend();
+        }
+    };
+
+    const handleResetSession = async () => {
+        try {
+            await userCloseChatSessionAPI();
+            setSessionId(null);
+            setMessages([{ sender: "AGENT", content: "Xin chào 👋 Bộ phận CSKH có thể giúp gì cho bạn hôm nay?" }]);
+            antdMessage.success("Đã bắt đầu cuộc trò chuyện mới!");
+        } catch {
+            antdMessage.error("Không thể reset cuộc trò chuyện!");
         }
     };
 
@@ -216,7 +254,10 @@ const CustomerSupportChat = () => {
                             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                 <CustomerServiceOutlined /> CSKH Rạp CNM
                             </div>
-                            <Button icon={<CloseOutlined />} type="text" onClick={() => setOpen(false)} />
+                            <div className="actions" style={{ display: "flex", gap: 6 }}>
+                                <Button icon={<ReloadOutlined />} type="text" onClick={handleResetSession} />
+                                <Button icon={<CloseOutlined />} type="text" onClick={() => setOpen(false)} />
+                            </div>
                         </div>
 
                         <div className="chatbot-body" ref={messagesContainerRef}>
@@ -261,7 +302,11 @@ const CustomerSupportChat = () => {
                                 type="primary"
                                 icon={<SendOutlined />}
                                 shape="circle"
-                                onClick={handleSend}
+                                onClick={() =>
+                                    requireLogin(() => {
+                                        handleSend();
+                                    })
+                                }
                                 disabled={loading}
                                 style={{ backgroundColor: "#fa8c16", borderColor: "#fa8c16" }}
                             />

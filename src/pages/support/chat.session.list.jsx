@@ -7,6 +7,7 @@ import {
     getSupportSessionsAPI,
     assignSupportSessionAPI,
     agentMarkAsReadAPI,
+    agentCloseChatSessionAPI,
 } from "@/services/api.service";
 import SupportChatPopup from "./SupportChatPopup";
 
@@ -75,6 +76,29 @@ const ChatSessionListPage = () => {
 
                 subscriptionsRef.current[session.sessionId] = sub;
             });
+
+        sessions
+            .filter(s => s.status === "ASSIGNED")
+            .forEach(session => {
+                const topic = `/topic/user/close/support-sessions/${session.sessionId}`;
+                const sub = stompClientRef.current.subscribe(topic, (msg) => {
+                    const { sessionId, status } = JSON.parse(msg.body);
+
+                    if (status === "CLOSED") {
+                        message.warning(`👋 Khách hàng đã kết thúc phiên ${sessionId}.`);
+
+                        // Nếu đang mở popup đúng phiên đó → tự đóng
+                        if (activeSession?.sessionId === sessionId) {
+                            setActiveSession(null);
+                        }
+
+                        // Cập nhật lại danh sách
+                        fetchSessions();
+                    }
+                });
+
+                subscriptionsRef.current[session.sessionId] = sub;
+            });
     }, [sessions, activeSession]);
 
     const fetchSessions = async () => {
@@ -97,6 +121,16 @@ const ChatSessionListPage = () => {
         await agentMarkAsReadAPI(sessionId);
     }
 
+    const handleCloseSession = async (sessionId) => {
+        try {
+            await agentCloseChatSessionAPI(sessionId);
+            message.success("Phiên đã được kết thúc!");
+            fetchSessions();
+        } catch (err) {
+            message.error("Không thể kết thúc phiên!");
+        }
+    };
+
     // 🧠 Kết nối WebSocket
     const connectWebSocket = () => {
         const socket = new SockJS(socketUrl);
@@ -111,8 +145,8 @@ const ChatSessionListPage = () => {
                         const exists = prev.some(s => s.sessionId === newSession.sessionId);
                         return exists ? prev : [newSession, ...prev];
                     });
-                    message.info(`🆕 Có khách hàng mới mở phiên hỗ trợ!`);
                 }
+                message.info(`🆕 Có khách hàng mới mở phiên hỗ trợ!`);
             });
 
             client.subscribe("/topic/support-session-updates", (msg) => {
@@ -202,21 +236,33 @@ const ChatSessionListPage = () => {
                             Tiếp nhận
                         </Button>
                     )}
-                    {record.status === "ASSIGNED" && (
-                        <Badge
-                            count={record.unreadCountForAgent}
-                            size="small"
-                            offset={[5, -2]}
-                            color="red"
-                        >
-                            <Button
-                                icon={<MessageOutlined />}
+                    {(record.status === "ASSIGNED" || record.status === "CLOSED") && (
+                        <Space style={{ gap: "20px" }}>
+                            <Badge
+                                count={record.unreadCountForAgent}
                                 size="small"
-                                onClick={() => handleOpenChat(record)}
+                                offset={[5, -2]}
+                                color="red"
                             >
-                                Mở chat
-                            </Button>
-                        </Badge>
+                                <Button
+                                    icon={<MessageOutlined />}
+                                    size="small"
+                                    onClick={() => handleOpenChat(record)}
+                                >
+                                    Mở chat
+                                </Button>
+                            </Badge>
+
+                            {record.status === "ASSIGNED" && (
+                                <Button
+                                    danger
+                                    size="small"
+                                    onClick={() => handleCloseSession(record.sessionId)}
+                                >
+                                    Kết thúc
+                                </Button>
+                            )}
+                        </Space>
                     )}
                 </Space>
             ),
@@ -245,7 +291,11 @@ const ChatSessionListPage = () => {
             />
 
             {activeSession && (
-                <SupportChatPopup session={activeSession} onClose={handleCloseChat} />
+                <SupportChatPopup
+                    session={activeSession}
+                    onClose={handleCloseChat}
+                    isReadOnly={activeSession.status === "CLOSED"}
+                />
             )}
         </div>
     );

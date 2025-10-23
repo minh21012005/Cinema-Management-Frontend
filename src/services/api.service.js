@@ -646,6 +646,14 @@ const agentMarkAsReadAPI = (sessionId) => {
     return axios.post(`/communication-service/api/v1/support-chat-messages/agent/read`, null, { params: { sessionId } });
 }
 
+const userCloseChatSessionAPI = () => {
+    return axios.post(`/communication-service/api/v1/support-chat-sessions/user/close`);
+}
+
+const agentCloseChatSessionAPI = (sessionId) => {
+    return axios.post(`/communication-service/api/v1/support-chat-sessions/agent/close/${sessionId}`);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -661,5 +669,6 @@ export {
     createBannerAPI, fetchAllBannerAPI, fetchAllBannersActiveAPI, updateBannerAPI, fetchMovieByIdAPI, fetchShowtimeByMovieAPI,
     bookingAPI, cancelBookingAPI, fetchRatingsByMovieAPI, createRatingAPI, chatBotAPI, fetchChatBotHistory, fetchChatBotHistoryForUser,
     resetChatBotSession, fetchSupportHistoryAPI, createSupportMessageAPI, resetSupportSessionAPI, getSupportSessionsAPI,
-    assignSupportSessionAPI, getSupportMessagesAPI, sendSupportMessageAPI, userMarkAsReadAPI, agentMarkAsReadAPI
+    assignSupportSessionAPI, getSupportMessagesAPI, sendSupportMessageAPI, userMarkAsReadAPI, agentMarkAsReadAPI, userCloseChatSessionAPI,
+    agentCloseChatSessionAPI
 }

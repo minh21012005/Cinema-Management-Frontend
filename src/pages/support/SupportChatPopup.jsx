@@ -18,7 +18,7 @@ import Stomp from "stompjs";
 
 const { TextArea } = Input;
 
-const SupportChatPopup = ({ session, onClose }) => {
+const SupportChatPopup = ({ session, onClose, isReadOnly }) => {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
@@ -181,6 +181,7 @@ const SupportChatPopup = ({ session, onClose }) => {
                     <TextArea
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
+                        disabled={isReadOnly}
                         onKeyDown={(e) => {
                             if (e.key === "Enter" && !e.shiftKey) {
                                 e.preventDefault();
@@ -196,7 +197,7 @@ const SupportChatPopup = ({ session, onClose }) => {
                         icon={<SendOutlined />}
                         shape="circle"
                         onClick={handleSend}
-                        disabled={loading}
+                        disabled={loading || isReadOnly}
                         style={{ backgroundColor: "#1677ff", borderColor: "#1677ff" }}
                     />
                 </div>
