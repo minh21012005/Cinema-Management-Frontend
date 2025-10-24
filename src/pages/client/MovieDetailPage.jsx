@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Row, Col, Select, Spin, Divider } from "antd";
 import "@/styles/movie-detail.css";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchActiveCinemasAPI, fetchMovieByIdAPI, fetchShowingMoviesAPI, fetchShowtimeByMovieAPI, getMediaUrlAPI } from "@/services/api.service";
-import SidebarNowShowing from "@/components/client/movie-detail/SidebarNowShowing";
+import { fetchActiveCinemasAPI, fetchMovieByIdAPI, fetchShowingMoviesAPI, fetchShowtimeByMovieAPI, fetchSimilarMoviesAPI, getMediaUrlAPI } from "@/services/api.service";
 import MovieInfo from "@/components/client/movie-detail/MovieInfo";
 import MovieHero from "@/components/client/movie-detail/MovieHero";
 import MovieReviewSection from "@/components/client/movie-detail/MovieReviewSection";
+import SidebarSimilarMovies from "@/components/client/movie-detail/SidebarSimilarMovies";
 
 const MovieDetailPage = () => {
 
@@ -18,7 +18,9 @@ const MovieDetailPage = () => {
     const [movie, setMovie] = useState({});
     const [poster, setPoster] = useState(null);
     const [nowShowing, setNowShowing] = useState([]);
+    const [similar, setSimilar] = useState([]);
     const [nowShowingPosters, setNowShowingPosters] = useState({});
+    const [similarPosters, setSimilarPosters] = useState({});
     const [visibleCount, setVisibleCount] = useState(3);
     const [showtimes, setShowtimes] = useState([]);
     const [cinemas, setCinemas] = useState([]);
@@ -64,6 +66,7 @@ const MovieDetailPage = () => {
             setLoading(false); // kết thúc loading
         };
         fetchData();
+        fetchSimilarMovies();
     }, [id]);
 
     useEffect(() => {
@@ -82,6 +85,22 @@ const MovieDetailPage = () => {
         const res = await fetchMovieByIdAPI(id);
         if (res?.data) {
             setMovie(res.data);
+        }
+    }
+
+    const fetchSimilarMovies = async () => {
+        const res = await fetchSimilarMoviesAPI(id);
+        if (res?.data) {
+            setSimilar(res.data);
+
+            const posters = {};
+            await Promise.all(
+                res.data.map(async (film) => {
+                    const posterRes = await getMediaUrlAPI(film.posterKey);
+                    if (posterRes?.data) posters[film.id] = posterRes.data;
+                })
+            );
+            setSimilarPosters(posters);
         }
     }
 
@@ -207,9 +226,9 @@ const MovieDetailPage = () => {
                                     movieId={movie.id} />
                             </Col>
                             <Col xs={24} lg={5}>
-                                <SidebarNowShowing
-                                    nowShowing={nowShowing}
-                                    nowShowingPosters={nowShowingPosters}
+                                <SidebarSimilarMovies
+                                    similar={similar}
+                                    similarPosters={similarPosters}
                                     visibleCount={visibleCount}
                                     onSeeMore={handleSeeMore}
                                     onClickSidebar={handleClickSidebar}

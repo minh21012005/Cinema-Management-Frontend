@@ -654,6 +654,10 @@ const agentCloseChatSessionAPI = (sessionId) => {
     return axios.post(`/communication-service/api/v1/support-chat-sessions/agent/close/${sessionId}`);
 }
 
+const fetchSimilarMoviesAPI = (movieId) => {
+    return axios.get(`/movie-service/api/v1/movies/${movieId}/similar`);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -670,5 +674,5 @@ export {
     bookingAPI, cancelBookingAPI, fetchRatingsByMovieAPI, createRatingAPI, chatBotAPI, fetchChatBotHistory, fetchChatBotHistoryForUser,
     resetChatBotSession, fetchSupportHistoryAPI, createSupportMessageAPI, resetSupportSessionAPI, getSupportSessionsAPI,
     assignSupportSessionAPI, getSupportMessagesAPI, sendSupportMessageAPI, userMarkAsReadAPI, agentMarkAsReadAPI, userCloseChatSessionAPI,
-    agentCloseChatSessionAPI
+    agentCloseChatSessionAPI, fetchSimilarMoviesAPI
 }
