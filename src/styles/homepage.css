@@ -268,3 +268,20 @@
 .banner-slide * {
     cursor: pointer !important;
 }
+
+.see-more-btn {
+    background-color: #fff;
+    border: 1.5px solid #ff761b;
+    color: #ff761b;
+    border-radius: 4px;
+    font-weight: 400;
+    padding: 20px 32px;
+    transition: all 0.4s ease;
+}
+
+.see-more-btn:hover {
+    background-color: #ff8839 !important;
+    color: white !important;
+    border-color: #ff8839 !important;
+    transform: translateY(-2px);
+}

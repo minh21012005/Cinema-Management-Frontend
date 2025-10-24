@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Row, Col, Button, Divider, Tabs, Modal } from "antd";
+import { Row, Col, Button, Divider, Tabs } from "antd";
 import "@/styles/homepage.css";
 import { fetchAllBannersActiveAPI, fetchComingSoonMoviesAPI, fetchShowingMoviesAPI } from "@/services/api.service";
 import MovieCard from "@/components/movie/movie.card";
@@ -13,6 +13,8 @@ const HomePage = () => {
     const [bannerImages, setBannerImages] = useState([]);
     const [isTrailerOpen, setIsTrailerOpen] = useState(false);
     const [currentTrailerUrl, setCurrentTrailerUrl] = useState("");
+    const [visibleNowShowing, setVisibleNowShowing] = useState(8);
+    const [visibleComingSoon, setVisibleComingSoon] = useState(8);
 
     useEffect(() => {
         fetchComingSoonMovies();
@@ -28,14 +30,14 @@ const HomePage = () => {
     }
 
     const fetchShowingMovies = async () => {
-        const res = await fetchShowingMoviesAPI(8);
+        const res = await fetchShowingMoviesAPI(20);
         if (res?.data) {
             setNowShowing(res.data);
         }
     }
 
     const fetchComingSoonMovies = async () => {
-        const res = await fetchComingSoonMoviesAPI(8);
+        const res = await fetchComingSoonMoviesAPI(20);
         if (res?.data) {
             setComingSoon(res.data);
         }
@@ -69,12 +71,28 @@ const HomePage = () => {
                             children: (
                                 <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
                                     <Row gutter={[20, 20]} justify="start">
-                                        {nowShowing.map((movie) => (
+                                        {nowShowing.slice(0, visibleNowShowing).map((movie) => (
                                             <Col xs={24} sm={12} md={12} lg={6} key={movie.id}>
                                                 <MovieCard movie={movie} onWatchTrailer={handleWatchTrailer} />
                                             </Col>
                                         ))}
                                     </Row>
+
+                                    {nowShowing.length > 8 && (
+                                        <div style={{ textAlign: "center", marginTop: 24 }}>
+                                            <Button
+                                                type="default"
+                                                className="see-more-btn"
+                                                onClick={() =>
+                                                    setVisibleNowShowing(
+                                                        visibleNowShowing === 8 ? nowShowing.length : 8
+                                                    )
+                                                }
+                                            >
+                                                {visibleNowShowing === 8 ? "Xem thêm" : "Thu gọn"}
+                                            </Button>
+                                        </div>
+                                    )}
                                 </div>
                             ),
                         },
@@ -84,15 +102,31 @@ const HomePage = () => {
                             children: (
                                 <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
                                     <Row gutter={[20, 20]} justify="start">
-                                        {comingSoon.map((movie) => (
+                                        {comingSoon.slice(0, visibleComingSoon).map((movie) => (
                                             <Col xs={24} sm={12} md={12} lg={6} key={movie.id}>
                                                 <MovieCard movie={movie} onWatchTrailer={handleWatchTrailer} />
                                             </Col>
                                         ))}
                                     </Row>
+
+                                    {comingSoon.length > 8 && (
+                                        <div style={{ textAlign: "center", marginTop: 24 }}>
+                                            <Button
+                                                type="default"
+                                                className="see-more-btn"
+                                                onClick={() =>
+                                                    setVisibleComingSoon(
+                                                        visibleComingSoon === 8 ? comingSoon.length : 8
+                                                    )
+                                                }
+                                            >
+                                                {visibleComingSoon === 8 ? "Xem thêm" : "Thu gọn"}
+                                            </Button>
+                                        </div>
+                                    )}
                                 </div>
-                            )
-                        }
+                            ),
+                        },
                     ]}
                 />
 
