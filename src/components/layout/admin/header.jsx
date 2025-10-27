@@ -20,6 +20,7 @@ const HeaderLayout = () => {
             setUser(null);
             navigate("/");
             localStorage.removeItem("access_token");
+            localStorage.removeItem("userId");
             localStorage.removeItem("chatSessionId");
             message.success("Đăng xuất thành công");
         }

@@ -658,6 +658,10 @@ const fetchSimilarMoviesAPI = (movieId) => {
     return axios.get(`/movie-service/api/v1/movies/${movieId}/similar`);
 }
 
+const fetchRecommendedMoviesAPI = () => {
+    return axios.get(`/movie-service/api/v1/movies/recommend`);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -674,5 +678,5 @@ export {
     bookingAPI, cancelBookingAPI, fetchRatingsByMovieAPI, createRatingAPI, chatBotAPI, fetchChatBotHistory, fetchChatBotHistoryForUser,
     resetChatBotSession, fetchSupportHistoryAPI, createSupportMessageAPI, resetSupportSessionAPI, getSupportSessionsAPI,
     assignSupportSessionAPI, getSupportMessagesAPI, sendSupportMessageAPI, userMarkAsReadAPI, agentMarkAsReadAPI, userCloseChatSessionAPI,
-    agentCloseChatSessionAPI, fetchSimilarMoviesAPI
+    agentCloseChatSessionAPI, fetchSimilarMoviesAPI, fetchRecommendedMoviesAPI
 }

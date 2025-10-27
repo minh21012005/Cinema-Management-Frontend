@@ -22,6 +22,8 @@
     "react-konva": "^18.2.12",
     "react-player": "^3.3.3",
     "react-router-dom": "6.23.1",
+    "react-slick": "^0.31.0",
+    "slick-carousel": "^1.8.1",
     "sockjs-client": "^1.6.1",
     "stompjs": "^2.3.3"
   },

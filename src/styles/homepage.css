@@ -285,3 +285,19 @@
     border-color: #ff8839 !important;
     transform: translateY(-2px);
 }
+
+/* Carousel arrows */
+.slick-prev:before,
+.slick-next:before {
+    color: #ff6600;
+    font-size: 28px;
+}
+
+.slick-slide {
+    padding: 15px;
+}
+
+.slick-track {
+    display: flex;
+    align-items: stretch;
+}

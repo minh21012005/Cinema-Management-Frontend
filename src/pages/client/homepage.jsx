@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Row, Col, Button, Divider, Tabs } from "antd";
+import { Divider } from "antd";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import "@/styles/homepage.css";
-import { fetchAllBannersActiveAPI, fetchComingSoonMoviesAPI, fetchShowingMoviesAPI } from "@/services/api.service";
-import MovieCard from "@/components/movie/movie.card";
+import { fetchAllBannersActiveAPI, fetchComingSoonMoviesAPI, fetchRecommendedMoviesAPI, fetchShowingMoviesAPI } from "@/services/api.service";
 import BannerSection from "@/components/banner/banner.section";
 import TrailerModal from "../../components/client/movie-detail/trailer.modal";
+import Footer from "@/components/layout/client/footer";
+import RecommendSection from "@/components/recommend/recommend.section";
+import MovieTabsSection from "@/components/movie/movie.tabs.section";
 
 const HomePage = () => {
 
@@ -13,14 +17,21 @@ const HomePage = () => {
     const [bannerImages, setBannerImages] = useState([]);
     const [isTrailerOpen, setIsTrailerOpen] = useState(false);
     const [currentTrailerUrl, setCurrentTrailerUrl] = useState("");
-    const [visibleNowShowing, setVisibleNowShowing] = useState(8);
-    const [visibleComingSoon, setVisibleComingSoon] = useState(8);
+    const [recommendedMovies, setRecommendedMovies] = useState([]);
 
     useEffect(() => {
         fetchComingSoonMovies();
         fetchShowingMovies();
         fetchBanners();
+        fetchRecommendedMovies();
     }, []);
+
+    const fetchRecommendedMovies = async () => {
+        const res = await fetchRecommendedMoviesAPI();
+        if (res?.data) {
+            setRecommendedMovies(res.data);
+        }
+    };
 
     const fetchBanners = async () => {
         const res = await fetchAllBannersActiveAPI();
@@ -58,76 +69,15 @@ const HomePage = () => {
                     <BannerSection banners={bannerImages} />
                 </div>
 
-                {/* 🎞️ Tabs for movies */}
-                <Divider orientation="left" className="section-title">Phim</Divider>
+                <MovieTabsSection
+                    nowShowing={nowShowing}
+                    comingSoon={comingSoon}
+                    onWatchTrailer={handleWatchTrailer}
+                />
 
-                <Tabs
-                    defaultActiveKey="1"
-                    centered
-                    items={[
-                        {
-                            key: "1",
-                            label: "Đang Chiếu",
-                            children: (
-                                <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-                                    <Row gutter={[20, 20]} justify="start">
-                                        {nowShowing.slice(0, visibleNowShowing).map((movie) => (
-                                            <Col xs={24} sm={12} md={12} lg={6} key={movie.id}>
-                                                <MovieCard movie={movie} onWatchTrailer={handleWatchTrailer} />
-                                            </Col>
-                                        ))}
-                                    </Row>
-
-                                    {nowShowing.length > 8 && (
-                                        <div style={{ textAlign: "center", marginTop: 24 }}>
-                                            <Button
-                                                type="default"
-                                                className="see-more-btn"
-                                                onClick={() =>
-                                                    setVisibleNowShowing(
-                                                        visibleNowShowing === 8 ? nowShowing.length : 8
-                                                    )
-                                                }
-                                            >
-                                                {visibleNowShowing === 8 ? "Xem thêm" : "Thu gọn"}
-                                            </Button>
-                                        </div>
-                                    )}
-                                </div>
-                            ),
-                        },
-                        {
-                            key: "2",
-                            label: "Sắp Chiếu",
-                            children: (
-                                <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-                                    <Row gutter={[20, 20]} justify="start">
-                                        {comingSoon.slice(0, visibleComingSoon).map((movie) => (
-                                            <Col xs={24} sm={12} md={12} lg={6} key={movie.id}>
-                                                <MovieCard movie={movie} onWatchTrailer={handleWatchTrailer} />
-                                            </Col>
-                                        ))}
-                                    </Row>
-
-                                    {comingSoon.length > 8 && (
-                                        <div style={{ textAlign: "center", marginTop: 24 }}>
-                                            <Button
-                                                type="default"
-                                                className="see-more-btn"
-                                                onClick={() =>
-                                                    setVisibleComingSoon(
-                                                        visibleComingSoon === 8 ? comingSoon.length : 8
-                                                    )
-                                                }
-                                            >
-                                                {visibleComingSoon === 8 ? "Xem thêm" : "Thu gọn"}
-                                            </Button>
-                                        </div>
-                                    )}
-                                </div>
-                            ),
-                        },
-                    ]}
+                <RecommendSection
+                    recommendedMovies={recommendedMovies}
+                    onWatchTrailer={handleWatchTrailer}
                 />
 
                 {/* ✅ Modal Trailer */}
@@ -139,11 +89,7 @@ const HomePage = () => {
 
                 {/* Footer */}
                 <Divider />
-                <div className="footer-section">
-                    <h2>Tham gia thành viên</h2>
-                    <p>Nhận ưu đãi, giảm giá, và vé sớm dành riêng cho bạn!</p>
-                    <Button type="primary" size="large" className="footer-btn">Đăng ký ngay</Button>
-                </div>
+                <Footer />
             </div>
         </>
     );
