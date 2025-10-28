@@ -662,6 +662,38 @@ const fetchRecommendedMoviesAPI = () => {
     return axios.get(`/movie-service/api/v1/movies/recommend`);
 }
 
+const getDailyRevenueAPI = () => {
+    return axios.get(`/booking-service/api/v1/orders/revenue/today`);
+}
+
+const getMonthlyRevenueAPI = () => {
+    return axios.get(`/booking-service/api/v1/orders/revenue/this-month`);
+}
+
+const getTicketsSoldTodayAPI = () => {
+    return axios.get(`/booking-service/api/v1/tickets/sold/today`);
+}
+
+const getActiveShowtimesAPI = () => {
+    return axios.get(`/cinema-service/api/v1/showtime/active`);
+}
+
+const getNowShowingMovieAPI = () => {
+    return axios.get(`/cinema-service/api/v1/showtime/now-showing`);
+}
+
+const getAverageRatingAPI = () => {
+    return axios.get(`/movie-service/api/v1/ratings/average`);
+}
+
+const getNewUsersAPI = () => {
+    return axios.get(`/user-service/api/v1/users/new-users`);
+}
+
+const getOccupancyRateAPI = () => {
+    return axios.get(`/booking-service/api/v1/tickets/occupancy-rate`);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -678,5 +710,6 @@ export {
     bookingAPI, cancelBookingAPI, fetchRatingsByMovieAPI, createRatingAPI, chatBotAPI, fetchChatBotHistory, fetchChatBotHistoryForUser,
     resetChatBotSession, fetchSupportHistoryAPI, createSupportMessageAPI, resetSupportSessionAPI, getSupportSessionsAPI,
     assignSupportSessionAPI, getSupportMessagesAPI, sendSupportMessageAPI, userMarkAsReadAPI, agentMarkAsReadAPI, userCloseChatSessionAPI,
-    agentCloseChatSessionAPI, fetchSimilarMoviesAPI, fetchRecommendedMoviesAPI
+    agentCloseChatSessionAPI, fetchSimilarMoviesAPI, fetchRecommendedMoviesAPI, getDailyRevenueAPI, getMonthlyRevenueAPI,
+    getTicketsSoldTodayAPI, getActiveShowtimesAPI, getNowShowingMovieAPI, getAverageRatingAPI, getNewUsersAPI, getOccupancyRateAPI
 }
