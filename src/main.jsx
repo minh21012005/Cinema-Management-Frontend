@@ -35,6 +35,7 @@ import PrivateRouteClient from './pages/client/private.route.client.jsx';
 import PrivateRouteSupport from './pages/support/private.route.support.jsx';
 import SupportLayout from './pages/support/index.jsx';
 import ChatSessionListPage from './pages/support/chat.session.list.jsx';
+import DashboardPage from './pages/manager/dashboard/DashboardPage.jsx';
 
 const router = createBrowserRouter([
   {
@@ -93,7 +94,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <CinemaListPage />,
+        element: <DashboardPage />,
       },
       {
         path: "cinemas/:id/rooms",
@@ -126,6 +127,10 @@ const router = createBrowserRouter([
       {
         path: "banners",
         element: <BannerListPage />,
+      },
+      {
+        path: "cinemas",
+        element: <CinemaListPage />,
       },
     ],
   },

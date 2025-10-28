@@ -1,7 +1,6 @@
 import {
-    ApartmentOutlined,
-    BankOutlined, BarChartOutlined, CustomerServiceOutlined, DashboardOutlined, LockOutlined, SearchOutlined, SettingOutlined,
-    ShopOutlined, ShoppingCartOutlined, UserOutlined, VideoCameraOutlined
+    ApartmentOutlined, BankOutlined, CustomerServiceOutlined, DashboardOutlined, LockOutlined,
+    SearchOutlined, SettingOutlined, ShopOutlined, ShoppingCartOutlined, UserOutlined, VideoCameraOutlined
 } from "@ant-design/icons";
 import { Menu } from "antd";
 import { useContext, useMemo } from "react";
@@ -16,17 +15,16 @@ const Sidebar = () => {
 
     // Map URL -> key (dùng regex để match cả sub-path)
     const pathToKey = useMemo(() => [
-        { pattern: /^\/manager$/, key: "cinema-management" },
+        { pattern: /^\/manager$/, key: "dashboard" },
         { pattern: /^\/manager\/cinemas/, key: "cinema-management" },
         { pattern: /^\/manager\/movies/, key: "movie" },
         { pattern: /^\/manager\/rating/, key: "rating" },
         { pattern: /^\/manager\/foods/, key: "food" },
         { pattern: /^\/manager\/combo/, key: "combo" },
         { pattern: /^\/manager\/banners/, key: "banner" },
-        { pattern: /^\/manager\/ticket-report/, key: "ticket-report" },
-        { pattern: /^\/manager\/food-report/, key: "food-report" },
         { pattern: /^\/manager\/staff/, key: "staff" },
         { pattern: /^\/manager\/settings/, key: "settings" },
+        { pattern: /^\/manager\/dashboard/, key: "cinema-management" },
         { pattern: /^\/staff/, key: "selling" },
         { pattern: /^\/customer-lookup/, key: "customer-lookup" },
         { pattern: /^\/admin$/, key: "user" },
@@ -62,10 +60,16 @@ const Sidebar = () => {
     } else if (user.role.name === "MANAGER") {
         items = [
             {
+                label: 'Dashboard',
+                key: 'dashboard',
+                icon: <DashboardOutlined />,
+                onClick: () => nav('/manager')
+            },
+            {
                 label: 'Cinema Management',
                 key: 'cinema-management',
                 icon: <BankOutlined />,
-                onClick: () => nav('/manager')
+                onClick: () => nav('/manager/cinemas')
             },
             {
                 label: 'Movie Management',
@@ -111,21 +115,6 @@ const Sidebar = () => {
                         ]
                     }
                 ]
-            },
-            {
-                label: 'Reports',
-                key: 'reports',
-                icon: <BarChartOutlined />,
-                children: [
-                    {
-                        type: 'group',
-                        label: 'Revenue Reports',
-                        children: [
-                            { label: 'Ticket Report', key: 'ticket-report', onClick: () => nav('/manager/ticket-report') },
-                            { label: 'Food Report', key: 'food-report', onClick: () => nav('/manager/food-report') },
-                        ],
-                    },
-                ],
             },
             {
                 label: 'Staff Management',

@@ -1,0 +1,45 @@
+.dashboard-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-subtitle {
+    color: #8c8c8c;
+    font-size: 15px;
+    margin-top: 4px;
+}
+
+/* Các khối chart bằng nhau */
+.equal-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.equal-card .ant-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+/* Recharts chiếm full chiều cao card */
+.equal-card .recharts-responsive-container {
+    flex: 1;
+}
+
+/* Table & Card style tinh tế */
+.ant-card-head-title {
+    font-weight: 600;
+}
+
+.ant-divider-inner-text {
+    font-weight: 600;
+}
+
+.ant-table {
+    border-radius: 12px;
+}
