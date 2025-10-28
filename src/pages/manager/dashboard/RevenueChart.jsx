@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card } from "antd";
 import {
     LineChart,
@@ -12,17 +12,31 @@ import {
     ReferenceLine,
 } from "recharts";
 import { LineChartOutlined } from "@ant-design/icons";
-
-const data = [
-    { month: "Jan", revenue: 55000000, tickets: 820 },
-    { month: "Feb", revenue: 72000000, tickets: 960 },
-    { month: "Mar", revenue: 85000000, tickets: 1010 },
-    { month: "Apr", revenue: 91000000, tickets: 1120 },
-    { month: "May", revenue: 100000000, tickets: 1180 },
-    { month: "Jun", revenue: 115000000, tickets: 1320 },
-];
+import { getMonthRevenueAPI } from "@/services/api.service";
 
 const RevenueChart = () => {
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        fetchChartData();
+    }, []);
+
+    const fetchChartData = async () => {
+        try {
+            const res = await getMonthRevenueAPI(); // gọi API backend
+            if (res.data) {
+                const chartData = res.data.map(item => ({
+                    month: new Date(2025, item.month - 1).toLocaleString('default', { month: 'short' }),
+                    revenue: item.revenue,
+                    tickets: item.tickets,
+                }));
+                setData(chartData);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     return (
         <Card
             bordered={false}
@@ -46,7 +60,7 @@ const RevenueChart = () => {
                     }}
                 >
                     <LineChartOutlined style={{ color: "#1677ff" }} />
-                    Doanh thu & Vé bán theo tháng
+                    Doanh thu & Vé bán quý hiện tại
                 </div>
             }
         >
