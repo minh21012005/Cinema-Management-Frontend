@@ -706,6 +706,10 @@ const getMovieGenresDistributionAPI = () => {
     return axios.get(`/movie-service/api/v1/movies/genres-distribution`);
 }
 
+const getTopCustomersAPI = () => {
+    return axios.get(`/booking-service/api/v1/orders/top-customers`);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -724,5 +728,5 @@ export {
     assignSupportSessionAPI, getSupportMessagesAPI, sendSupportMessageAPI, userMarkAsReadAPI, agentMarkAsReadAPI, userCloseChatSessionAPI,
     agentCloseChatSessionAPI, fetchSimilarMoviesAPI, fetchRecommendedMoviesAPI, getDailyRevenueAPI, getMonthlyRevenueAPI,
     getTicketsSoldTodayAPI, getActiveShowtimesAPI, getNowShowingMovieAPI, getAverageRatingAPI, getNewUsersAPI, getOccupancyRateAPI,
-    getMonthRevenueAPI, getTopMoviesCurrentQuarterAPI, getMovieGenresDistributionAPI
+    getMonthRevenueAPI, getTopMoviesCurrentQuarterAPI, getMovieGenresDistributionAPI, getTopCustomersAPI
 }
