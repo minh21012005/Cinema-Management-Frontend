@@ -1,5 +1,5 @@
-import React from "react";
-import { Card, Typography } from "antd";
+import React, { useEffect, useState } from "react";
+import { Card } from "antd";
 import {
     BarChart,
     Bar,
@@ -12,21 +12,24 @@ import {
     Cell,
 } from "recharts";
 import { PlaySquareOutlined } from "@ant-design/icons";
-
-const { Text } = Typography;
-
-const data = [
-    { title: "Inside Out 2", revenue: 150000000 },
-    { title: "Dune: Part Two", revenue: 120000000 },
-    { title: "Deadpool & Wolverine", revenue: 132000000 },
-    { title: "Kung Fu Panda 4", revenue: 83000000 },
-    { title: "Godzilla x Kong", revenue: 78000000 },
-    { title: "Despicable Me 4", revenue: 69000000 },
-];
+import { getTopMoviesCurrentQuarterAPI } from "@/services/api.service";
 
 const COLORS = ["#722ED1", "#9254DE", "#B37FEB", "#1890FF", "#36CFC9", "#13C2C2"];
 
 const TopMoviesChart = () => {
+
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        fetchTopMovies();
+    }, []);
+
+    const fetchTopMovies = async () => {
+        const res = await getTopMoviesCurrentQuarterAPI();
+        if (res && res.data) {
+            setData(res.data);
+        }
+    }
     return (
         <Card
             bordered={false}
@@ -50,7 +53,7 @@ const TopMoviesChart = () => {
                     }}
                 >
                     <PlaySquareOutlined style={{ color: "#722ED1" }} />
-                    Top phim doanh thu cao nhất
+                    Top phim doanh thu cao nhất trong quý
                 </div>
             }
         >
@@ -58,7 +61,7 @@ const TopMoviesChart = () => {
                 <BarChart
                     data={data}
                     layout="vertical"
-                    margin={{ top: 10, right: 40, left: 80, bottom: 10 }}
+                    margin={{ top: 10, right: 40, bottom: 10 }}
                 >
                     <defs>
                         <linearGradient id="barGradient" x1="0" y1="0" x2="1" y2="0">
@@ -84,7 +87,7 @@ const TopMoviesChart = () => {
                     <YAxis
                         dataKey="title"
                         type="category"
-                        width={140}
+                        width={160}
                         axisLine={false}
                         tickLine={false}
                         tick={{ fill: "#444", fontWeight: 500, fontSize: 13 }}

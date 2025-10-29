@@ -60,7 +60,7 @@ const RevenueChart = () => {
                     }}
                 >
                     <LineChartOutlined style={{ color: "#1677ff" }} />
-                    Doanh thu & Vé bán quý hiện tại
+                    Doanh thu & Vé bán trong quý
                 </div>
             }
         >
