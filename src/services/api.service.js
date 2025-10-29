@@ -714,6 +714,12 @@ const getRecentTransactionsAPI = () => {
     return axios.get(`/booking-service/api/v1/orders/today`);
 }
 
+const importShowtimeAPI = (formData) => {
+    return axios.post("/cinema-service/api/v1/showtime/import", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+};
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -732,5 +738,6 @@ export {
     assignSupportSessionAPI, getSupportMessagesAPI, sendSupportMessageAPI, userMarkAsReadAPI, agentMarkAsReadAPI, userCloseChatSessionAPI,
     agentCloseChatSessionAPI, fetchSimilarMoviesAPI, fetchRecommendedMoviesAPI, getDailyRevenueAPI, getMonthlyRevenueAPI,
     getTicketsSoldTodayAPI, getActiveShowtimesAPI, getNowShowingMovieAPI, getAverageRatingAPI, getNewUsersAPI, getOccupancyRateAPI,
-    getMonthRevenueAPI, getTopMoviesCurrentQuarterAPI, getMovieGenresDistributionAPI, getTopCustomersAPI, getRecentTransactionsAPI
+    getMonthRevenueAPI, getTopMoviesCurrentQuarterAPI, getMovieGenresDistributionAPI, getTopCustomersAPI, getRecentTransactionsAPI,
+    importShowtimeAPI
 }

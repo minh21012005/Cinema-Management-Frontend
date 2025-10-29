@@ -1,7 +1,8 @@
 import ShowtimeModalCreate from "@/components/showtime/showtime.modal.create";
 import ShowTimeTable from "@/components/showtime/showtime.table";
-import { fetchActiveMovies, fetchRoomByCinemaAPI, fetchShowtimeByCinemaAPI, findCinemaByIdAPI } from "@/services/api.service";
-import { Button, DatePicker, Input, Select } from "antd";
+import { fetchActiveMovies, fetchRoomByCinemaAPI, fetchShowtimeByCinemaAPI, findCinemaByIdAPI, importShowtimeAPI } from "@/services/api.service";
+import { UploadOutlined } from "@ant-design/icons";
+import { Button, DatePicker, Input, message, notification, Select } from "antd";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 const { Search } = Input;
@@ -87,6 +88,33 @@ const ShowTimeListPage = () => {
         setIsModalOpen(true);
     }
 
+    const handleImportFile = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const res = await importShowtimeAPI(formData); // gọi API backend
+            if (res.data) {
+                notification.success({
+                    message: "Success",
+                    description: "Import file thành công!"
+                });
+                fetchShowtimeByCinema();
+            } else {
+                notification.error({
+                    message: "Failed",
+                    description: JSON.stringify(res.message)
+                });
+            }
+        } catch (error) {
+            message.error("Import thất bại: " + error.message);
+        }
+        e.target.value = null;
+    };
+
     return (
         <>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
@@ -130,10 +158,25 @@ const ShowTimeListPage = () => {
                         onChange={(values) => setDateRange(values)}
                     />
                 </div>
-
-                <Button type="primary" onClick={showModal}>
-                    Create Showtime
-                </Button>
+                <span style={{ display: "flex", gap: "10px" }}>
+                    <Button
+                        type="default"
+                        icon={<UploadOutlined />}
+                        onClick={() => document.getElementById("import-input").click()}
+                    >
+                        Import Excel
+                    </Button>
+                    <input
+                        type="file"
+                        id="import-input"
+                        accept=".xlsx,.xls"
+                        style={{ display: "none" }}
+                        onChange={handleImportFile}
+                    />
+                    <Button type="primary" onClick={showModal}>
+                        Create Showtime
+                    </Button>
+                </span>
             </div>
             <ShowTimeTable
                 dataShowtime={dataShowtime}
