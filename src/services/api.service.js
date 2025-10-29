@@ -710,6 +710,10 @@ const getTopCustomersAPI = () => {
     return axios.get(`/booking-service/api/v1/orders/top-customers`);
 }
 
+const getRecentTransactionsAPI = () => {
+    return axios.get(`/booking-service/api/v1/orders/today`);
+}
+
 export {
     loginApi, registerUserApi, getAccountApi, refreshTokenApi, fetchAllUserAPI, changeUserStatusAPI,
     fetchUser, logoutApi, createUserApi, fetchCinemaAPI, fetchAllRoleAPI, createCinemaApi, changeCinemaStatusAPI,
@@ -728,5 +732,5 @@ export {
     assignSupportSessionAPI, getSupportMessagesAPI, sendSupportMessageAPI, userMarkAsReadAPI, agentMarkAsReadAPI, userCloseChatSessionAPI,
     agentCloseChatSessionAPI, fetchSimilarMoviesAPI, fetchRecommendedMoviesAPI, getDailyRevenueAPI, getMonthlyRevenueAPI,
     getTicketsSoldTodayAPI, getActiveShowtimesAPI, getNowShowingMovieAPI, getAverageRatingAPI, getNewUsersAPI, getOccupancyRateAPI,
-    getMonthRevenueAPI, getTopMoviesCurrentQuarterAPI, getMovieGenresDistributionAPI, getTopCustomersAPI
+    getMonthRevenueAPI, getTopMoviesCurrentQuarterAPI, getMovieGenresDistributionAPI, getTopCustomersAPI, getRecentTransactionsAPI
 }
