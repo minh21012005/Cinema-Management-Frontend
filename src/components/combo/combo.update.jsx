@@ -25,7 +25,6 @@ const ComboUpdateModal = (props) => {
                 imageKey: comboSelected.imageKey,
                 available: comboSelected.available
             });
-            console.log("comboSelected", comboSelected);
             setImageKey(comboSelected.imageKey || null);
             fetchUrl(comboSelected.imageKey || null);
         }

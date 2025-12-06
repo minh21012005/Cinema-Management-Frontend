@@ -102,7 +102,6 @@ const UserPage = () => {
     }
 
     const handleChange = value => {
-        console.log(`selected ${value}`);
         if (value) {
             setRoleSelected(value);
         } else {

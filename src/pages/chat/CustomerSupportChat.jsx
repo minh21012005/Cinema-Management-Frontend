@@ -47,7 +47,6 @@ const CustomerSupportChat = () => {
             client.connect(
                 {},
                 () => {
-                    console.log("✅ Connected to WebSocket");
                     setConnected(true);
                 },
                 (error) => {

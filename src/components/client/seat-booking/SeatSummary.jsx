@@ -154,13 +154,6 @@ const SeatSummary = ({ selectedSeats, setSelectedSeats, total, showtime, movie, 
                             return;
                         }
                         handleSepayPayment();
-                        console.log("Proceed booking:", {
-                            showtime,
-                            movie,
-                            seats: selectedSeats,
-                            foods: selectedItems,
-                            total,
-                        });
                     }}
                 >
                     Tiếp tục

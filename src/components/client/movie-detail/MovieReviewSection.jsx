@@ -45,7 +45,6 @@ const MovieReviewSection = ({ fetchMovie, movieId }) => {
             }
             try {
                 const res = await createRatingAPI(movieId, rating, comment);
-                console.log(res)
                 if (res?.data) {
                     message.success("Cảm ơn bạn đã đánh giá!");
                     setRating(0);

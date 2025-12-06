@@ -17,7 +17,6 @@ const MovieCard = ({ movie, onWatchTrailer }) => {
     }, [movie.posterKey]);
 
     const handleBooking = () => {
-        console.log(movie)
         navigate(`/booking/${movie.id}`);
     };
 

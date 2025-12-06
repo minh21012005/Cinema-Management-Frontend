@@ -1,68 +1,50 @@
-import { useEffect, useContext } from "react";
+import { useEffect, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { message } from "antd";
+import { message, Spin } from "antd";
 import { AuthContext } from "../components/context/auth.context";
+import { refreshTokenApi } from "@/services/api.service";
 
 const SocialLogin = () => {
     const navigate = useNavigate();
     const { setUser } = useContext(AuthContext);
 
     useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-
-        const accessToken = params.get("access_token");
-        const userJson = params.get("user");
-
-        // Nếu BE không trả userJson thì fail luôn
-        if (!accessToken || !userJson) {
-            message.error("Không thể đăng nhập bằng mạng xã hội!");
-            navigate("/login");
-            return;
-        }
-
-        let user = null;
-        try {
-            user = JSON.parse(decodeURIComponent(userJson));
-        } catch (err) {
-            console.error("Lỗi parse user JSON:", err);
-            message.error("Lỗi dữ liệu trả về từ server!");
-            navigate("/login");
-            return;
-        }
-
-        // Clear session cũ
-        localStorage.removeItem("chatSessionId");
-
-        // Lưu token + userId
-        localStorage.setItem("access_token", accessToken);
-        localStorage.setItem("userId", user.id);
-
-        // Set user vào context
-        setUser(user);
-
-        message.success("Đăng nhập thành công!");
-
-        // Điều hướng theo role
-        switch (user.role?.name) {
-            case "ADMIN":
-                navigate("/admin");
-                break;
-            case "MANAGER":
-                navigate("/manager");
-                break;
-            case "STAFF":
-                navigate("/staff");
-                break;
-            case "SUPPORT":
-                navigate("/support");
-                break;
-            default:
-                navigate("/");
-        }
-
+        getData();
     }, []);
 
-    return <>Đang xử lý đăng nhập...</>;
+    const getData = async () => {
+        const res = await refreshTokenApi();
+        if (res.data) {
+            message.success("Đăng nhập thành công");
+            localStorage.removeItem("chatSessionId");
+            localStorage.setItem("access_token", res.data.access_token);
+            localStorage.setItem("userId", res.data.user.id);
+            setUser(res.data.user);
+            if (res.data.user.role.name === 'ADMIN') {
+                navigate("/admin");
+            } else if (res.data.user.role.name === 'MANAGER') {
+                navigate("/manager");
+            }
+            else if (res.data.user.role.name === 'STAFF') {
+                navigate("/staff");
+            }
+            else if (res.data.user.role.name === 'SUPPORT') {
+                navigate("/support");
+            }
+            else {
+                navigate("/");
+            }
+        } else {
+            message.error("Đăng nhập không thành công");
+            navigate("/login");
+        }
+    };
+
+    return (
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+            <Spin size="large" />
+        </div >
+    );
 };
 
 export default SocialLogin;

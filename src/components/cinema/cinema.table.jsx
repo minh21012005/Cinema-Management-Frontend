@@ -82,7 +82,6 @@ const CinemaTable = (props) => {
     ];
 
     const changeStatus = async (id) => {
-        console.log(id)
         try {
             await changeCinemaStatusAPI(id);
             loadCinema(); // reload user data after changing status

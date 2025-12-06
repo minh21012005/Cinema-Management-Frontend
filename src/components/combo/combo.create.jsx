@@ -43,7 +43,6 @@ const ComboCreateModal = (props) => {
     }, [imageKey]);
 
     const onFinish = async (values) => {
-        console.log("Received values:", values);
         const resCommit = await commitFileAPI(values.imageKey, "combos");
         if (resCommit.data) {
             let newKey = resCommit.data;
