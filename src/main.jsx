@@ -36,6 +36,7 @@ import PrivateRouteSupport from './pages/support/private.route.support.jsx';
 import SupportLayout from './pages/support/index.jsx';
 import ChatSessionListPage from './pages/support/chat.session.list.jsx';
 import DashboardPage from './pages/manager/dashboard/DashboardPage.jsx';
+import SocialLogin from './pages/login.social.jsx';
 
 const router = createBrowserRouter([
   {
@@ -175,6 +176,10 @@ const router = createBrowserRouter([
   {
     path: "/verify-otp",
     element: <VerifyOtpPage />,
+  },
+  {
+    path: "/social-login",
+    element: <SocialLogin />,
   },
   {
     path: "/404",

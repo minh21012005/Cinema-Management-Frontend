@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
-import { Button, Checkbox, Col, Divider, Form, Input, message, notification, Row } from 'antd';
+import { Button, Col, Divider, Form, Input, message, notification, Row } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRightOutlined } from '@ant-design/icons';
+import { ArrowRightOutlined, FacebookFilled, GoogleOutlined } from '@ant-design/icons';
 import { loginApi } from '../services/api.service';
 import { AuthContext } from '../components/context/auth.context';
 
@@ -44,9 +44,14 @@ const LoginPage = () => {
         setLoading(false);
     };
 
+    const loginWithFacebookOrGoogle = async (provider) => {
+        const baseURL = import.meta.env.VITE_BACKEND_URL;
+        window.location.href = baseURL + `/auth-service/oauth2/authorization/${provider}`;
+    };
+
     return (
         <div style={{
-            height: "80vh",
+            height: "90vh",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
@@ -108,6 +113,44 @@ const LoginPage = () => {
                                 </div>
                             </Form.Item>
                         </Form>
+                        <Divider>Hoặc đăng nhập với</Divider>
+
+                        <div style={{
+                            display: "flex",
+                            gap: "10px",
+                            justifyContent: "space-between"
+                        }}>
+                            <Button
+                                style={{
+                                    flex: 1,
+                                    background: "#DB4437",
+                                    color: "#fff",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center"
+                                }}
+                                onClick={() => { loginWithFacebookOrGoogle('google') }}
+                            >
+                                <GoogleOutlined />
+                                Google
+                            </Button>
+
+                            <Button
+                                style={{
+                                    flex: 1,
+                                    background: "#1877F2",
+                                    color: "#fff",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center"
+                                }}
+                                onClick={() => { loginWithFacebookOrGoogle('facebook') }}
+                            >
+                                <FacebookFilled />
+                                Facebook
+                            </Button>
+                        </div>
+
                         <Divider />
                         <div style={{ textAlign: "center" }}>
                             Chưa có tài khoản? <Link to={"/register"}>Đăng ký tại đây</Link>
